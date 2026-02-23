@@ -134,212 +134,149 @@
   tryOnMounted(() => {
     fetchRoutePlanning();
   });
-
-  const SCRIPT_END = '</' + 'script>';
-  const SCRIPT_START = '<' + 'script setup lang="ts">';
-
-  const codeExample = `${SCRIPT_START}
-import { VMap, VMarker, VLayerMaplibreRoute } from '@geoql/v-maplibre';
-
-const start = { coordinates: [4.4777, 51.9244] }; // Rotterdam
-const end = { coordinates: [4.9041, 52.3676] };   // Amsterdam
-
-// Fetch routes with alternatives from Valhalla API
-const params = {
-  locations: [
-    { lat: start.coordinates[1], lon: start.coordinates[0], type: 'break' },
-    { lat: end.coordinates[1], lon: end.coordinates[0], type: 'break' },
-  ],
-  costing: 'auto',
-  alternates: 2,
-};
-const response = await fetch(\`/api/valhalla?json=\${encodeURIComponent(JSON.stringify(params))}\`);
-const data = await response.json();
-
-// Parse main route + alternates
-const routes = [data.trip, ...(data.alternates?.map(a => a.trip) || [])].map(trip => ({
-  coordinates: decodePolyline(trip.legs[0].shape),
-  duration: trip.summary.time,
-  distance: trip.summary.length * 1000,
-}));
-
-const selectedRoute = ref(0);
-${SCRIPT_END}
-
-<template>
-  <VMap :options="mapOptions" class="h-[500px] w-full rounded-lg">
-    <!-- Alternative routes (gray, behind) -->
-    <VLayerMaplibreRoute
-      v-for="(route, i) in routes"
-      :key="i"
-      :id="\`route-\${i}\`"
-      :coordinates="route.coordinates"
-      :color="i === selectedRoute ? '#6366f1' : '#6b7280'"
-      :width="i === selectedRoute ? 5 : 4"
-      :opacity="i === selectedRoute ? 1 : 0.5"
-      @click="selectedRoute = i"
-    />
-    <VMarker :coordinates="start.coordinates">
-      <div class="start-marker" />
-    </VMarker>
-    <VMarker :coordinates="end.coordinates">
-      <div class="end-marker" />
-    </VMarker>
-  </VMap>
-</template>`;
 </script>
 
 <template>
-  <div>
-    <p class="mb-2 text-muted-foreground">
-      Click on a route or use the buttons to switch between alternatives.
-    </p>
+  <div class="relative size-full min-w-0 overflow-hidden">
+    <ClientOnly>
+      <VMap
+        :key="`planning-${mapStyle}`"
+        :options="planningMapOptions"
+        class="size-full"
+        @loaded="onMapLoaded"
+      >
+        <VControlNavigation position="top-right" />
+        <VControlScale position="bottom-left" />
+        <VControlLegend
+          :layer-ids="['planning-route-selected']"
+          position="bottom-left"
+          type="category"
+          title="Route Planning"
+          :items="legendItems"
+          :interactive="false"
+        />
 
-    <div class="grid gap-8 lg:grid-cols-3">
-      <div class="space-y-3">
+        <VLayerMaplibreRoute
+          v-for="(route, index) in routeOptions"
+          :id="`planning-route-alt-${index}`"
+          :key="`route-alt-${index}`"
+          :coordinates="route.coordinates"
+          :color="getRouteColor(index)"
+          :width="4"
+          :opacity="getRouteOpacity(index)"
+          line-cap="round"
+          line-join="round"
+          @click="selectRoute(index)"
+        />
+
+        <VLayerMaplibreRoute
+          v-if="routeOptions[selectedRouteIndex]"
+          id="planning-route-selected"
+          :coordinates="routeOptions[selectedRouteIndex]?.coordinates ?? []"
+          color="#6366f1"
+          :width="5"
+          :opacity="1"
+          line-cap="round"
+          line-join="round"
+        />
+
+        <VMarker :coordinates="rotterdam.coordinates">
+          <template #markers="{ setRef }">
+            <div
+              :ref="wrapMarkerRef(setRef)"
+              class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-red-500 shadow-lg"
+            >
+              <div class="size-2 rounded-full bg-white"></div>
+            </div>
+          </template>
+        </VMarker>
+
+        <VMarker :coordinates="amsterdam.coordinates">
+          <template #markers="{ setRef }">
+            <div
+              :ref="wrapMarkerRef(setRef)"
+              class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-emerald-500 shadow-lg"
+            >
+              <div class="size-2 rounded-full bg-white"></div>
+            </div>
+          </template>
+        </VMarker>
+      </VMap>
+    </ClientOnly>
+
+    <!-- Route options overlay -->
+    <div
+      class="absolute top-4 left-4 z-10 w-64 max-h-[calc(100%-2rem)] overflow-auto rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+    >
+      <div class="p-3">
         <div
           v-if="planningLoading"
-          class="flex items-center gap-2 p-4 text-muted-foreground"
+          class="flex items-center gap-2 py-4 text-muted-foreground"
         >
           <Icon name="lucide:loader-2" class="size-4 animate-spin" />
           <span>Calculating routes...</span>
         </div>
 
         <template v-else>
-          <button
-            v-for="(route, index) in routeOptions"
-            :key="index"
-            :class="[
-              'w-full rounded-lg border p-4 text-left transition-all',
-              selectedRouteIndex === index
-                ? 'border-indigo-500 bg-card shadow-sm'
-                : `
-                  border-border bg-card/50
-                  hover:border-border/80 hover:bg-card
-                `,
-            ]"
-            @click="selectRoute(index)"
-          >
-            <div class="flex items-center gap-3">
-              <Icon name="lucide:clock" class="size-4 text-muted-foreground" />
-              <span class="font-semibold">{{
-                formatDuration(route.duration)
-              }}</span>
-              <Icon
-                name="lucide:route"
-                class="ml-2 size-4 text-muted-foreground"
-              />
-              <span class="text-muted-foreground">{{
-                formatDistance(route.distance)
-              }}</span>
-              <span
-                v-if="index === 0"
-                class="ml-auto rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
-              >
-                Fastest
-              </span>
-            </div>
-          </button>
+          <div class="space-y-2">
+            <button
+              v-for="(route, index) in routeOptions"
+              :key="index"
+              :class="[
+                'w-full rounded-lg border p-3 text-left transition-all',
+                selectedRouteIndex === index
+                  ? 'border-indigo-500 bg-card shadow-sm'
+                  : `
+                    border-border bg-card/50
+                    hover:border-border/80 hover:bg-card
+                  `,
+              ]"
+              @click="selectRoute(index)"
+            >
+              <div class="flex items-center gap-2">
+                <Icon
+                  name="lucide:clock"
+                  class="size-3.5 text-muted-foreground"
+                />
+                <span class="text-sm font-semibold">{{
+                  formatDuration(route.duration)
+                }}</span>
+                <Icon
+                  name="lucide:route"
+                  class="ml-1 size-3.5 text-muted-foreground"
+                />
+                <span class="text-sm text-muted-foreground">{{
+                  formatDistance(route.distance)
+                }}</span>
+                <span
+                  v-if="index === 0"
+                  class="ml-auto rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+                >
+                  Fastest
+                </span>
+              </div>
+            </button>
+          </div>
 
           <div
             v-if="routeOptions.length === 0 && !planningLoading"
-            class="rounded-lg border border-border bg-card p-4 text-center text-muted-foreground"
+            class="rounded-lg border border-border bg-card p-3 text-center text-sm text-muted-foreground"
           >
             No routes available
           </div>
         </template>
 
-        <div
-          class="mt-6 space-y-2 rounded-lg border border-border bg-card/50 p-4"
-        >
+        <div class="mt-3 space-y-1.5 border-t border-border pt-3">
           <div class="flex items-center gap-2 text-sm">
-            <div class="size-3 rounded-full bg-red-500"></div>
+            <div class="size-2.5 rounded-full bg-red-500"></div>
             <span class="text-muted-foreground">Rotterdam</span>
           </div>
           <div class="flex items-center gap-2 text-sm">
-            <div class="size-3 rounded-full bg-emerald-500"></div>
+            <div class="size-2.5 rounded-full bg-emerald-500"></div>
             <span class="text-muted-foreground">Amsterdam</span>
           </div>
         </div>
       </div>
-
-      <div
-        class="h-125 min-w-0 overflow-hidden rounded-lg border border-border lg:col-span-2"
-      >
-        <ClientOnly>
-          <VMap
-            :key="`planning-${mapStyle}`"
-            :options="planningMapOptions"
-            class="size-full"
-            @loaded="onMapLoaded"
-          >
-            <VControlNavigation position="top-right" />
-            <VControlScale position="bottom-left" />
-            <VControlLegend
-              :layer-ids="['planning-route-selected']"
-              position="bottom-left"
-              type="category"
-              title="Route Planning"
-              :items="legendItems"
-              :interactive="false"
-            />
-
-            <VLayerMaplibreRoute
-              v-for="(route, index) in routeOptions"
-              :id="`planning-route-alt-${index}`"
-              :key="`route-alt-${index}`"
-              :coordinates="route.coordinates"
-              :color="getRouteColor(index)"
-              :width="4"
-              :opacity="getRouteOpacity(index)"
-              line-cap="round"
-              line-join="round"
-              @click="selectRoute(index)"
-            />
-
-            <VLayerMaplibreRoute
-              v-if="routeOptions[selectedRouteIndex]"
-              id="planning-route-selected"
-              :coordinates="routeOptions[selectedRouteIndex]?.coordinates ?? []"
-              color="#6366f1"
-              :width="5"
-              :opacity="1"
-              line-cap="round"
-              line-join="round"
-            />
-
-            <VMarker :coordinates="rotterdam.coordinates">
-              <template #markers="{ setRef }">
-                <div
-                  :ref="wrapMarkerRef(setRef)"
-                  class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-red-500 shadow-lg"
-                >
-                  <div class="size-2 rounded-full bg-white"></div>
-                </div>
-              </template>
-            </VMarker>
-
-            <VMarker :coordinates="amsterdam.coordinates">
-              <template #markers="{ setRef }">
-                <div
-                  :ref="wrapMarkerRef(setRef)"
-                  class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-emerald-500 shadow-lg"
-                >
-                  <div class="size-2 rounded-full bg-white"></div>
-                </div>
-              </template>
-            </VMarker>
-          </VMap>
-        </ClientOnly>
-      </div>
-    </div>
-
-    <div class="mt-8">
-      <LazyCodeBlock
-        :code="codeExample"
-        lang="vue"
-        filename="RoutePlanning.vue"
-      />
     </div>
   </div>
 </template>

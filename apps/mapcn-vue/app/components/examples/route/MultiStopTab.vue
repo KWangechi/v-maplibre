@@ -203,275 +203,206 @@
   tryOnMounted(() => {
     fetchMultiStopRoute();
   });
-
-  const SCRIPT_END = '</' + 'script>';
-  const SCRIPT_START = '<' + 'script setup lang="ts">';
-
-  const codeExample = `${SCRIPT_START}
-import { ref } from 'vue';
-import { VMap, VMarker, VLayerMaplibreRoute } from '@geoql/v-maplibre';
-
-const stops = ref([
-  { name: 'Ferry Building', coordinates: [-122.3936, 37.7956] },
-  { name: 'Chinatown', coordinates: [-122.4058, 37.7941] },
-  { name: 'Union Square', coordinates: [-122.4075, 37.7879] },
-  { name: 'Golden Gate Park', coordinates: [-122.4862, 37.7694] },
-  { name: 'Fisherman\\'s Wharf', coordinates: [-122.4169, 37.808] },
-]);
-
-const routeCoordinates = ref([]);
-
-// Fetch optimized route from Valhalla
-const fetchRoute = async () => {
-  const locations = stops.value.map(s => ({ lat: s.coordinates[1], lon: s.coordinates[0] }));
-  const params = { locations, costing: 'auto' };
-  
-  // Use optimized_route endpoint for TSP optimization
-  const response = await fetch(\`/api/valhalla?endpoint=optimized_route&json=\${encodeURIComponent(JSON.stringify(params))}\`);
-  const data = await response.json();
-  
-  // Combine all leg shapes
-  routeCoordinates.value = data.trip.legs.flatMap(leg => decodePolyline(leg.shape));
-};
-
-// Handle marker drag
-const handleDrag = (index, coords) => {
-  stops.value[index].coordinates = coords;
-  fetchRoute(); // Recalculate route
-};
-${SCRIPT_END}
-
-<template>
-  <VMap :options="mapOptions" class="h-[500px] w-full rounded-lg">
-    <VLayerMaplibreRoute
-      id="route"
-      :coordinates="routeCoordinates"
-      color="#6366f1"
-      :width="5"
-    />
-    <VMarker
-      v-for="(stop, i) in stops"
-      :key="i"
-      :coordinates="stop.coordinates"
-      :options="{ draggable: true }"
-      @update:coordinates="(c) => handleDrag(i, c)"
-    >
-      <template #markers="{ setRef }">
-        <div :ref="setRef" class="marker">{{ i + 1 }}</div>
-      </template>
-    </VMarker>
-  </VMap>
-</template>`;
 </script>
 
 <template>
-  <div>
-    <p class="mb-2 text-muted-foreground">
-      <strong>Drag markers</strong> to adjust stops and recalculate the route.
-    </p>
+  <div class="relative size-full min-w-0 overflow-hidden">
+    <ClientOnly>
+      <VMap
+        :key="`multistop-${mapStyle}`"
+        :options="multiStopMapOptions"
+        class="size-full"
+        @loaded="onMapLoaded"
+      >
+        <VControlNavigation position="top-right" />
+        <VControlScale position="bottom-left" />
+        <VControlLegend
+          :layer-ids="['multistop-route']"
+          position="bottom-left"
+          type="category"
+          title="Multi-Stop Route"
+          :items="legendItems"
+          :interactive="false"
+        />
 
-    <div class="grid gap-8 lg:grid-cols-3">
-      <div class="space-y-4">
-        <div class="rounded-xl border border-border bg-card p-4 shadow-sm">
-          <div class="mb-3 flex items-center justify-between">
-            <span
-              class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
-              >Trip Summary</span
+        <VLayerMaplibreRoute
+          v-if="multiStopRouteCoordinates.length > 0"
+          id="multistop-route"
+          :coordinates="multiStopRouteCoordinates"
+          color="#6366f1"
+          :width="5"
+          :opacity="0.9"
+          line-cap="round"
+          line-join="round"
+        />
+
+        <VMarker
+          v-for="(stop, index) in stops"
+          :key="`stop-${index}`"
+          :coordinates="stop.coordinates"
+          :options="{ draggable: true }"
+          @update:coordinates="
+            (coords: [number, number]) => handleStopDrag(index, coords)
+          "
+        >
+          <template #markers="{ setRef }">
+            <div
+              :ref="wrapMarkerRef(setRef)"
+              class="relative cursor-grab active:cursor-grabbing"
             >
-            <span
-              v-if="optimizedOrder.length > 0"
-              class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
-            >
-              Optimized
-            </span>
-          </div>
-
-          <div
-            v-if="multiStopLoading"
-            class="flex items-center gap-2 py-4 text-muted-foreground"
-          >
-            <Icon name="lucide:loader-2" class="size-4 animate-spin" />
-            <span>Optimizing route...</span>
-          </div>
-
-          <template v-else-if="multiStopTotalDuration > 0">
-            <div class="mb-1 flex items-baseline gap-2">
-              <span class="text-3xl font-bold">{{
-                formatDuration(multiStopTotalDuration)
-              }}</span>
-              <span class="text-muted-foreground">total</span>
-            </div>
-            <div class="flex items-center gap-4 text-sm text-muted-foreground">
-              <span class="flex items-center gap-1">
-                <Icon name="lucide:route" class="size-3.5" />
-                {{ formatDistanceKm(multiStopTotalDistance) }}
-              </span>
-              <span class="flex items-center gap-1">
-                <Icon name="lucide:map-pin" class="size-3.5" />
-                {{ stops.length }} stops
-              </span>
+              <div
+                class="absolute -top-1 -right-1 z-10 flex size-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shadow-sm"
+              >
+                {{ index + 1 }}
+              </div>
+              <div
+                :class="[
+                  `
+                    flex size-10 items-center justify-center rounded-full
+                    border-2 border-white shadow-lg transition-transform
+                    hover:scale-110
+                  `,
+                  getMarkerBgClass(stop),
+                ]"
+              >
+                <Icon :name="stop.icon" class="size-5 text-white" />
+              </div>
             </div>
           </template>
+        </VMarker>
+      </VMap>
+    </ClientOnly>
+
+    <!-- Trip Summary overlay -->
+    <div
+      class="absolute top-4 left-4 z-10 w-72 max-h-[calc(100%-2rem)] overflow-auto rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+    >
+      <div class="p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <span
+            class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
+            >Trip Summary</span
+          >
+          <span
+            v-if="optimizedOrder.length > 0"
+            class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400"
+          >
+            Optimized
+          </span>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-border bg-card">
-          <div class="border-b border-border bg-muted/30 px-4 py-3">
-            <span
-              class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
-              >Journey</span
-            >
+        <div
+          v-if="multiStopLoading"
+          class="flex items-center gap-2 py-4 text-muted-foreground"
+        >
+          <Icon name="lucide:loader-2" class="size-4 animate-spin" />
+          <span>Optimizing route...</span>
+        </div>
+
+        <template v-else-if="multiStopTotalDuration > 0">
+          <div class="mb-1 flex items-baseline gap-2">
+            <span class="text-2xl font-bold">{{
+              formatDuration(multiStopTotalDuration)
+            }}</span>
+            <span class="text-muted-foreground">total</span>
           </div>
+          <div class="flex items-center gap-4 text-sm text-muted-foreground">
+            <span class="flex items-center gap-1">
+              <Icon name="lucide:route" class="size-3.5" />
+              {{ formatDistanceKm(multiStopTotalDistance) }}
+            </span>
+            <span class="flex items-center gap-1">
+              <Icon name="lucide:map-pin" class="size-3.5" />
+              {{ stops.length }} stops
+            </span>
+          </div>
+        </template>
+      </div>
 
-          <div class="divide-y divide-border">
-            <div v-for="(stop, index) in stops" :key="index" class="relative">
+      <!-- Journey stops -->
+      <div class="border-t border-border">
+        <div class="border-b border-border bg-muted/30 px-4 py-2">
+          <span
+            class="text-xs font-medium tracking-wider text-muted-foreground uppercase"
+            >Journey</span
+          >
+        </div>
+
+        <div class="divide-y divide-border">
+          <div v-for="(stop, index) in stops" :key="index" class="relative">
+            <div
+              v-if="index < stops.length - 1"
+              class="absolute top-10 bottom-0 left-6 w-0.5 bg-linear-to-b from-border to-border/50"
+            ></div>
+
+            <div class="flex gap-3 p-3">
               <div
-                v-if="index < stops.length - 1"
-                class="absolute top-12 bottom-0 left-6 w-0.5 bg-linear-to-b from-border to-border/50"
-              ></div>
+                :class="[
+                  `
+                    relative z-10 flex size-7 shrink-0 items-center
+                    justify-center rounded-full border-2
+                  `,
+                  getStopBorderClass(stop),
+                ]"
+              >
+                <Icon
+                  :name="stop.icon"
+                  :class="['size-3.5', getStopIconClass(stop)]"
+                />
+              </div>
 
-              <div class="flex gap-3 p-4">
-                <div
-                  :class="[
-                    `
-                      relative z-10 flex size-8 shrink-0 items-center
-                      justify-center rounded-full border-2
-                    `,
-                    getStopBorderClass(stop),
-                  ]"
-                >
-                  <Icon
-                    :name="stop.icon"
-                    :class="['size-4', getStopIconClass(stop)]"
-                  />
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="truncate text-sm font-medium">{{
+                    stop.name
+                  }}</span>
+                  <span
+                    v-if="index === 0"
+                    class="shrink-0 text-xs text-muted-foreground"
+                  >
+                    Now
+                  </span>
+                  <span
+                    v-else-if="multiStopLegs.length >= index"
+                    class="shrink-0 text-xs font-medium text-foreground"
+                  >
+                    {{ getArrivalTime(index) }}
+                  </span>
                 </div>
 
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="truncate font-medium">{{ stop.name }}</span>
-                    <span
-                      v-if="index === 0"
-                      class="shrink-0 text-xs text-muted-foreground"
-                    >
-                      Now
-                    </span>
-                    <span
-                      v-else-if="multiStopLegs.length >= index"
-                      class="shrink-0 text-xs font-medium text-foreground"
-                    >
-                      {{ getArrivalTime(index) }}
-                    </span>
-                  </div>
+                <div
+                  v-if="index < multiStopLegs.length"
+                  class="mt-0.5 flex items-center gap-3 text-xs text-muted-foreground"
+                >
+                  <span>{{ formatDuration(getLegDuration(index)) }}</span>
+                  <span class="text-border">&bull;</span>
+                  <span>{{ formatDistanceKm(getLegDistance(index)) }}</span>
+                </div>
 
-                  <div
-                    v-if="index < multiStopLegs.length"
-                    class="mt-1 flex items-center gap-3 text-xs text-muted-foreground"
-                  >
-                    <span>{{ formatDuration(getLegDuration(index)) }}</span>
-                    <span class="text-border">&bull;</span>
-                    <span>{{ formatDistanceKm(getLegDistance(index)) }}</span>
-                  </div>
-
-                  <div
-                    v-if="stop.type === 'start'"
-                    class="mt-1 text-xs text-emerald-600 dark:text-emerald-400"
-                  >
-                    Starting point
-                  </div>
-                  <div
-                    v-else-if="stop.type === 'end'"
-                    class="mt-1 text-xs text-red-600 dark:text-red-400"
-                  >
-                    Final destination
-                  </div>
+                <div
+                  v-if="stop.type === 'start'"
+                  class="mt-0.5 text-xs text-emerald-600 dark:text-emerald-400"
+                >
+                  Starting point
+                </div>
+                <div
+                  v-else-if="stop.type === 'end'"
+                  class="mt-0.5 text-xs text-red-600 dark:text-red-400"
+                >
+                  Final destination
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div class="flex items-center gap-2 px-1 text-xs text-muted-foreground">
-          <Icon name="lucide:move" class="size-3.5" />
-          <span>Drag markers on map to adjust stops</span>
-        </div>
       </div>
 
       <div
-        class="h-150 min-w-0 overflow-hidden rounded-lg border border-border lg:col-span-2"
+        class="flex items-center gap-2 border-t border-border px-4 py-2 text-xs text-muted-foreground"
       >
-        <ClientOnly>
-          <VMap
-            :key="`multistop-${mapStyle}`"
-            :options="multiStopMapOptions"
-            class="size-full"
-            @loaded="onMapLoaded"
-          >
-            <VControlNavigation position="top-right" />
-            <VControlScale position="bottom-left" />
-            <VControlLegend
-              :layer-ids="['multistop-route']"
-              position="bottom-left"
-              type="category"
-              title="Multi-Stop Route"
-              :items="legendItems"
-              :interactive="false"
-            />
-
-            <VLayerMaplibreRoute
-              v-if="multiStopRouteCoordinates.length > 0"
-              id="multistop-route"
-              :coordinates="multiStopRouteCoordinates"
-              color="#6366f1"
-              :width="5"
-              :opacity="0.9"
-              line-cap="round"
-              line-join="round"
-            />
-
-            <VMarker
-              v-for="(stop, index) in stops"
-              :key="`stop-${index}`"
-              :coordinates="stop.coordinates"
-              :options="{ draggable: true }"
-              @update:coordinates="
-                (coords: [number, number]) => handleStopDrag(index, coords)
-              "
-            >
-              <template #markers="{ setRef }">
-                <div
-                  :ref="wrapMarkerRef(setRef)"
-                  class="relative cursor-grab active:cursor-grabbing"
-                >
-                  <div
-                    class="absolute -top-1 -right-1 z-10 flex size-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shadow-sm"
-                  >
-                    {{ index + 1 }}
-                  </div>
-                  <div
-                    :class="[
-                      `
-                        flex size-10 items-center justify-center rounded-full
-                        border-2 border-white shadow-lg transition-transform
-                        hover:scale-110
-                      `,
-                      getMarkerBgClass(stop),
-                    ]"
-                  >
-                    <Icon :name="stop.icon" class="size-5 text-white" />
-                  </div>
-                </div>
-              </template>
-            </VMarker>
-          </VMap>
-        </ClientOnly>
+        <Icon name="lucide:move" class="size-3.5" />
+        <span>Drag markers to adjust stops</span>
       </div>
-    </div>
-
-    <div class="mt-8">
-      <LazyCodeBlock
-        :code="codeExample"
-        lang="vue"
-        filename="MultiStopRoute.vue"
-      />
     </div>
   </div>
 </template>

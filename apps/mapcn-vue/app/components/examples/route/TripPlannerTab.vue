@@ -115,117 +115,13 @@
   tryOnMounted(() => {
     fetchTripPlan();
   });
-
-  const SCRIPT_END = '</' + 'script>';
-  const SCRIPT_START = '<' + 'script setup lang="ts">';
-
-  const codeExample = `${SCRIPT_START}
-import { ref, nextTick } from 'vue';
-import { VMap, VMarker, VLayerMaplibreRoute } from '@geoql/v-maplibre';
-
-interface TripData {
-  title: string;
-  duration: string;
-  budget: string;
-  highlights: { name: string; coordinates: [number, number] }[];
-  days: { day: number; title: string; activities: any[]; stay: any }[];
-  routeWaypoints: [number, number][];
-}
-
-const tripData = ref<TripData | null>(null);
-const routeCoordinates = ref<[number, number][]>([]);
-const mapRef = ref(null);
-
-const fetchTripPlan = async () => {
-  // Fetch trip data from API
-  const data = await fetch('/api/trip-planner').then(r => r.json());
-  tripData.value = data;
-
-  // Fetch route from Valhalla
-  const locations = data.routeWaypoints.map(([lon, lat]) => ({ lat, lon, type: 'break' }));
-  const params = { locations, costing: 'auto' };
-  const routeData = await fetch(\`/api/valhalla?json=\${encodeURIComponent(JSON.stringify(params))}\`).then(r => r.json());
-  
-  routeCoordinates.value = routeData.trip.legs.flatMap(leg => decodePolyline(leg.shape));
-
-  // Fit map to show all waypoints
-  nextTick(() => {
-    const waypoints = data.routeWaypoints;
-    const bounds = [
-      [Math.min(...waypoints.map(w => w[0])), Math.min(...waypoints.map(w => w[1]))],
-      [Math.max(...waypoints.map(w => w[0])), Math.max(...waypoints.map(w => w[1]))]
-    ];
-    mapRef.value?.map?.fitBounds(bounds, { padding: 50 });
-  });
-};
-${SCRIPT_END}
-
-<template>
-  <div v-if="tripData">
-    <h2>{{ tripData.title }}</h2>
-    <p>{{ tripData.duration }} • {{ tripData.budget }} budget</p>
-
-    <VMap ref="mapRef" :options="mapOptions" class="h-80 rounded-xl">
-      <VLayerMaplibreRoute
-        id="trip-route"
-        :coordinates="routeCoordinates"
-        color="#6366f1"
-        :width="4"
-      />
-      <VMarker
-        v-for="(highlight, i) in tripData.highlights"
-        :key="i"
-        :coordinates="highlight.coordinates"
-      />
-    </VMap>
-
-    <!-- Route Highlights -->
-    <div class="flex items-center">
-      <template v-for="(h, i) in tripData.highlights" :key="i">
-        <span>{{ h.name }}</span>
-        <span v-if="i < tripData.highlights.length - 1" class="border-dashed" />
-      </template>
-    </div>
-
-    <!-- Day Cards -->
-    <div v-for="day in tripData.days" :key="day.day">
-      <h3>Day {{ day.day }}: {{ day.title }}</h3>
-      <div v-for="activity in day.activities" :key="activity.name">
-        {{ activity.name }} - {{ activity.time }}
-      </div>
-      <p>Stay: {{ day.stay.name }} - {{ day.stay.price }}</p>
-    </div>
-  </div>
-</template>`;
 </script>
 
 <template>
-  <div>
-    <div class="mb-6 flex items-start justify-between">
-      <div>
-        <h2 class="text-xl font-semibold tracking-tight">
-          {{ tripData?.title || 'Loading trip...' }}
-        </h2>
-        <p v-if="tripData" class="mt-1 text-sm text-muted-foreground">
-          {{ tripData.duration }} &bull; {{ tripData.budget }} budget
-        </p>
-      </div>
-      <button
-        class="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-        :disabled="tripLoading"
-        @click="fetchTripPlan(true)"
-      >
-        <Icon
-          name="lucide:refresh-cw"
-          :class="['size-4', tripLoading && 'animate-spin']"
-        />
-        Regenerate
-      </button>
-    </div>
-
+  <div class="relative size-full min-w-0 overflow-hidden">
     <div
       v-if="tripLoading && !tripData"
-      class="flex items-center justify-center py-20"
+      class="flex size-full items-center justify-center"
     >
       <div class="flex items-center gap-3 text-muted-foreground">
         <Icon name="lucide:loader-2" class="size-5 animate-spin" />
@@ -233,185 +129,188 @@ ${SCRIPT_END}
       </div>
     </div>
 
-    <template v-else-if="tripData">
-      <div class="mb-8 h-80 overflow-hidden rounded-xl border border-border">
-        <ClientOnly>
-          <VMap
-            :key="`tripplanner-${mapStyle}`"
-            :options="tripPlannerMapOptions"
-            class="size-full"
-            @loaded="onMapLoaded"
-          >
-            <VControlNavigation position="top-right" />
-            <VControlScale position="bottom-left" />
-            <VControlLegend
-              :layer-ids="['trip-route']"
-              position="bottom-left"
-              type="category"
-              title="Trip Planner"
-              :items="legendItems"
-              :interactive="false"
-            />
-
-            <VLayerMaplibreRoute
-              v-if="tripRouteCoordinates.length > 0"
-              id="trip-route"
-              :coordinates="tripRouteCoordinates"
-              color="#6366f1"
-              :width="4"
-              :opacity="0.85"
-              line-cap="round"
-              line-join="round"
-            />
-
-            <VMarker
-              v-for="(highlight, index) in tripData.highlights"
-              :key="`highlight-${index}`"
-              :coordinates="highlight.coordinates"
-            >
-              <template #markers="{ setRef }">
-                <div
-                  :ref="wrapMarkerRef(setRef)"
-                  class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-indigo-500 shadow-lg"
-                >
-                  <div class="size-2 rounded-full bg-white"></div>
-                </div>
-              </template>
-            </VMarker>
-          </VMap>
-        </ClientOnly>
-      </div>
-
-      <div class="mb-8">
-        <h3
-          class="mb-4 text-xs font-medium tracking-wider text-muted-foreground uppercase"
+    <template v-else>
+      <ClientOnly>
+        <VMap
+          :key="`tripplanner-${mapStyle}`"
+          :options="tripPlannerMapOptions"
+          class="size-full"
+          @loaded="onMapLoaded"
         >
-          Route Highlights
-        </h3>
-        <div class="flex items-center">
-          <template
-            v-for="(highlight, index) in tripData.highlights"
-            :key="`route-highlight-${index}`"
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['trip-route']"
+            position="bottom-left"
+            type="category"
+            title="Trip Planner"
+            :items="legendItems"
+            :interactive="false"
+          />
+
+          <VLayerMaplibreRoute
+            v-if="tripRouteCoordinates.length > 0"
+            id="trip-route"
+            :coordinates="tripRouteCoordinates"
+            color="#6366f1"
+            :width="4"
+            :opacity="0.85"
+            line-cap="round"
+            line-join="round"
+          />
+
+          <VMarker
+            v-for="(highlight, index) in tripData?.highlights ?? []"
+            :key="`highlight-${index}`"
+            :coordinates="highlight.coordinates"
           >
-            <div class="flex shrink-0 items-center gap-2">
+            <template #markers="{ setRef }">
               <div
-                class="flex size-8 items-center justify-center rounded-full bg-indigo-500/10"
+                :ref="wrapMarkerRef(setRef)"
+                class="flex size-6 items-center justify-center rounded-full border-2 border-white bg-indigo-500 shadow-lg"
               >
-                <Icon
-                  name="lucide:map-pin"
-                  class="size-4 text-indigo-600 dark:text-indigo-400"
-                />
+                <div class="size-2 rounded-full bg-white"></div>
               </div>
-              <span class="text-sm font-medium">{{ highlight.name }}</span>
+            </template>
+          </VMarker>
+        </VMap>
+      </ClientOnly>
+
+      <!-- Trip info overlay -->
+      <div
+        v-if="tripData"
+        class="absolute top-4 left-4 z-10 w-72 max-h-[calc(100%-2rem)] overflow-auto rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+      >
+        <div class="p-4">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <h2 class="text-sm font-semibold tracking-tight">
+                {{ tripData.title }}
+              </h2>
+              <p class="mt-0.5 text-xs text-muted-foreground">
+                {{ tripData.duration }} &bull; {{ tripData.budget }} budget
+              </p>
             </div>
-            <div
-              v-if="index < tripData.highlights.length - 1"
-              class="mx-3 flex min-w-8 flex-1 items-center justify-center"
+            <button
+              class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted"
+              :disabled="tripLoading"
+              @click="fetchTripPlan(true)"
             >
+              <Icon
+                name="lucide:refresh-cw"
+                :class="['size-3', tripLoading && 'animate-spin']"
+              />
+              Regenerate
+            </button>
+          </div>
+
+          <!-- Route Highlights -->
+          <div class="mt-3 border-t border-border pt-3">
+            <h3
+              class="mb-2 text-xs font-medium tracking-wider text-muted-foreground uppercase"
+            >
+              Route Highlights
+            </h3>
+            <div class="flex flex-wrap gap-1.5">
               <div
-                class="h-px w-full border-t-2 border-dashed border-border"
-              ></div>
+                v-for="(highlight, index) in tripData.highlights"
+                :key="`route-highlight-${index}`"
+                class="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:text-indigo-400"
+              >
+                <Icon name="lucide:map-pin" class="size-3" />
+                {{ highlight.name }}
+              </div>
             </div>
-          </template>
+          </div>
         </div>
-      </div>
 
-      <div class="space-y-3">
-        <div
-          v-for="day in tripData.days"
-          :key="`day-${day.day}`"
-          class="overflow-hidden rounded-xl border border-border bg-card"
-        >
-          <button
-            class="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-muted/50"
-            @click="toggleDayExpanded(day.day)"
-          >
-            <div class="flex items-center gap-3">
-              <div
-                class="flex size-8 items-center justify-center rounded-full bg-indigo-500/10 text-sm font-bold text-indigo-600 dark:text-indigo-400"
-              >
-                {{ day.day }}
-              </div>
-              <span class="font-medium"
-                >Day {{ day.day }}: {{ day.title }}</span
-              >
-            </div>
-            <Icon
-              name="lucide:chevron-down"
-              :class="[
-                'size-5 text-muted-foreground transition-transform duration-200',
-                expandedDays.has(day.day) && 'rotate-180',
-              ]"
-            />
-          </button>
-
+        <!-- Day Cards -->
+        <div class="border-t border-border">
           <div
-            v-show="expandedDays.has(day.day)"
-            class="border-t border-border"
+            v-for="day in tripData.days"
+            :key="`day-${day.day}`"
+            class="border-b border-border last:border-b-0"
           >
-            <div class="divide-y divide-border">
-              <div
-                v-for="(activity, actIndex) in day.activities"
-                :key="`activity-${day.day}-${actIndex}`"
-                class="flex items-center gap-3 px-4 py-3"
-              >
-                <Icon
-                  name="lucide:arrow-right"
-                  class="size-4 shrink-0 text-muted-foreground"
-                />
+            <button
+              class="flex w-full items-center justify-between p-3 text-left transition-colors hover:bg-muted/50"
+              @click="toggleDayExpanded(day.day)"
+            >
+              <div class="flex items-center gap-2">
+                <div
+                  class="flex size-6 items-center justify-center rounded-full bg-indigo-500/10 text-xs font-bold text-indigo-600 dark:text-indigo-400"
+                >
+                  {{ day.day }}
+                </div>
+                <span class="text-sm font-medium"
+                  >Day {{ day.day }}: {{ day.title }}</span
+                >
+              </div>
+              <Icon
+                name="lucide:chevron-down"
+                :class="[
+                  'size-4 text-muted-foreground transition-transform duration-200',
+                  expandedDays.has(day.day) && 'rotate-180',
+                ]"
+              />
+            </button>
 
-                <span class="flex-1 text-sm">{{ activity.name }}</span>
-
-                <span
-                  :class="[
-                    `
-                      inline-flex items-center gap-1 rounded-full px-2 py-0.5
-                      text-xs font-medium
-                    `,
-                    getActivityBadgeClasses(activity.type).bg,
-                    getActivityBadgeClasses(activity.type).text,
-                  ]"
+            <div
+              v-show="expandedDays.has(day.day)"
+              class="border-t border-border"
+            >
+              <div class="divide-y divide-border">
+                <div
+                  v-for="(activity, actIndex) in day.activities"
+                  :key="`activity-${day.day}-${actIndex}`"
+                  class="flex items-center gap-2 px-3 py-2"
                 >
                   <Icon
-                    :name="getActivityBadgeClasses(activity.type).icon"
-                    class="size-3"
+                    name="lucide:arrow-right"
+                    class="size-3 shrink-0 text-muted-foreground"
                   />
-                  {{ activity.type }}
-                </span>
-
-                <span
-                  class="shrink-0 text-xs text-muted-foreground tabular-nums"
-                >
-                  {{ activity.time }}
-                </span>
+                  <span class="flex-1 text-xs">{{ activity.name }}</span>
+                  <span
+                    :class="[
+                      'inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium',
+                      getActivityBadgeClasses(activity.type).bg,
+                      getActivityBadgeClasses(activity.type).text,
+                    ]"
+                  >
+                    <Icon
+                      :name="getActivityBadgeClasses(activity.type).icon"
+                      class="size-2.5"
+                    />
+                    {{ activity.type }}
+                  </span>
+                  <span
+                    class="shrink-0 text-[10px] text-muted-foreground tabular-nums"
+                  >
+                    {{ activity.time }}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <div
-              class="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-3"
-            >
-              <div class="flex items-center gap-2 text-sm">
-                <Icon name="lucide:bed" class="size-4 text-muted-foreground" />
-                <span class="text-muted-foreground">Overnight Stay:</span>
-                <span class="font-medium">{{ day.stay.name }}</span>
-              </div>
-              <span
-                class="text-sm font-semibold text-indigo-600 dark:text-indigo-400"
+              <div
+                class="flex items-center justify-between border-t border-border bg-muted/30 px-3 py-2"
               >
-                {{ day.stay.price }}
-              </span>
+                <div class="flex items-center gap-1.5 text-xs">
+                  <Icon
+                    name="lucide:bed"
+                    class="size-3 text-muted-foreground"
+                  />
+                  <span class="text-muted-foreground">Stay:</span>
+                  <span class="font-medium">{{ day.stay.name }}</span>
+                </div>
+                <span
+                  class="text-xs font-semibold text-indigo-600 dark:text-indigo-400"
+                >
+                  {{ day.stay.price }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </template>
-
-    <div class="mt-8">
-      <LazyCodeBlock
-        :code="codeExample"
-        lang="vue"
-        filename="TripPlanner.vue"
-      />
-    </div>
   </div>
 </template>

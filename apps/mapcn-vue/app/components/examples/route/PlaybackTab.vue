@@ -269,237 +269,155 @@
 
     return coords;
   });
-
-  const SCRIPT_END = '</' + 'script>';
-  const SCRIPT_START = '<' + 'script setup lang="ts">';
-
-  const codeExample = `${SCRIPT_START}
-import { VMap, VMarker, VLayerMaplibreRoute } from '@geoql/v-maplibre';
-import { decodePolyline, fitMapToBounds } from '~/composables/use-route-utils';
-
-const start = { coordinates: [-74.006, 40.7128] }; // NYC City Hall
-const end = { coordinates: [-73.8648, 40.7614] };  // Forest Hills
-
-// Fetch route from Valhalla API
-const params = {
-  locations: [
-    { lat: start.coordinates[1], lon: start.coordinates[0], type: 'break' },
-    { lat: end.coordinates[1], lon: end.coordinates[0], type: 'break' },
-  ],
-  costing: 'auto',
-};
-
-const response = await fetch(\`/api/valhalla?json=\${encodeURIComponent(JSON.stringify(params))}\`);
-const data = await response.json();
-const routeCoordinates = decodePolyline(data.trip.legs[0].shape);
-
-const isPlaying = ref(false);
-const progress = ref(0);
-const currentPosition = ref(routeCoordinates[0]);
-
-function animate() {
-  progress.value = Math.min(100, progress.value + increment);
-  currentPosition.value = getPositionAtProgress(progress.value);
-  if (progress.value < 100) requestAnimationFrame(animate);
-}
-${SCRIPT_END}
-
-<template>
-  <VMap :options="mapOptions" class="h-[500px] w-full" @loaded="onMapLoaded">
-    <VLayerMaplibreRoute id="route-full" :coordinates="routeCoordinates" color="#94a3b8" :width="4" :opacity="0.5" />
-    <VLayerMaplibreRoute id="route-progress" :coordinates="progressPath" color="#3b82f6" :width="4" />
-    <VMarker :coordinates="currentPosition" :options="{ color: '#3b82f6' }" />
-    <VMarker :coordinates="start.coordinates" :options="{ color: '#22c55e' }" />
-    <VMarker :coordinates="end.coordinates" :options="{ color: '#ef4444' }" />
-  </VMap>
-</template>`;
 </script>
 
 <template>
-  <div>
-    <p class="mb-2 text-muted-foreground">
-      Perfect for delivery tracking replay or journey visualization.
-    </p>
-
-    <div class="grid gap-8 lg:grid-cols-2">
-      <div class="min-w-0 space-y-4">
-        <div class="relative h-125 overflow-hidden rounded-lg border">
-          <ClientOnly>
-            <VMap
-              :key="mapStyle"
-              :options="mapOptions"
-              class="size-full"
-              @loaded="handleMapLoad"
-            >
-              <VControlNavigation position="top-right" />
-              <VControlLegend
-                :layer-ids="['playback-route-full', 'playback-route-progress']"
-                position="bottom-left"
-                type="category"
-                title="Trip Playback"
-                :items="legendItems"
-                :interactive="false"
-              />
-
-              <template v-if="mapLoaded && routeCoordinates.length > 0">
-                <VLayerMaplibreRoute
-                  id="playback-route-full"
-                  :coordinates="routeCoordinates"
-                  color="#94a3b8"
-                  :width="6"
-                  :opacity="0.5"
-                />
-
-                <VLayerMaplibreRoute
-                  v-if="progressPath.length > 1"
-                  id="playback-route-progress"
-                  :coordinates="progressPath"
-                  color="#3b82f6"
-                  :width="6"
-                />
-              </template>
-
-              <VMarker
-                :coordinates="currentPosition"
-                :options="{ color: '#3b82f6' }"
-              />
-
-              <VMarker
-                :coordinates="startLocation.coordinates"
-                :options="{ color: '#22c55e' }"
-              />
-
-              <VMarker
-                :coordinates="endLocation.coordinates"
-                :options="{ color: '#ef4444' }"
-              />
-            </VMap>
-            <template #fallback>
-              <div class="flex h-full items-center justify-center bg-muted">
-                <Icon
-                  name="lucide:loader-2"
-                  class="size-8 animate-spin text-muted-foreground"
-                />
-              </div>
-            </template>
-          </ClientOnly>
-
-          <div
-            v-if="routeLoading"
-            class="absolute inset-0 z-10 flex items-center justify-center bg-background/50"
-          >
-            <div class="flex items-center gap-2 text-sm">
-              <Icon name="lucide:loader-2" class="size-4 animate-spin" />
-              Loading route...
-            </div>
-          </div>
-        </div>
-
-        <div class="rounded-lg border bg-card p-4">
-          <div class="mb-4 flex items-center justify-between">
-            <div class="flex gap-2">
-              <button
-                class="flex size-10 items-center justify-center rounded-full border transition-colors"
-                :class="[
-                  isPlaying
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : `
-                      border-border
-                      hover:bg-muted
-                    `,
-                ]"
-                :disabled="routeCoordinates.length === 0"
-                @click="isPlaying ? pause() : play()"
-              >
-                <Icon
-                  :name="isPlaying ? 'lucide:pause' : 'lucide:play'"
-                  class="size-5"
-                />
-              </button>
-              <button
-                class="flex size-10 items-center justify-center rounded-full border border-border transition-colors hover:bg-muted"
-                :disabled="routeCoordinates.length === 0"
-                @click="stop"
-              >
-                <Icon name="lucide:square" class="size-4" />
-              </button>
-            </div>
-
-            <div class="text-right text-sm text-muted-foreground">
-              <div>{{ Math.round(progress) }}% complete</div>
-              <div v-if="routeInfo" class="text-xs">
-                {{ formatDistanceKm(routeInfo.distance) }} •
-                {{ formatDuration(routeInfo.duration) }}
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <Slider
-              :model-value="[progress]"
-              :min="0"
-              :max="100"
-              :step="0.1"
-              :disabled="routeCoordinates.length === 0"
-              @update:model-value="(val) => setProgress(val?.[0] ?? 0)"
-            />
-          </div>
-
-          <div class="flex items-center gap-4">
-            <span class="text-sm text-muted-foreground">Speed:</span>
-            <div class="flex gap-1">
-              <button
-                v-for="s in [0.5, 1, 2, 4]"
-                :key="s"
-                class="rounded-md border px-2 py-1 text-sm transition-colors"
-                :class="[
-                  speed === s
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : `
-                      border-border
-                      hover:bg-muted
-                    `,
-                ]"
-                @click="speed = s"
-              >
-                {{ s }}x
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="min-w-0">
-        <CodeBlock
-          :code="codeExample"
-          lang="vue"
-          filename="RoutePlayback.vue"
+  <div class="relative size-full min-w-0 overflow-hidden">
+    <ClientOnly>
+      <VMap
+        :key="mapStyle"
+        :options="mapOptions"
+        class="size-full"
+        @loaded="handleMapLoad"
+      >
+        <VControlNavigation position="top-right" />
+        <VControlLegend
+          :layer-ids="['playback-route-full', 'playback-route-progress']"
+          position="bottom-left"
+          type="category"
+          title="Trip Playback"
+          :items="legendItems"
+          :interactive="false"
         />
 
-        <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-          <h3 class="mb-2 font-medium">Features</h3>
-          <ul class="space-y-2 text-sm text-muted-foreground">
-            <li>
-              <strong class="text-foreground">Real Routes:</strong> Uses
-              Valhalla routing API for actual road-following paths
-            </li>
-            <li>
-              <strong class="text-foreground">Play/Pause:</strong> Control the
-              animation with standard playback controls
-            </li>
-            <li>
-              <strong class="text-foreground">Seek:</strong> Drag the progress
-              bar to jump to any point in the route
-            </li>
-            <li>
-              <strong class="text-foreground">Speed:</strong> Adjust playback
-              speed from 0.5x to 4x
-            </li>
-            <li>
-              <strong class="text-foreground">Progress Path:</strong> Shows the
-              traveled portion in a different color
-            </li>
-          </ul>
+        <template v-if="mapLoaded && routeCoordinates.length > 0">
+          <VLayerMaplibreRoute
+            id="playback-route-full"
+            :coordinates="routeCoordinates"
+            color="#94a3b8"
+            :width="6"
+            :opacity="0.5"
+          />
+
+          <VLayerMaplibreRoute
+            v-if="progressPath.length > 1"
+            id="playback-route-progress"
+            :coordinates="progressPath"
+            color="#3b82f6"
+            :width="6"
+          />
+        </template>
+
+        <VMarker
+          :coordinates="currentPosition"
+          :options="{ color: '#3b82f6' }"
+        />
+
+        <VMarker
+          :coordinates="startLocation.coordinates"
+          :options="{ color: '#22c55e' }"
+        />
+
+        <VMarker
+          :coordinates="endLocation.coordinates"
+          :options="{ color: '#ef4444' }"
+        />
+      </VMap>
+      <template #fallback>
+        <div class="flex h-full items-center justify-center bg-muted">
+          <Icon
+            name="lucide:loader-2"
+            class="size-8 animate-spin text-muted-foreground"
+          />
+        </div>
+      </template>
+    </ClientOnly>
+
+    <!-- Loading overlay -->
+    <div
+      v-if="routeLoading"
+      class="absolute inset-0 z-10 flex items-center justify-center bg-background/50"
+    >
+      <div class="flex items-center gap-2 text-sm">
+        <Icon name="lucide:loader-2" class="size-4 animate-spin" />
+        Loading route...
+      </div>
+    </div>
+
+    <!-- Playback controls overlay -->
+    <div
+      class="absolute bottom-4 left-4 right-14 z-10 rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+    >
+      <div class="p-4">
+        <div class="mb-3 flex items-center justify-between">
+          <div class="flex gap-2">
+            <button
+              class="flex size-9 items-center justify-center rounded-full border transition-colors"
+              :class="[
+                isPlaying
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : `
+                    border-border
+                    hover:bg-muted
+                  `,
+              ]"
+              :disabled="routeCoordinates.length === 0"
+              @click="isPlaying ? pause() : play()"
+            >
+              <Icon
+                :name="isPlaying ? 'lucide:pause' : 'lucide:play'"
+                class="size-4"
+              />
+            </button>
+            <button
+              class="flex size-9 items-center justify-center rounded-full border border-border transition-colors hover:bg-muted"
+              :disabled="routeCoordinates.length === 0"
+              @click="stop"
+            >
+              <Icon name="lucide:square" class="size-3.5" />
+            </button>
+          </div>
+
+          <div class="text-right text-sm text-muted-foreground">
+            <div>{{ Math.round(progress) }}% complete</div>
+            <div v-if="routeInfo" class="text-xs">
+              {{ formatDistanceKm(routeInfo.distance) }} •
+              {{ formatDuration(routeInfo.duration) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <Slider
+            :model-value="[progress]"
+            :min="0"
+            :max="100"
+            :step="0.1"
+            :disabled="routeCoordinates.length === 0"
+            @update:model-value="(val) => setProgress(val?.[0] ?? 0)"
+          />
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-muted-foreground">Speed:</span>
+          <div class="flex gap-1">
+            <button
+              v-for="s in [0.5, 1, 2, 4]"
+              :key="s"
+              class="rounded-md border px-2 py-0.5 text-xs transition-colors"
+              :class="[
+                speed === s
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : `
+                    border-border
+                    hover:bg-muted
+                  `,
+              ]"
+              @click="speed = s"
+            >
+              {{ s }}x
+            </button>
+          </div>
         </div>
       </div>
     </div>
