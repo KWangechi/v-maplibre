@@ -6,6 +6,15 @@
 
   const isExpanded = computed(() => state.value === 'expanded');
 
+  function handleEscape(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && isExpanded.value) {
+      setOpen(false);
+    }
+  }
+
+  onMounted(() => document.addEventListener('keydown', handleEscape));
+  onUnmounted(() => document.removeEventListener('keydown', handleEscape));
+
   function toggleColorMode() {
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark';
   }
@@ -17,6 +26,7 @@
     <div
       v-if="isExpanded"
       class="fixed inset-0 z-40 bg-black/40"
+      aria-hidden="true"
       @click="setOpen(false)"
     ></div>
   </Transition>

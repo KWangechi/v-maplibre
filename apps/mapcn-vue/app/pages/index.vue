@@ -225,9 +225,18 @@
             <div
               class="flex items-center gap-2 border-b border-border/50 px-4 py-2"
             >
-              <div class="size-2.5 rounded-full bg-red-500/70"></div>
-              <div class="size-2.5 rounded-full bg-yellow-500/70"></div>
-              <div class="size-2.5 rounded-full bg-green-500/70"></div>
+              <div
+                class="size-2.5 rounded-full bg-red-500/70"
+                aria-hidden="true"
+              ></div>
+              <div
+                class="size-2.5 rounded-full bg-yellow-500/70"
+                aria-hidden="true"
+              ></div>
+              <div
+                class="size-2.5 rounded-full bg-green-500/70"
+                aria-hidden="true"
+              ></div>
               <span class="ml-2 text-xs text-muted-foreground">Terminal</span>
             </div>
             <div class="overflow-x-auto p-4">
