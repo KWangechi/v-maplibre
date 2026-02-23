@@ -7,6 +7,7 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
+  import type { GreatCircleData } from '~/types/great-circle';
 
   useSeoMeta({
     title: 'Great Circle Layer (deck.gl) - mapcn-vue Examples',
@@ -75,13 +76,6 @@
     },
   ];
 
-  interface GreatCircleData {
-    from: [number, number];
-    to: [number, number];
-    name: string;
-    color: [number, number, number];
-  }
-
   const legendItems: CategoryLegendItem[] = [
     { value: 'tokyo', label: 'Tokyo', color: '#ff8c00' },
     { value: 'london', label: 'London', color: '#00c896' },
@@ -137,53 +131,38 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Great Circle Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Great circle arcs showing the shortest path between points on Earth.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglGreatCircle
-                id="great-circle-layer"
-                :data="flightData"
-                :get-source-position="getSourcePosition"
-                :get-target-position="getTargetPosition"
-                :get-source-color="getSourceColor"
-                :get-target-color="getTargetColor"
-                :get-stroke-width="3"
-                :pickable="true"
-              />
-              <VControlLegend
-                position="bottom-left"
-                type="category"
-                title="Flight Destinations"
-                :layer-ids="['great-circle-layer']"
-                :items="legendItems"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Great Circle Layer (deck.gl)"
+    description="Great circle arcs showing the shortest path between points on Earth."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglGreatCircle
+            id="great-circle-layer"
+            :data="flightData"
+            :get-source-position="getSourcePosition"
+            :get-target-position="getTargetPosition"
+            :get-source-color="getSourceColor"
+            :get-target-color="getTargetColor"
+            :get-stroke-width="3"
+            :pickable="true"
+          />
+          <VControlLegend
+            position="bottom-left"
+            type="category"
+            title="Flight Destinations"
+            :layer-ids="['great-circle-layer']"
+            :items="legendItems"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>
