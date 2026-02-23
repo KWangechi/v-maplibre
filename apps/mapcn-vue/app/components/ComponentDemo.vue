@@ -26,7 +26,7 @@
   <div class="flex min-h-dvh flex-col lg:h-dvh lg:flex-row lg:overflow-hidden">
     <!-- Left panel: docs/code -->
     <div
-      class="relative order-last flex flex-1 flex-col lg:order-first lg:w-1/2 lg:max-w-[50%]"
+      class="relative order-last flex flex-1 flex-col lg:order-first lg:w-1/3 lg:max-w-[33.333%]"
     >
       <!-- Scrollable content -->
       <div
@@ -44,7 +44,7 @@
         <!-- Title -->
         <h1
           v-if="title"
-          class="gradient-text mb-2 font-display text-2xl font-bold tracking-tighter lg:text-3xl"
+          class="gradient-text mb-2 font-display text-2xl font-bold leading-normal tracking-tighter lg:text-3xl"
         >
           {{ title }}
         </h1>
@@ -52,7 +52,7 @@
         <!-- Description -->
         <p
           v-if="description"
-          class="mb-8 max-w-lg text-sm/relaxed text-muted-foreground"
+          class="mb-8 text-sm/relaxed text-muted-foreground"
         >
           {{ description }}
         </p>
@@ -61,6 +61,8 @@
         <div v-if="code" class="not-prose">
           <button
             class="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            :aria-expanded="codeExpanded"
+            aria-controls="code-panel"
             @click="codeExpanded = !codeExpanded"
           >
             <Icon name="lucide:code" class="size-3.5" />
@@ -76,6 +78,9 @@
 
           <div
             v-show="codeExpanded"
+            id="code-panel"
+            role="region"
+            aria-label="Source code"
             class="relative overflow-hidden rounded-xl border border-border/50"
           >
             <button
@@ -109,9 +114,13 @@
 
     <!-- Right panel: live preview -->
     <div
+      role="img"
+      :aria-label="
+        title ? `Interactive map demo: ${title}` : 'Interactive map demo'
+      "
       :class="
         cn(
-          'relative order-first min-h-[50dvh] overflow-hidden bg-muted/30 dark:bg-background lg:order-last lg:h-dvh lg:w-1/2',
+          'relative order-first min-h-[50dvh] overflow-hidden bg-muted/30 dark:bg-background lg:order-last lg:h-dvh lg:w-2/3',
           props.class,
         )
       "
