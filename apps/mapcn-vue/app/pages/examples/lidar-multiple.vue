@@ -113,7 +113,7 @@ ${SCRIPT_END}
 
 <template>
   <VMap :options="mapOptions" class="h-125 w-full">
-    <VControlNavigation position="top-left" />
+    <VControlNavigation position="top-right" />
     <VControlLidar
       ref="lidarRef"
       position="top-right"
@@ -136,7 +136,7 @@ ${SCRIPT_END}
     <div class="size-full min-w-0 overflow-hidden">
       <ClientOnly>
         <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-          <VControlNavigation position="top-left" />
+          <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
           <VControlLegend
             :layer-ids="['lidar-points']"

@@ -168,7 +168,7 @@ ${SCRIPT_END}
             @loaded="handleMapLoad"
           >
             <VControlNavigation position="top-right" />
-            <VControlScale position="bottom-right" />
+            <VControlScale position="bottom-left" />
           </VMap>
           <template #fallback>
             <div class="flex h-full items-center justify-center bg-muted">
