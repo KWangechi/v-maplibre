@@ -13,3 +13,9 @@ export interface ExampleCategory {
   icon: string;
   examples: Example[];
 }
+
+export interface PackageManager {
+  id: string;
+  label: string;
+  prefix: string;
+}
