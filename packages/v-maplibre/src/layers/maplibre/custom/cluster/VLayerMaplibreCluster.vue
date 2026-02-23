@@ -29,6 +29,7 @@
     clusterPaint?: {
       colors?: string[];
       radii?: number[];
+      breakpoints?: number[];
     };
     unclusteredPaint?: {
       color?: DataDrivenPropertyValueSpecification<string>;
@@ -48,6 +49,7 @@
     clusterPaint: () => ({
       colors: ['#51bbd6', '#f1f075', '#f28cb1'],
       radii: [20, 30, 40],
+      breakpoints: [100, 750],
     }),
     unclusteredPaint: () => ({
       color: '#51bbd6',
@@ -131,18 +133,18 @@
               'step',
               ['get', 'point_count'],
               props.clusterPaint.colors![0]!,
-              100,
+              props.clusterPaint.breakpoints![0]!,
               props.clusterPaint.colors![1]!,
-              750,
+              props.clusterPaint.breakpoints![1]!,
               props.clusterPaint.colors![2]!,
             ],
             'circle-radius': [
               'step',
               ['get', 'point_count'],
               props.clusterPaint.radii![0]!,
-              100,
+              props.clusterPaint.breakpoints![0]!,
               props.clusterPaint.radii![1]!,
-              750,
+              props.clusterPaint.breakpoints![1]!,
               props.clusterPaint.radii![2]!,
             ],
             'circle-stroke-width': 2,
