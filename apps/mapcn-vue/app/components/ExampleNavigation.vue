@@ -61,6 +61,7 @@
       <NuxtLink
         v-if="prevExample"
         :to="prevExample.href"
+        :aria-label="`Previous example: ${prevExample.title}`"
         class="group relative flex flex-col overflow-hidden rounded-xl border border-border/50 bg-card/50 p-5 backdrop-blur-md transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5"
       >
         <div
@@ -97,6 +98,7 @@
       <NuxtLink
         v-if="nextExample"
         :to="nextExample.href"
+        :aria-label="`Next example: ${nextExample.title}`"
         class="group relative flex flex-col items-end overflow-hidden rounded-xl border border-border/50 bg-card/50 p-5 text-right backdrop-blur-md transition-all duration-300 hover:border-primary/30 hover:bg-card/80 hover:shadow-lg hover:shadow-primary/5"
       >
         <div
