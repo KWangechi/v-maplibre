@@ -53,7 +53,7 @@
 </script>
 
 <template>
-  <div class="h-125 min-w-0 overflow-hidden">
+  <div class="size-full min-w-0 overflow-hidden">
     <ClientOnly>
       <VMap
         :key="mapStyle"
@@ -78,6 +78,7 @@
           :cluster-paint="{
             colors: ['#10b981', '#059669', '#047857'],
             radii: [15, 22, 30],
+            breakpoints: [10, 50],
           }"
           :unclustered-paint="{
             color: '#10b981',
