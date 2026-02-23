@@ -64,6 +64,22 @@ export function useExamplesData() {
           icon: 'lucide:snowflake',
           badge: 'NYC',
         },
+        {
+          title: 'Weather Dashboard',
+          description:
+            'Global weather explorer with city search, live conditions, and 7-day forecasts from Open-Meteo.',
+          href: '/examples/weather-dashboard',
+          icon: 'lucide:cloud-sun-rain',
+          badge: 'Live',
+        },
+        {
+          title: 'Drone Flight',
+          description:
+            'Cinematic drone animation along uploaded GeoJSON paths with camera follow.',
+          href: '/examples/drone-flight',
+          icon: 'lucide:plane',
+          badge: 'Animated',
+        },
       ],
     },
     {
