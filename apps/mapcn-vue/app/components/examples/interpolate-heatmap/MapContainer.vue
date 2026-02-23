@@ -42,7 +42,7 @@
 </script>
 
 <template>
-  <div class="relative h-125 min-w-0 overflow-hidden">
+  <div class="relative size-full min-w-0 overflow-hidden">
     <div
       v-if="isLoading"
       class="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm"

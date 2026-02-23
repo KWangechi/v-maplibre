@@ -158,8 +158,8 @@ ${SCRIPT_END}
     full-width
     class="h-full"
   >
-    <div class="min-w-0">
-      <div class="relative h-125 overflow-hidden">
+    <div class="size-full min-w-0">
+      <div class="relative size-full overflow-hidden">
         <ClientOnly>
           <VMap
             :key="currentStyleId"

@@ -172,8 +172,8 @@ ${SCRIPT_END}
     full-width
     class="h-full"
   >
-    <div class="min-w-0">
-      <div class="h-125 overflow-hidden">
+    <div class="size-full min-w-0">
+      <div class="size-full overflow-hidden">
         <ClientOnly>
           <VMap
             :key="mapStyle"

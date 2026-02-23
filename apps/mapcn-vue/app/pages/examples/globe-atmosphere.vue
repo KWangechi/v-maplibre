@@ -115,7 +115,7 @@ ${SCRIPT_END}
     full-width
     class="h-full"
   >
-    <div class="relative h-125 min-w-0 overflow-hidden bg-black">
+    <div class="relative size-full min-w-0 overflow-hidden bg-black">
       <div
         class="absolute left-3 top-3 z-10 flex gap-1.5 rounded-lg border border-white/10 bg-black/70 p-1.5 backdrop-blur-xl"
       >

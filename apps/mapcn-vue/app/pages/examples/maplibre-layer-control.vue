@@ -271,8 +271,8 @@ ${SCRIPT_END}
     registry="map-layers"
     class="h-full"
   >
-    <div class="min-w-0">
-      <div class="relative h-125 overflow-hidden">
+    <div class="size-full min-w-0">
+      <div class="relative size-full overflow-hidden">
         <!-- Tab switcher pill -->
         <div
           class="absolute left-3 top-3 z-10 flex gap-1 rounded-lg border border-border/50 bg-background/80 p-1 backdrop-blur-sm"
