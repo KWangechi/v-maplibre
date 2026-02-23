@@ -253,7 +253,7 @@
 <template>
   <div
     ref="containerRef"
-    class="v-layer-group"
+    class="v-layer-group maplibregl-ctrl"
     :class="{ 'is-collapsed': isCollapsed }"
   >
     <button
@@ -353,7 +353,7 @@
 <style>
   .v-layer-group {
     min-width: 140px;
-    max-width: 200px;
+    max-width: 280px;
     margin: 10px;
     background: var(--color-card, #fff);
     border-radius: var(--radius, 0.5rem);

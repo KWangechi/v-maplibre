@@ -1,4 +1,10 @@
-import { onMounted, onUnmounted, type Ref, type ShallowRef } from 'vue';
+import {
+  onMounted,
+  onUnmounted,
+  onUpdated,
+  type Ref,
+  type ShallowRef,
+} from 'vue';
 import type { Map, IControl, ControlPosition } from 'maplibre-gl';
 
 /**
@@ -14,6 +20,22 @@ export function useMapControl(
   position: ControlPosition,
 ): void {
   let control: IControl | null = null;
+  let isAdded = false;
+
+  /**
+   * Re-add the maplibregl-ctrl class if Vue's :class reconciliation removed it.
+   * Vue overwrites the class attribute when dynamic :class bindings update,
+   * which drops imperatively-added classes like maplibregl-ctrl.
+   */
+  const ensureControlClass = () => {
+    if (
+      isAdded &&
+      containerRef.value &&
+      !containerRef.value.classList.contains('maplibregl-ctrl')
+    ) {
+      containerRef.value.classList.add('maplibregl-ctrl');
+    }
+  };
 
   onMounted(() => {
     if (!map.value || !containerRef.value) return;
@@ -27,6 +49,11 @@ export function useMapControl(
     };
 
     map.value.addControl(control, position);
+    isAdded = true;
+  });
+
+  onUpdated(() => {
+    ensureControlClass();
   });
 
   onUnmounted(() => {
