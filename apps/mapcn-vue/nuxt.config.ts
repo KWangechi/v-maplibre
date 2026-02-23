@@ -84,6 +84,23 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2025-01-06',
 
+  vite: {
+    resolve: {
+      dedupe: [
+        '@deck.gl/core',
+        '@deck.gl/layers',
+        '@deck.gl/mapbox',
+        '@deck.gl/aggregation-layers',
+        '@deck.gl/geo-layers',
+        '@deck.gl/mesh-layers',
+        '@deck.gl/extensions',
+        '@luma.gl/core',
+        '@luma.gl/engine',
+        '@luma.gl/shadertools',
+      ],
+    },
+  },
+
   postcss: {
     plugins: {},
   },
