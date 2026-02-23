@@ -103,55 +103,29 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl py-10">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Tile Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Generic tile layer for loading and rendering tiled data with custom
-          sublayers.
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Data source:
-          <a
-            href="https://www.openstreetmap.org/"
-            target="_blank"
-            class="text-primary hover:underline"
-            >OpenStreetMap</a
-          >
-          contributors
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglTile
-                id="tile-layer"
-                :data="TILE_URL"
-                :render-sub-layers="renderSubLayers"
-                :min-zoom="0"
-                :max-zoom="19"
-                :tile-size="256"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Tile Layer (deck.gl)"
+    description="Generic tile layer for loading and rendering tiled data with custom sublayers."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglTile
+            id="tile-layer"
+            :data="TILE_URL"
+            :render-sub-layers="renderSubLayers"
+            :min-zoom="0"
+            :max-zoom="19"
+            :tile-size="256"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

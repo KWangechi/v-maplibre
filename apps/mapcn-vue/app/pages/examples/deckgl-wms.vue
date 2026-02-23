@@ -64,58 +64,29 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          WMS Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Load and display Web Map Service (WMS) layers with automatic tiling
-          and caching.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglWMS
-                id="wms-layer"
-                :data="WMS_URL"
-                service-type="wms"
-                :layers="['OSM-WMS']"
-                srs="EPSG:4326"
-                :opacity="0.7"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Data source:</strong> OpenStreetMap WMS from
-          <a
-            href="https://ows.terrestris.de/"
-            target="_blank"
-            class="text-primary hover:underline"
-            >terrestris</a
-          >. Supports WMS 1.1.1 and 1.3.0 specifications with configurable
-          layers, SRS, and request parameters.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="WMS Layer (deck.gl)"
+    description="Load and display Web Map Service (WMS) layers with automatic tiling and caching."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglWMS
+            id="wms-layer"
+            :data="WMS_URL"
+            service-type="wms"
+            :layers="['OSM-WMS']"
+            srs="EPSG:4326"
+            :opacity="0.7"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

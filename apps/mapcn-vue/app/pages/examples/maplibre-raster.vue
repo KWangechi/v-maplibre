@@ -88,42 +88,27 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Raster Layer
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Display raster tile layers from tile servers like OpenStreetMap.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerMaplibreRaster
-                source-id="osm-source"
-                layer-id="osm-raster"
-                :source="rasterSource"
-                :layer="rasterLayer"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Raster Layer"
+    description="Display raster tile layers from tile servers like OpenStreetMap."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerMaplibreRaster
+            source-id="osm-source"
+            layer-id="osm-raster"
+            :source="rasterSource"
+            :layer="rasterLayer"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

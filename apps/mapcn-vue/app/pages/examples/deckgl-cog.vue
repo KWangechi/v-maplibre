@@ -100,121 +100,39 @@
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl py-10">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="COG Layer (deck.gl-raster)"
+    description="GPU-accelerated Cloud-Optimized GeoTIFF visualization with automatic reprojection and intelligent tile streaming."
+    :code="codeExample"
+    registry="map-deckgl-raster"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap
+          :key="mapStyle"
+          :options="mapOptions"
+          class="size-full"
+          @loaded="onMapLoaded"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          COG Layer (deck.gl-raster)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          GPU-accelerated Cloud-Optimized GeoTIFF visualization with automatic
-          reprojection and intelligent tile streaming.
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Powered by
-          <a
-            href="https://github.com/developmentseed/deck.gl-raster"
-            target="_blank"
-            class="text-primary hover:underline"
-            >@developmentseed/deck.gl-raster</a
-          >
-          - fully client-side, no server required. Data:
-          <a
-            href="https://registry.opendata.aws/sentinel-2-l2a-cogs/"
-            target="_blank"
-            class="text-primary hover:underline"
-            >Sentinel-2 L2A COGs</a
-          >.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap
-              :key="mapStyle"
-              :options="mapOptions"
-              class="size-full"
-              @loaded="onMapLoaded"
-            >
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglCOG
-                id="cog-layer"
-                :geotiff="COG_URL"
-                @geotiff-load="handleGeotiffLoad"
-              />
-              <VControlLegend
-                :layer-ids="['cog-layer']"
-                position="bottom-left"
-                type="category"
-                title="Sentinel-2 Imagery"
-                :items="legendItems"
-                :interactive="false"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-8 rounded-lg border border-border bg-card p-4">
-        <h3 class="mb-3 font-semibold">Features</h3>
-        <ul
-          class="grid grid-cols-2 gap-x-8 gap-y-1.5 text-sm text-muted-foreground md:grid-cols-3 lg:grid-cols-6"
-        >
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Fully client-side
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            GPU-accelerated
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Auto reprojection
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Tile streaming
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Auto overviews
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            No server required
-          </li>
-        </ul>
-      </div>
-
-      <ExampleNavigation />
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglCOG
+            id="cog-layer"
+            :geotiff="COG_URL"
+            @geotiff-load="handleGeotiffLoad"
+          />
+          <VControlLegend
+            :layer-ids="['cog-layer']"
+            position="bottom-left"
+            type="category"
+            title="Sentinel-2 Imagery"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

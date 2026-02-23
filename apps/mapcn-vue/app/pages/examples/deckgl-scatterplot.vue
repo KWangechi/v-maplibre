@@ -100,53 +100,38 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Scatterplot (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          High-performance WebGL scatterplot rendering thousands of points.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglScatterplot
-                id="scatterplot"
-                :data="scatterData"
-                :get-position="getPosition"
-                :get-radius="getRadius"
-                :get-fill-color="getFillColor"
-                :radius-min-pixels="3"
-                :radius-max-pixels="30"
-                :opacity="0.8"
-              />
-              <VControlLegend
-                position="bottom-left"
-                type="category"
-                title="Point Categories"
-                :layer-ids="['scatterplot']"
-                :items="legendItems"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Scatterplot (deck.gl)"
+    description="High-performance WebGL scatterplot rendering thousands of points."
+    :code="codeExample"
+    registry="map-deckgl-core"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglScatterplot
+            id="scatterplot"
+            :data="scatterData"
+            :get-position="getPosition"
+            :get-radius="getRadius"
+            :get-fill-color="getFillColor"
+            :radius-min-pixels="3"
+            :radius-max-pixels="30"
+            :opacity="0.8"
+          />
+          <VControlLegend
+            position="bottom-left"
+            type="category"
+            title="Point Categories"
+            :layer-ids="['scatterplot']"
+            :items="legendItems"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

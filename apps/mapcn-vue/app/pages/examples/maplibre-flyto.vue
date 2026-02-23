@@ -164,140 +164,101 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          FlyTo Animation
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Smooth camera animations using flyTo, easeTo, and jumpTo methods.
-          Click on cities to animate the camera with 3D perspective.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="h-125 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="mapStyle"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="handleMapLoad"
-              >
-                <VControlNavigation position="top-right" />
-                <VMarker
-                  v-for="city in cities"
-                  :key="city.name"
-                  :coordinates="city.coordinates"
-                />
-              </VMap>
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
-          </div>
-
-          <div class="mt-4 bg-card p-4">
-            <div class="mb-4">
-              <h3 class="mb-2 text-sm font-medium">Animation Type</h3>
-              <div class="flex gap-2">
-                <button
-                  v-for="type in ['flyTo', 'easeTo', 'jumpTo']"
-                  :key="type"
-                  class="rounded-md border px-3 py-1.5 text-sm transition-colors"
-                  :class="[
-                    animationType === type
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : `border-border bg-background hover:bg-muted`,
-                  ]"
-                  @click="animationType = type as 'flyTo' | 'easeTo' | 'jumpTo'"
-                >
-                  {{ type }}
-                </button>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <h3 class="mb-2 text-sm font-medium">
-                Duration: {{ duration }}ms
-              </h3>
-              <input
-                v-model.number="duration"
-                type="range"
-                min="500"
-                max="5000"
-                step="100"
-                class="w-full"
+  <ComponentDemo
+    title="FlyTo Animation"
+    description="Smooth camera animations using flyTo, easeTo, and jumpTo methods. Click on cities to animate the camera with 3D perspective."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="min-w-0">
+      <div class="h-125 overflow-hidden">
+        <ClientOnly>
+          <VMap
+            :key="mapStyle"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
+          >
+            <VControlNavigation position="top-right" />
+            <VMarker
+              v-for="city in cities"
+              :key="city.name"
+              :coordinates="city.coordinates"
+            />
+          </VMap>
+          <template #fallback>
+            <div class="flex h-full items-center justify-center bg-muted">
+              <Icon
+                name="lucide:loader-2"
+                class="size-8 animate-spin text-muted-foreground"
               />
             </div>
+          </template>
+        </ClientOnly>
+      </div>
 
-            <div class="mb-4">
-              <h3 class="mb-2 text-sm font-medium">Cities</h3>
-              <div class="flex flex-wrap gap-2">
-                <button
-                  v-for="city in cities"
-                  :key="city.name"
-                  class="rounded-md border px-3 py-1.5 text-sm transition-colors"
-                  :class="[
-                    currentCity.name === city.name
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : `border-border bg-background hover:bg-muted`,
-                  ]"
-                  @click="flyToCity(city)"
-                >
-                  <Icon
-                    name="lucide:map-pin"
-                    class="mr-1 inline-block size-3"
-                  />
-                  {{ city.name }}
-                </button>
-              </div>
-            </div>
-
+      <div class="mt-4 bg-card p-4">
+        <div class="mb-4">
+          <h3 class="mb-2 text-sm font-medium">Animation Type</h3>
+          <div class="flex gap-2">
             <button
-              class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
-              @click="resetView"
+              v-for="type in ['flyTo', 'easeTo', 'jumpTo']"
+              :key="type"
+              class="rounded-md border px-3 py-1.5 text-sm transition-colors"
+              :class="[
+                animationType === type
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : `border-border bg-background hover:bg-muted`,
+              ]"
+              @click="animationType = type as 'flyTo' | 'easeTo' | 'jumpTo'"
             >
-              <Icon name="lucide:globe" class="mr-1 inline-block size-4" />
-              Reset to World View
+              {{ type }}
             </button>
           </div>
         </div>
-      </ComponentDemo>
 
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Animation Types</h3>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <strong class="text-foreground">flyTo:</strong> Smooth curved
-            animation with zoom out/in effect
-          </li>
-          <li>
-            <strong class="text-foreground">easeTo:</strong> Linear transition
-            without zoom curve
-          </li>
-          <li>
-            <strong class="text-foreground">jumpTo:</strong> Instant transition,
-            no animation
-          </li>
-        </ul>
+        <div class="mb-4">
+          <h3 class="mb-2 text-sm font-medium">Duration: {{ duration }}ms</h3>
+          <input
+            v-model.number="duration"
+            type="range"
+            min="500"
+            max="5000"
+            step="100"
+            class="w-full"
+          />
+        </div>
+
+        <div class="mb-4">
+          <h3 class="mb-2 text-sm font-medium">Cities</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="city in cities"
+              :key="city.name"
+              class="rounded-md border px-3 py-1.5 text-sm transition-colors"
+              :class="[
+                currentCity.name === city.name
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : `border-border bg-background hover:bg-muted`,
+              ]"
+              @click="flyToCity(city)"
+            >
+              <Icon name="lucide:map-pin" class="mr-1 inline-block size-3" />
+              {{ city.name }}
+            </button>
+          </div>
+        </div>
+
+        <button
+          class="w-full rounded-md border border-border bg-background px-3 py-2 text-sm transition-colors hover:bg-muted"
+          @click="resetView"
+        >
+          <Icon name="lucide:globe" class="mr-1 inline-block size-4" />
+          Reset to World View
+        </button>
       </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

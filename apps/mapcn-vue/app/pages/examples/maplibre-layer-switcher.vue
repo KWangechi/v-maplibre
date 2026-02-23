@@ -150,140 +150,97 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Layer Switcher
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Switch between different basemap styles dynamically. Includes light,
-          dark, voyager, and other free map styles.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="currentStyleId"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="handleMapLoad"
-              >
-                <VControlNavigation position="top-right" />
-                <VControlScale position="bottom-right" />
-              </VMap>
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
-
-            <!-- Layer Switcher Control -->
-            <div ref="dropdownRef" class="absolute bottom-4 left-4 z-10">
-              <button
-                class="flex items-center gap-2 rounded-lg bg-background/95 px-3 py-2 text-sm shadow-lg backdrop-blur-sm transition-colors hover:bg-muted"
-                @click="toggleDropdown"
-              >
-                <Icon :name="currentStyle.icon" class="size-4" />
-                <span>{{ currentStyle.name }}</span>
-                <Icon
-                  name="lucide:chevron-up"
-                  class="size-4 transition-transform"
-                  :class="{ 'rotate-180': !isDropdownOpen }"
-                />
-              </button>
-
-              <div
-                v-show="isDropdownOpen"
-                class="absolute bottom-full left-0 mb-2 w-48 rounded-lg bg-background/95 p-1 shadow-lg backdrop-blur-sm"
-              >
-                <button
-                  v-for="style in mapStyles"
-                  :key="style.id"
-                  class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors"
-                  :class="[
-                    currentStyleId === style.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-muted',
-                  ]"
-                  @click="selectStyle(style)"
-                >
-                  <Icon :name="style.icon" class="size-4" />
-                  <span>{{ style.name }}</span>
-                  <Icon
-                    v-if="currentStyleId === style.id"
-                    name="lucide:check"
-                    class="ml-auto size-4"
-                  />
-                </button>
-              </div>
+  <ComponentDemo
+    title="Layer Switcher"
+    description="Switch between different basemap styles dynamically. Includes light, dark, voyager, and other free map styles."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="min-w-0">
+      <div class="relative h-125 overflow-hidden">
+        <ClientOnly>
+          <VMap
+            :key="currentStyleId"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
+          >
+            <VControlNavigation position="top-right" />
+            <VControlScale position="bottom-right" />
+          </VMap>
+          <template #fallback>
+            <div class="flex h-full items-center justify-center bg-muted">
+              <Icon
+                name="lucide:loader-2"
+                class="size-8 animate-spin text-muted-foreground"
+              />
             </div>
-          </div>
+          </template>
+        </ClientOnly>
 
-          <div class="mt-4 bg-card p-4">
-            <h3 class="mb-3 font-medium">Quick Select</h3>
-            <div class="grid grid-cols-3 gap-2">
-              <button
-                v-for="style in mapStyles"
-                :key="style.id"
-                class="flex flex-col items-center gap-1 p-3 text-sm transition-colors"
-                :class="[
-                  currentStyleId === style.id
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : `border-border hover:bg-muted`,
-                ]"
-                @click="selectStyle(style)"
-              >
-                <Icon :name="style.icon" class="size-5" />
-                <span class="text-xs">{{ style.name }}</span>
-              </button>
-            </div>
+        <!-- Layer Switcher Control -->
+        <div ref="dropdownRef" class="absolute bottom-4 left-4 z-10">
+          <button
+            class="flex items-center gap-2 rounded-lg bg-background/95 px-3 py-2 text-sm shadow-lg backdrop-blur-sm transition-colors hover:bg-muted"
+            @click="toggleDropdown"
+          >
+            <Icon :name="currentStyle.icon" class="size-4" />
+            <span>{{ currentStyle.name }}</span>
+            <Icon
+              name="lucide:chevron-up"
+              class="size-4 transition-transform"
+              :class="{ 'rotate-180': !isDropdownOpen }"
+            />
+          </button>
+
+          <div
+            v-show="isDropdownOpen"
+            class="absolute bottom-full left-0 mb-2 w-48 rounded-lg bg-background/95 p-1 shadow-lg backdrop-blur-sm"
+          >
+            <button
+              v-for="style in mapStyles"
+              :key="style.id"
+              class="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors"
+              :class="[
+                currentStyleId === style.id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'hover:bg-muted',
+              ]"
+              @click="selectStyle(style)"
+            >
+              <Icon :name="style.icon" class="size-4" />
+              <span>{{ style.name }}</span>
+              <Icon
+                v-if="currentStyleId === style.id"
+                name="lucide:check"
+                class="ml-auto size-4"
+              />
+            </button>
           </div>
         </div>
-      </ComponentDemo>
-
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Available Styles</h3>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <strong class="text-foreground">Light & Dark:</strong> Clean themes
-            for day/night modes
-          </li>
-
-          <li>
-            <strong class="text-foreground">Vintage:</strong> Warm, paper-like
-            aesthetic with muted tones
-          </li>
-          <li>
-            <strong class="text-foreground">Minimal:</strong> Clean, modern with
-            fewer labels
-          </li>
-          <li>
-            <strong class="text-foreground">Grayscale:</strong> Monochrome map
-            with shades of gray
-          </li>
-          <li>
-            <strong class="text-foreground">High Contrast:</strong>
-            Accessibility-focused with strong contrast
-          </li>
-        </ul>
       </div>
 
-      <ExampleNavigation />
+      <div class="mt-4 bg-card p-4">
+        <h3 class="mb-3 font-medium">Quick Select</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            v-for="style in mapStyles"
+            :key="style.id"
+            class="flex flex-col items-center gap-1 p-3 text-sm transition-colors"
+            :class="[
+              currentStyleId === style.id
+                ? 'border-primary bg-primary/10 text-primary'
+                : `border-border hover:bg-muted`,
+            ]"
+            @click="selectStyle(style)"
+          >
+            <Icon :name="style.icon" class="size-5" />
+            <span class="text-xs">{{ style.name }}</span>
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

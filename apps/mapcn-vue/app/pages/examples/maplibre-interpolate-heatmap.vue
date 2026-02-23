@@ -94,75 +94,18 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Interpolate Heatmap
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Real-time global temperature visualization using IDW (Inverse Distance
-          Weighting) interpolation with live data from OpenWeatherMap.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <ExamplesInterpolateHeatmapMapContainer
-          :is-loading="isLoading"
-          :error="error"
-          @loaded="onMapLoaded"
-        />
-      </ComponentDemo>
-
-      <ExamplesInterpolateHeatmapInfoCards />
-
-      <div class="mt-8 rounded-lg border bg-muted/30 p-6">
-        <h3 class="mb-3 text-lg font-semibold">About This Example</h3>
-        <p class="mb-4 text-muted-foreground">
-          This example uses
-          <a
-            href="https://github.com/nicholasyager/maplibre-gl-interpolate-heatmap"
-            target="_blank"
-            class="text-primary hover:underline"
-          >
-            maplibre-interpolate-heatmap
-          </a>
-          to render an IDW (Inverse Distance Weighting) interpolated heatmap of
-          real-time global temperature data from the OpenWeatherMap API.
-        </p>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>MaplibreInterpolateHeatmapLayer</strong> - WebGL-based IDW
-              interpolation rendered directly on the map
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>VControlLegend</strong> - Gradient legend with temperature
-              color scale (-30°C to 40°C)
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              Live temperature data from 100 global grid points via
-              OpenWeatherMap
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <ExampleNavigation />
-    </div>
-  </div>
+  <ComponentDemo
+    title="Interpolate Heatmap"
+    description="Real-time global temperature visualization using IDW (Inverse Distance Weighting) interpolation with live data from OpenWeatherMap."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <ExamplesInterpolateHeatmapMapContainer
+      :is-loading="isLoading"
+      :error="error"
+      @loaded="onMapLoaded"
+    />
+  </ComponentDemo>
 </template>

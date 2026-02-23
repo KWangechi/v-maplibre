@@ -110,54 +110,39 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          H3 Hexagon Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Uber's H3 hexagonal hierarchical geospatial indexing system.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['h3-layer']"
-                position="bottom-left"
-                type="category"
-                title="Cell Value"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerDeckglH3Hexagon
-                id="h3-layer"
-                :data="h3Data"
-                :get-hexagon="getHexagon"
-                :get-fill-color="getFillColor"
-                :get-elevation="getElevation"
-                :elevation-scale="20"
-                :extruded="true"
-                :pickable="true"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="H3 Hexagon Layer (deck.gl)"
+    description="Uber's H3 hexagonal hierarchical geospatial indexing system."
+    :code="codeExample"
+    registry="map-deckgl-aggregation"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['h3-layer']"
+            position="bottom-left"
+            type="category"
+            title="Cell Value"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerDeckglH3Hexagon
+            id="h3-layer"
+            :data="h3Data"
+            :get-hexagon="getHexagon"
+            :get-fill-color="getFillColor"
+            :get-elevation="getElevation"
+            :elevation-scale="20"
+            :extruded="true"
+            :pickable="true"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

@@ -66,52 +66,28 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl py-10">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Bitmap Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Overlay georeferenced images on the map with precise positioning.
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Data source:
-          <a
-            href="https://github.com/visgl/deck.gl-data"
-            target="_blank"
-            class="text-primary hover:underline"
-            >deck.gl-data</a
-          >
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglBitmap
-                id="bitmap-layer"
-                :image="IMAGE_URL"
-                :bounds="BOUNDS"
-                :opacity="0.8"
-                :pickable="true"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Bitmap Layer (deck.gl)"
+    description="Overlay georeferenced images on the map with precise positioning."
+    :code="codeExample"
+    registry="map-deckgl-core"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglBitmap
+            id="bitmap-layer"
+            :image="IMAGE_URL"
+            :bounds="BOUNDS"
+            :opacity="0.8"
+            :pickable="true"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

@@ -172,64 +172,39 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          H3 Cluster Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render grouped H3 hexagons as merged cluster regions with shared
-          properties.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['h3-cluster-layer']"
-                position="bottom-left"
-                type="gradient"
-                title="Cluster Value"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerDeckglH3Cluster
-                id="h3-cluster-layer"
-                :data="h3ClusterData"
-                :get-hexagons="getHexagons"
-                :get-fill-color="getFillColor"
-                :get-elevation="getElevation"
-                :extruded="true"
-                :pickable="true"
-                :auto-highlight="true"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> H3ClusterLayer merges multiple H3 hexagons into
-          a single polygon. This is useful for visualizing regions, service
-          areas, or any grouped spatial data. Unlike H3HexagonLayer which
-          renders individual cells, clusters share a single color and elevation.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="H3 Cluster Layer (deck.gl)"
+    description="Render grouped H3 hexagons as merged cluster regions with shared properties."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['h3-cluster-layer']"
+            position="bottom-left"
+            type="gradient"
+            title="Cluster Value"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerDeckglH3Cluster
+            id="h3-cluster-layer"
+            :data="h3ClusterData"
+            :get-hexagons="getHexagons"
+            :get-fill-color="getFillColor"
+            :get-elevation="getElevation"
+            :extruded="true"
+            :pickable="true"
+            :auto-highlight="true"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

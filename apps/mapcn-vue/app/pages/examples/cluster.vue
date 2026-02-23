@@ -94,39 +94,23 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Clustered Points
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Cluster large datasets of points for better performance. Click on a
-          cluster to expand it, or zoom in to see individual points.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <ExamplesClusterMapContainer
-          :points-data="pointsData"
-          :show-popup="showPopup"
-          :popup-coordinates="popupCoordinates"
-          :popup-content="popupContent"
-          @loaded="onMapLoaded"
-          @cluster-click="handleClusterClick"
-          @point-click="handlePointClick"
-          @close-popup="closePopup"
-        />
-      </ComponentDemo>
-
-      <ExampleNavigation />
-    </div>
-  </div>
+  <ComponentDemo
+    title="Clustered Points"
+    description="Cluster large datasets of points for better performance. Click on a cluster to expand it, or zoom in to see individual points."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <ExamplesClusterMapContainer
+      :points-data="pointsData"
+      :show-popup="showPopup"
+      :popup-coordinates="popupCoordinates"
+      :popup-content="popupContent"
+      @loaded="onMapLoaded"
+      @cluster-click="handleClusterClick"
+      @point-click="handlePointClick"
+      @close-popup="closePopup"
+    />
+  </ComponentDemo>
 </template>

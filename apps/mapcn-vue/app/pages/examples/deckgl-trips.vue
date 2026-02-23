@@ -133,58 +133,42 @@
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Trips Animation (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Animated NYC taxi trips using real data. Orange and teal paths
-          represent different vendors.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglTrips
-                id="trips"
-                :data="tripsData"
-                :get-path="getPath"
-                :get-timestamps="getTimestamps"
-                :get-color="getColor"
-                :current-time="currentTime"
-                :trail-length="180"
-                :width-min-pixels="3"
-                :cap-rounded="true"
-                :joint-rounded="true"
-                :opacity="0.8"
-              />
-              <VControlLegend
-                :layer-ids="['trips']"
-                position="bottom-left"
-                type="category"
-                title="Taxi Vendor"
-                :items="legendItems"
-                :interactive="false"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Trips Animation (deck.gl)"
+    description="Animated NYC taxi trips using real data. Orange and teal paths represent different vendors."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglTrips
+            id="trips"
+            :data="tripsData"
+            :get-path="getPath"
+            :get-timestamps="getTimestamps"
+            :get-color="getColor"
+            :current-time="currentTime"
+            :trail-length="180"
+            :width-min-pixels="3"
+            :cap-rounded="true"
+            :joint-rounded="true"
+            :opacity="0.8"
+          />
+          <VControlLegend
+            :layer-ids="['trips']"
+            position="bottom-left"
+            type="category"
+            title="Taxi Vendor"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

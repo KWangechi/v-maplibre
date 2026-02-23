@@ -116,97 +116,45 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Wind Animation
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Real-time wind particle visualization using live data from
-          OpenWeatherMap API. Particles flow based on actual wind speed and
-          direction.
-        </p>
+  <ComponentDemo
+    title="Wind Animation"
+    description="Real-time wind particle visualization using live data from OpenWeatherMap API. Particles flow based on actual wind speed and direction."
+    :code="codeExample"
+    registry="map-deckgl-wind"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ExamplesWindMapContainer
+        :wind-data="windData"
+        :is-loading="isLoading"
+        :error="error"
+        :last-updated="lastUpdated"
+        :color-ramp="colorRamp"
+        :num-particles="numParticles[0]"
+        :max-age="maxAge[0]"
+        :speed-factor="speedFactor[0]"
+        :line-width="lineWidth[0]"
+        :speed-range="speedRange"
+        class="size-full"
+        @load="handleMapLoad"
+        @refresh="fetchWindData"
+        @wind-loaded="handleWindLoaded"
+        @wind-error="handleWindError"
+      />
+
+      <!-- Controls overlay -->
+      <div
+        class="absolute top-4 right-14 z-10 w-64 max-h-[calc(100%-2rem)] overflow-auto rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+      >
+        <ExamplesWindControlPanel
+          v-model:num-particles="numParticles"
+          v-model:max-age="maxAge"
+          v-model:speed-factor="speedFactor"
+          v-model:line-width="lineWidth"
+          :data-point-count="windData.length"
+        />
       </div>
-
-      <ComponentDemo :code="codeExample" full-width>
-        <div class="grid min-w-0 gap-0 lg:grid-cols-3">
-          <div class="relative h-125 min-w-0 lg:col-span-2">
-            <ExamplesWindMapContainer
-              :wind-data="windData"
-              :is-loading="isLoading"
-              :error="error"
-              :last-updated="lastUpdated"
-              :color-ramp="colorRamp"
-              :num-particles="numParticles[0]"
-              :max-age="maxAge[0]"
-              :speed-factor="speedFactor[0]"
-              :line-width="lineWidth[0]"
-              :speed-range="speedRange"
-              @load="handleMapLoad"
-              @refresh="fetchWindData"
-              @wind-loaded="handleWindLoaded"
-              @wind-error="handleWindError"
-            />
-          </div>
-
-          <ExamplesWindControlPanel
-            v-model:num-particles="numParticles"
-            v-model:max-age="maxAge"
-            v-model:speed-factor="speedFactor"
-            v-model:line-width="lineWidth"
-            :data-point-count="windData.length"
-          />
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-8 rounded-lg border bg-muted/30 p-6">
-        <h3 class="mb-3 text-lg font-semibold">About This Example</h3>
-        <p class="mb-4 text-muted-foreground">
-          This example demonstrates real-time wind particle visualization using
-          the wind layer integration in @geoql/v-maplibre. The underlying
-          rendering is powered by
-          <a
-            href="https://github.com/nicholasyager/maplibre-gl-wind"
-            target="_blank"
-            class="text-primary hover:underline"
-          >
-            maplibre-gl-wind
-          </a>
-          with live data from the OpenWeatherMap API.
-        </p>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>VLayerDeckglWindParticle</strong> - GPU-accelerated wind
-              particle animation with configurable density and speed
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              Live wind data from OpenWeatherMap with hourly auto-refresh
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              Configurable particle count, max age, speed factor, line width,
-              and color ramp
-            </span>
-          </li>
-        </ul>
-      </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

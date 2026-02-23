@@ -57,12 +57,11 @@
     return activeTab.value === tab;
   }
 
-  function getTabClasses(tab: TabType): string {
-    const base = 'relative px-1 pb-3 text-sm font-medium transition-colors';
-    return activeTab.value === tab
-      ? `${base} text-foreground`
-      : `${base} text-muted-foreground hover:text-foreground`;
-  }
+  const TAB_LABELS: Record<TabType, string> = {
+    maplibre: 'MapLibre',
+    deckgl: 'deck.gl',
+    group: 'Group',
+  };
 
   const mapOptions = computed(() => ({
     container: `layer-control-map-${mapId}-${activeTab.value}`,
@@ -258,333 +257,234 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="Layer Control"
+    description="Toggle layer visibility and adjust opacity with VControlLayer. Works with both MapLibre native layers and deck.gl layers."
+    :code="
+      isTabActive('maplibre')
+        ? maplibreCodeExample
+        : isTabActive('deckgl')
+          ? deckglCodeExample
+          : groupCodeExample
+    "
+    full-width
+    registry="map-layers"
+    class="h-full"
+  >
+    <div class="min-w-0">
+      <div class="relative h-125 overflow-hidden">
+        <!-- Tab switcher pill -->
+        <div
+          class="absolute left-3 top-3 z-10 flex gap-1 rounded-lg border border-border/50 bg-background/80 p-1 backdrop-blur-sm"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Layer Control
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Toggle layer visibility and adjust opacity with VControlLayer. Works
-          with both MapLibre native layers and deck.gl layers.
-        </p>
-      </div>
-
-      <div class="mb-6 border-b border-border">
-        <div class="flex gap-4">
           <button
-            :class="getTabClasses('maplibre')"
-            @click="setActiveTab('maplibre')"
+            v-for="tab in ['maplibre', 'deckgl', 'group'] as const"
+            :key="tab"
+            class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+            :class="
+              isTabActive(tab)
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            @click="setActiveTab(tab)"
           >
-            MapLibre GL
-            <span
-              v-if="isTabActive('maplibre')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
-          </button>
-          <button
-            :class="getTabClasses('deckgl')"
-            @click="setActiveTab('deckgl')"
-          >
-            deck.gl
-            <span
-              v-if="isTabActive('deckgl')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
-          </button>
-          <button
-            :class="getTabClasses('group')"
-            @click="setActiveTab('group')"
-          >
-            Layer Group
-            <span
-              v-if="isTabActive('group')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
+            {{ TAB_LABELS[tab] }}
           </button>
         </div>
-      </div>
+        <ClientOnly>
+          <template
+            v-if="
+              isLoading && (isTabActive('maplibre') || isTabActive('group'))
+            "
+          >
+            <div class="flex h-full items-center justify-center bg-muted">
+              <div class="text-center">
+                <Icon
+                  name="lucide:loader-2"
+                  class="mx-auto size-8 animate-spin text-muted-foreground"
+                />
+                <p class="mt-2 text-sm text-muted-foreground">
+                  Loading US states data...
+                </p>
+              </div>
+            </div>
+          </template>
 
-      <ComponentDemo
-        :code="
-          isTabActive('maplibre')
-            ? maplibreCodeExample
-            : isTabActive('deckgl')
-              ? deckglCodeExample
-              : groupCodeExample
-        "
-        full-width
-        class="h-125"
-      >
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <template
-                v-if="
-                  isLoading && (isTabActive('maplibre') || isTabActive('group'))
-                "
-              >
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <div class="text-center">
-                    <Icon
-                      name="lucide:loader-2"
-                      class="mx-auto size-8 animate-spin text-muted-foreground"
-                    />
-                    <p class="mt-2 text-sm text-muted-foreground">
-                      Loading US states data...
-                    </p>
-                  </div>
-                </div>
-              </template>
-
-              <template v-else-if="isTabActive('maplibre') && statesGeoJson">
-                <VMap
-                  :key="`maplibre-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
-                  <VControlScale position="bottom-left" />
-
-                  <VLayerMaplibreGeojson
-                    source-id="states-layer-control"
-                    layer-id="states-fill"
-                    :source="{ type: 'geojson', data: statesGeoJson }"
-                    :layer="{
-                      id: 'states-fill',
-                      type: 'fill',
-                      source: 'states-layer-control',
-                      paint: {
-                        'fill-color': '#627BC1',
-                        'fill-opacity': 0.5,
-                      },
-                    }"
-                  />
-
-                  <VControlLayer
-                    layer-id="states-fill"
-                    title="US States Layer"
-                    position="bottom-left"
-                    :visible="true"
-                    :opacity="0.5"
-                  />
-                </VMap>
-              </template>
-
-              <template v-else-if="isTabActive('deckgl')">
-                <VMap
-                  :key="`deckgl-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
-                  <VControlScale position="bottom-left" />
-
-                  <VLayerDeckglScatterplot
-                    id="scatter-layer"
-                    :data="scatterData"
-                    :get-position="getPosition"
-                    :get-radius="getRadius"
-                    :get-fill-color="[255, 140, 0, 200]"
-                    :radius-scale="1"
-                    :radius-min-pixels="5"
-                    :radius-max-pixels="100"
-                  />
-
-                  <VControlLayer
-                    layer-id="scatter-layer"
-                    title="Cities Layer"
-                    position="bottom-left"
-                    :visible="true"
-                    :opacity="1"
-                  />
-                </VMap>
-              </template>
-
-              <template v-else-if="isTabActive('group') && statesGeoJson">
-                <VMap
-                  :key="`group-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
-                  <VControlScale position="bottom-left" />
-
-                  <VLayerMaplibreGeojson
-                    source-id="states-layer-group"
-                    layer-id="states-fill-group"
-                    :source="{ type: 'geojson', data: statesGeoJson }"
-                    :layer="{
-                      id: 'states-fill-group',
-                      type: 'fill',
-                      source: 'states-layer-group',
-                      paint: {
-                        'fill-color': '#627BC1',
-                        'fill-opacity': 0.5,
-                      },
-                    }"
-                  />
-
-                  <VLayerMaplibreGeojson
-                    source-id="states-layer-group"
-                    layer-id="states-outline-group"
-                    :source="{ type: 'geojson', data: statesGeoJson }"
-                    :layer="{
-                      id: 'states-outline-group',
-                      type: 'line',
-                      source: 'states-layer-group',
-                      paint: {
-                        'line-color': '#627BC1',
-                        'line-width': 2,
-                      },
-                    }"
-                  />
-
-                  <VControlLayerGroup
-                    :layers="layerGroupConfig"
-                    title="Map Layers"
-                    position="bottom-left"
-                    :collapsible="true"
-                  />
-                </VMap>
-              </template>
-
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
-          </div>
-
-          <div class="mt-4 bg-muted/50 p-4">
-            <h3 class="mb-2 font-medium">
-              {{
-                isTabActive('group')
-                  ? 'VControlLayerGroup Features'
-                  : 'VControlLayer Features'
-              }}
-            </h3>
-            <ul
-              v-if="!isTabActive('group')"
-              class="space-y-2 text-sm text-muted-foreground"
+          <template v-else-if="isTabActive('maplibre') && statesGeoJson">
+            <VMap
+              :key="`maplibre-${mapStyle}`"
+              :options="mapOptions"
+              class="size-full"
+              @loaded="handleMapLoad"
             >
-              <li>
-                <strong class="text-foreground">Visibility Toggle:</strong>
-                Click the button to show/hide the layer instantly.
-              </li>
-              <li>
-                <strong class="text-foreground">Opacity Slider:</strong>
-                Drag the slider to adjust layer transparency (0-100%).
-              </li>
-              <li>
-                <strong class="text-foreground">Auto-Detection:</strong>
-                Automatically detects if layer is MapLibre or deck.gl.
-              </li>
-              <li>
-                <strong class="text-foreground">v-model Support:</strong>
-                Use <code>v-model:visible</code> and
-                <code>v-model:opacity</code> for two-way binding.
-              </li>
-            </ul>
-            <ul v-else class="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <strong class="text-foreground">Multiple Layers:</strong>
-                Control multiple layers in a single collapsible panel.
-              </li>
-              <li>
-                <strong class="text-foreground">Collapsible Panel:</strong>
-                Click the header to expand/collapse the layer list.
-              </li>
-              <li>
-                <strong class="text-foreground">Per-Layer Controls:</strong>
-                Each layer has its own visibility toggle and opacity slider.
-              </li>
-              <li>
-                <strong class="text-foreground">Mixed Layer Types:</strong>
-                Supports both MapLibre and deck.gl layers in the same group.
-              </li>
-            </ul>
-          </div>
-        </div>
-      </ComponentDemo>
+              <VControlNavigation position="top-right" />
+              <VControlScale position="bottom-left" />
 
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
+              <VLayerMaplibreGeojson
+                source-id="states-layer-control"
+                layer-id="states-fill"
+                :source="{ type: 'geojson', data: statesGeoJson }"
+                :layer="{
+                  id: 'states-fill',
+                  type: 'fill',
+                  source: 'states-layer-control',
+                  paint: {
+                    'fill-color': '#627BC1',
+                    'fill-opacity': 0.5,
+                  },
+                }"
+              />
+
+              <VControlLayer
+                layer-id="states-fill"
+                title="US States Layer"
+                position="bottom-left"
+                :visible="true"
+                :opacity="0.5"
+              />
+            </VMap>
+          </template>
+
+          <template v-else-if="isTabActive('deckgl')">
+            <VMap
+              :key="`deckgl-${mapStyle}`"
+              :options="mapOptions"
+              class="size-full"
+              @loaded="handleMapLoad"
+            >
+              <VControlNavigation position="top-right" />
+              <VControlScale position="bottom-left" />
+
+              <VLayerDeckglScatterplot
+                id="scatter-layer"
+                :data="scatterData"
+                :get-position="getPosition"
+                :get-radius="getRadius"
+                :get-fill-color="[255, 140, 0, 200]"
+                :radius-scale="1"
+                :radius-min-pixels="5"
+                :radius-max-pixels="100"
+              />
+
+              <VControlLayer
+                layer-id="scatter-layer"
+                title="Cities Layer"
+                position="bottom-left"
+                :visible="true"
+                :opacity="1"
+              />
+            </VMap>
+          </template>
+
+          <template v-else-if="isTabActive('group') && statesGeoJson">
+            <VMap
+              :key="`group-${mapStyle}`"
+              :options="mapOptions"
+              class="size-full"
+              @loaded="handleMapLoad"
+            >
+              <VControlNavigation position="top-right" />
+              <VControlScale position="bottom-left" />
+
+              <VLayerMaplibreGeojson
+                source-id="states-layer-group"
+                layer-id="states-fill-group"
+                :source="{ type: 'geojson', data: statesGeoJson }"
+                :layer="{
+                  id: 'states-fill-group',
+                  type: 'fill',
+                  source: 'states-layer-group',
+                  paint: {
+                    'fill-color': '#627BC1',
+                    'fill-opacity': 0.5,
+                  },
+                }"
+              />
+
+              <VLayerMaplibreGeojson
+                source-id="states-layer-group"
+                layer-id="states-outline-group"
+                :source="{ type: 'geojson', data: statesGeoJson }"
+                :layer="{
+                  id: 'states-outline-group',
+                  type: 'line',
+                  source: 'states-layer-group',
+                  paint: {
+                    'line-color': '#627BC1',
+                    'line-width': 2,
+                  },
+                }"
+              />
+
+              <VControlLayerGroup
+                :layers="layerGroupConfig"
+                title="Map Layers"
+                position="bottom-left"
+                :collapsible="true"
+              />
+            </VMap>
+          </template>
+
+          <template #fallback>
+            <div class="flex h-full items-center justify-center bg-muted">
+              <Icon
+                name="lucide:loader-2"
+                class="size-8 animate-spin text-muted-foreground"
+              />
+            </div>
+          </template>
+        </ClientOnly>
+      </div>
+
+      <div class="mt-4 bg-muted/50 p-4">
         <h3 class="mb-2 font-medium">
           {{
             isTabActive('group')
-              ? 'VControlLayerGroup Props'
-              : 'VControlLayer Props'
+              ? 'VControlLayerGroup Features'
+              : 'VControlLayer Features'
           }}
         </h3>
-        <div v-if="!isTabActive('group')" class="space-y-1 text-sm">
-          <div class="flex justify-between">
-            <code class="text-primary">layer-id</code>
-            <span class="text-muted-foreground">string (required)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">title</code>
-            <span class="text-muted-foreground"
-              >string (default: "Layer Control")</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">position</code>
-            <span class="text-muted-foreground"
-              >"top-left" | "top-right" | ...</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">visible</code>
-            <span class="text-muted-foreground">boolean (default: true)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">opacity</code>
-            <span class="text-muted-foreground">number 0-1 (default: 1)</span>
-          </div>
-        </div>
-        <div v-else class="space-y-1 text-sm">
-          <div class="flex justify-between">
-            <code class="text-primary">layers</code>
-            <span class="text-muted-foreground">LayerConfig[] (required)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">title</code>
-            <span class="text-muted-foreground"
-              >string (default: "Layers")</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">position</code>
-            <span class="text-muted-foreground"
-              >"top-left" | "top-right" | ...</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">collapsible</code>
-            <span class="text-muted-foreground">boolean (default: true)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">collapsed</code>
-            <span class="text-muted-foreground">boolean (default: false)</span>
-          </div>
-        </div>
+        <ul
+          v-if="!isTabActive('group')"
+          class="space-y-2 text-sm text-muted-foreground"
+        >
+          <li>
+            <strong class="text-foreground">Visibility Toggle:</strong>
+            Click the button to show/hide the layer instantly.
+          </li>
+          <li>
+            <strong class="text-foreground">Opacity Slider:</strong>
+            Drag the slider to adjust layer transparency (0-100%).
+          </li>
+          <li>
+            <strong class="text-foreground">Auto-Detection:</strong>
+            Automatically detects if layer is MapLibre or deck.gl.
+          </li>
+          <li>
+            <strong class="text-foreground">v-model Support:</strong>
+            Use <code>v-model:visible</code> and
+            <code>v-model:opacity</code> for two-way binding.
+          </li>
+        </ul>
+        <ul v-else class="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <strong class="text-foreground">Multiple Layers:</strong>
+            Control multiple layers in a single collapsible panel.
+          </li>
+          <li>
+            <strong class="text-foreground">Collapsible Panel:</strong>
+            Click the header to expand/collapse the layer list.
+          </li>
+          <li>
+            <strong class="text-foreground">Per-Layer Controls:</strong>
+            Each layer has its own visibility toggle and opacity slider.
+          </li>
+          <li>
+            <strong class="text-foreground">Mixed Layer Types:</strong>
+            Supports both MapLibre and deck.gl layers in the same group.
+          </li>
+        </ul>
       </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

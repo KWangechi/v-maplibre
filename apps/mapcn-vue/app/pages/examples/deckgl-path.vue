@@ -122,54 +122,38 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Path Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render continuous paths with multiple vertices for routes and
-          trajectories.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglPath
-                id="path-layer"
-                :data="pathData"
-                :get-path="getPath"
-                :get-color="getColor"
-                :get-width="4"
-                :width-min-pixels="2"
-                :pickable="true"
-                :rounded="true"
-              />
-              <VControlLegend
-                position="bottom-left"
-                type="category"
-                title="Routes"
-                :layer-ids="['path-layer']"
-                :items="legendItems"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Path Layer (deck.gl)"
+    description="Render continuous paths with multiple vertices for routes and trajectories."
+    :code="codeExample"
+    registry="map-deckgl-core"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglPath
+            id="path-layer"
+            :data="pathData"
+            :get-path="getPath"
+            :get-color="getColor"
+            :get-width="4"
+            :width-min-pixels="2"
+            :pickable="true"
+            :rounded="true"
+          />
+          <VControlLegend
+            position="bottom-left"
+            type="category"
+            title="Routes"
+            :layer-ids="['path-layer']"
+            :items="legendItems"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

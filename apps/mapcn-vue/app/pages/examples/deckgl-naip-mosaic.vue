@@ -181,212 +181,121 @@
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl py-10">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="NAIP Mosaic"
+    description="Client-side mosaic of NAIP aerial imagery from Microsoft Planetary Computer. All rendering happens in the browser with no server required."
+    :code="codeExample"
+    registry="map-deckgl-raster"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap
+          :key="mapStyle"
+          :options="mapOptions"
+          class="size-full"
+          @loaded="onMapLoaded"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">NAIP Mosaic</h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Client-side mosaic of NAIP aerial imagery from Microsoft Planetary
-          Computer. All rendering happens in the browser with no server
-          required.
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Powered by
-          <a
-            href="https://github.com/developmentseed/deck.gl-raster"
-            target="_blank"
-            class="text-primary hover:underline"
-            >@developmentseed/deck.gl-raster</a
-          >. Data from
-          <a
-            href="https://planetarycomputer.microsoft.com/dataset/naip"
-            target="_blank"
-            class="text-primary hover:underline"
-            >Microsoft Planetary Computer NAIP</a
-          >.
-        </p>
-      </div>
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['naip-mosaic']"
+            position="bottom-left"
+            type="category"
+            title="Render Mode"
+            :items="legendItems"
+            :interactive="false"
+          />
 
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="space-y-4">
-          <div class="relative h-125 min-w-0 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="mapStyle"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="onMapLoaded"
+          <VLayerDeckglMosaic
+            v-if="stacItems.length > 0"
+            id="naip-mosaic"
+            :sources="stacItems"
+            :render-mode="renderMode"
+            @source-load="handleSourceLoad"
+            @error="handleError"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <!-- Toggle button - always visible -->
+      <button
+        class="absolute top-4 left-4 z-10 flex size-9 items-center justify-center rounded-lg bg-background/95 shadow-lg backdrop-blur-sm transition-colors hover:bg-accent"
+        :class="{
+          'bg-primary text-primary-foreground hover:bg-primary/90': !panelOpen,
+        }"
+        @click="togglePanel"
+      >
+        <Icon
+          :name="
+            panelOpen ? 'lucide:panel-left-close' : 'lucide:panel-left-open'
+          "
+          class="size-4"
+        />
+      </button>
+
+      <!-- Collapsible panel with motion-v -->
+      <AnimatePresence>
+        <motion.div
+          v-if="panelOpen"
+          :initial="{ opacity: 0, x: -20, scale: 0.95 }"
+          :animate="{ opacity: 1, x: 0, scale: 1 }"
+          :exit="{ opacity: 0, x: -20, scale: 0.95 }"
+          :transition="{ type: 'spring', stiffness: 300, damping: 25 }"
+          class="absolute top-16 left-4 z-10 w-64 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
+        >
+          <h3 class="mb-2 text-sm font-semibold">NAIP Mosaic</h3>
+          <p class="mb-3 text-xs text-muted-foreground">
+            <span v-if="loading">Loading STAC items...</span>
+            <span v-else-if="error" class="text-destructive">{{ error }}</span>
+            <template v-else>
+              Fetched {{ stacItems.length }}
+              <a
+                href="https://stacspec.org/en"
+                target="_blank"
+                class="text-primary hover:underline"
+                >STAC</a
               >
-                <VControlNavigation position="top-right" />
-                <VControlScale position="bottom-left" />
-                <VControlLegend
-                  :layer-ids="['naip-mosaic']"
-                  position="bottom-left"
-                  type="category"
-                  title="Render Mode"
-                  :items="legendItems"
-                  :interactive="false"
-                />
+              Items from
+              <a
+                href="https://planetarycomputer.microsoft.com"
+                target="_blank"
+                class="text-primary hover:underline"
+                >Microsoft Planetary Computer</a
+              >.
+            </template>
+          </p>
+          <p class="mb-3 text-xs text-muted-foreground">
+            All imagery is rendered client-side with
+            <strong>no server involved</strong> using
+            <a
+              href="https://github.com/developmentseed/deck.gl-raster"
+              target="_blank"
+              class="font-mono text-primary hover:underline"
+              >@developmentseed/deck.gl-raster</a
+            >.
+          </p>
 
-                <VLayerDeckglMosaic
-                  v-if="stacItems.length > 0"
-                  id="naip-mosaic"
-                  :sources="stacItems"
-                  :render-mode="renderMode"
-                  @source-load="handleSourceLoad"
-                  @error="handleError"
-                />
-              </VMap>
-            </ClientOnly>
-
-            <!-- Toggle button - always visible -->
-            <button
-              class="absolute top-4 left-4 z-10 flex size-9 items-center justify-center rounded-lg bg-background/95 shadow-lg backdrop-blur-sm transition-colors hover:bg-accent"
-              :class="{
-                'bg-primary text-primary-foreground hover:bg-primary/90':
-                  !panelOpen,
-              }"
-              @click="togglePanel"
-            >
-              <Icon
-                :name="
-                  panelOpen
-                    ? 'lucide:panel-left-close'
-                    : 'lucide:panel-left-open'
-                "
-                class="size-4"
-              />
-            </button>
-
-            <!-- Collapsible panel with motion-v -->
-            <AnimatePresence>
-              <motion.div
-                v-if="panelOpen"
-                :initial="{ opacity: 0, x: -20, scale: 0.95 }"
-                :animate="{ opacity: 1, x: 0, scale: 1 }"
-                :exit="{ opacity: 0, x: -20, scale: 0.95 }"
-                :transition="{ type: 'spring', stiffness: 300, damping: 25 }"
-                class="absolute top-16 left-4 z-10 w-64 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
-              >
-                <h3 class="mb-2 text-sm font-semibold">NAIP Mosaic</h3>
-                <p class="mb-3 text-xs text-muted-foreground">
-                  <span v-if="loading">Loading STAC items...</span>
-                  <span v-else-if="error" class="text-destructive">{{
-                    error
-                  }}</span>
-                  <template v-else>
-                    Fetched {{ stacItems.length }}
-                    <a
-                      href="https://stacspec.org/en"
-                      target="_blank"
-                      class="text-primary hover:underline"
-                      >STAC</a
-                    >
-                    Items from
-                    <a
-                      href="https://planetarycomputer.microsoft.com"
-                      target="_blank"
-                      class="text-primary hover:underline"
-                      >Microsoft Planetary Computer</a
-                    >.
-                  </template>
-                </p>
-                <p class="mb-3 text-xs text-muted-foreground">
-                  All imagery is rendered client-side with
-                  <strong>no server involved</strong> using
-                  <a
-                    href="https://github.com/developmentseed/deck.gl-raster"
-                    target="_blank"
-                    class="font-mono text-primary hover:underline"
-                    >@developmentseed/deck.gl-raster</a
-                  >.
-                </p>
-
-                <div>
-                  <label class="mb-1.5 block text-xs font-medium"
-                    >Render Mode</label
-                  >
-                  <Select v-model="renderMode" :disabled="loading">
-                    <SelectTrigger class="w-full">
-                      <SelectValue
-                        :placeholder="getRenderModeLabel(renderMode)"
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem
-                        v-for="opt in renderModeOptions"
-                        :key="opt.value"
-                        :value="opt.value"
-                      >
-                        {{ opt.label }}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+          <div>
+            <label class="mb-1.5 block text-xs font-medium">Render Mode</label>
+            <Select v-model="renderMode" :disabled="loading">
+              <SelectTrigger class="w-full">
+                <SelectValue :placeholder="getRenderModeLabel(renderMode)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem
+                  v-for="opt in renderModeOptions"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
+                  {{ opt.label }}
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-card p-4">
-        <h3 class="mb-3 font-semibold">Features</h3>
-        <ul
-          class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-muted-foreground"
-        >
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Client-side mosaic
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            STAC API integration
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            4-band imagery (RGBN)
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            GPU-accelerated
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            No server required
-          </li>
-          <li class="flex items-center gap-2">
-            <Icon
-              name="lucide:check"
-              class="size-4 shrink-0 text-emerald-500"
-            />
-            Multi-render modes
-          </li>
-        </ul>
-      </div>
-
-      <ExampleNavigation />
+        </motion.div>
+      </AnimatePresence>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

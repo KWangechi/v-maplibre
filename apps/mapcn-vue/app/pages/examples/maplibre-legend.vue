@@ -65,12 +65,11 @@
     return activeTab.value === tab;
   }
 
-  function getTabClasses(tab: TabType): string {
-    const base = 'relative px-1 pb-3 text-sm font-medium transition-colors';
-    return activeTab.value === tab
-      ? `${base} text-foreground`
-      : `${base} text-muted-foreground hover:text-foreground`;
-  }
+  const TAB_LABELS: Record<TabType, string> = {
+    category: 'Category',
+    gradient: 'Gradient',
+    size: 'Size',
+  };
 
   const mapOptions = computed(() => ({
     container: `legend-map-${mapId}-${activeTab.value}`,
@@ -505,384 +504,238 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="Interactive Legend"
+    description="VControlLegend supports category, gradient, and size legend types. Category legends support click-to-filter functionality."
+    :code="currentCodeExample"
+    full-width
+    registry="map-layers"
+    class="h-full"
+  >
+    <div class="relative size-full overflow-hidden">
+      <div
+        class="absolute left-3 top-3 z-10 flex gap-1 rounded-lg border border-border/50 bg-background/80 p-1 backdrop-blur-sm"
+      >
+        <button
+          v-for="tab in ['category', 'gradient', 'size'] as const"
+          :key="tab"
+          class="rounded-md px-3 py-1.5 text-xs font-medium transition-colors"
+          :class="
+            isTabActive(tab)
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          "
+          @click="setActiveTab(tab)"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Interactive Legend
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          VControlLegend supports category, gradient, and size legend types.
-          Category legends support click-to-filter functionality.
-        </p>
+          {{ TAB_LABELS[tab] }}
+        </button>
       </div>
 
-      <div class="mb-6 border-b border-border">
-        <div class="flex gap-4">
-          <button
-            :class="getTabClasses('category')"
-            @click="setActiveTab('category')"
+      <ClientOnly>
+        <template v-if="isLoading && !isTabActive('size')">
+          <div class="flex h-full items-center justify-center bg-muted">
+            <div class="text-center">
+              <Icon
+                name="lucide:loader-2"
+                class="mx-auto size-8 animate-spin text-muted-foreground"
+              />
+              <p class="mt-2 text-sm text-muted-foreground">
+                Loading US states data...
+              </p>
+            </div>
+          </div>
+        </template>
+
+        <!-- CATEGORY LEGEND -->
+        <template v-else-if="isTabActive('category') && statesGeoJson">
+          <VMap
+            :key="`category-${mapStyle}`"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
           >
-            Category
-            <span
-              v-if="isTabActive('category')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
-          </button>
-          <button
-            :class="getTabClasses('gradient')"
-            @click="setActiveTab('gradient')"
+            <VControlNavigation position="top-right" />
+
+            <VLayerMaplibreGeojson
+              source-id="regions-legend"
+              layer-id="regions-fill"
+              :source="{ type: 'geojson', data: statesGeoJson }"
+              :layer="{
+                id: 'regions-fill',
+                type: 'fill',
+                source: 'regions-legend',
+                paint: {
+                  'fill-color': [
+                    'match',
+                    ['get', 'region'],
+                    'West',
+                    '#e41a1c',
+                    'Southwest',
+                    '#377eb8',
+                    'Midwest',
+                    '#4daf4a',
+                    'Southeast',
+                    '#984ea3',
+                    'Northeast',
+                    '#ff7f00',
+                    '#999999',
+                  ],
+                  'fill-opacity': 0.7,
+                },
+              }"
+            />
+
+            <VLayerMaplibreGeojson
+              source-id="regions-legend"
+              layer-id="regions-line"
+              :source="{ type: 'geojson', data: statesGeoJson }"
+              :layer="{
+                id: 'regions-line',
+                type: 'line',
+                source: 'regions-legend',
+                paint: {
+                  'line-color': '#ffffff',
+                  'line-width': 1,
+                },
+              }"
+            />
+
+            <VControlLegend
+              :layer-ids="['regions-fill']"
+              type="category"
+              :items="categoryLegendItems"
+              property="fill-color"
+              title="US Regions"
+              :interactive="true"
+              position="bottom-left"
+              @filter-change="handleFilterChange"
+            />
+          </VMap>
+        </template>
+
+        <!-- GRADIENT LEGEND -->
+        <template v-else-if="isTabActive('gradient') && statesWithDensity">
+          <VMap
+            :key="`gradient-${mapStyle}`"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
           >
-            Gradient
-            <span
-              v-if="isTabActive('gradient')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
-          </button>
-          <button :class="getTabClasses('size')" @click="setActiveTab('size')">
-            Size
-            <span
-              v-if="isTabActive('size')"
-              class="absolute right-0 bottom-0 left-0 h-0.5 bg-foreground"
-            ></span>
-          </button>
-        </div>
-      </div>
+            <VControlNavigation position="top-right" />
 
-      <ComponentDemo :code="currentCodeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <template v-if="isLoading && !isTabActive('size')">
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <div class="text-center">
-                    <Icon
-                      name="lucide:loader-2"
-                      class="mx-auto size-8 animate-spin text-muted-foreground"
-                    />
-                    <p class="mt-2 text-sm text-muted-foreground">
-                      Loading US states data...
-                    </p>
-                  </div>
-                </div>
-              </template>
+            <VLayerMaplibreGeojson
+              source-id="density-legend"
+              layer-id="density-fill"
+              :source="{ type: 'geojson', data: statesWithDensity }"
+              :layer="{
+                id: 'density-fill',
+                type: 'fill',
+                source: 'density-legend',
+                paint: {
+                  'fill-color': [
+                    'interpolate',
+                    ['linear'],
+                    ['get', 'density'],
+                    0,
+                    '#ffffcc',
+                    100,
+                    '#a1dab4',
+                    200,
+                    '#41b6c4',
+                    350,
+                    '#2c7fb8',
+                    500,
+                    '#253494',
+                  ],
+                  'fill-opacity': 0.8,
+                },
+              }"
+            />
 
-              <!-- CATEGORY LEGEND -->
-              <template v-else-if="isTabActive('category') && statesGeoJson">
-                <VMap
-                  :key="`category-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
+            <VLayerMaplibreGeojson
+              source-id="density-legend"
+              layer-id="density-line"
+              :source="{ type: 'geojson', data: statesWithDensity }"
+              :layer="{
+                id: 'density-line',
+                type: 'line',
+                source: 'density-legend',
+                paint: {
+                  'line-color': '#ffffff',
+                  'line-width': 1,
+                },
+              }"
+            />
 
-                  <VLayerMaplibreGeojson
-                    source-id="regions-legend"
-                    layer-id="regions-fill"
-                    :source="{ type: 'geojson', data: statesGeoJson }"
-                    :layer="{
-                      id: 'regions-fill',
-                      type: 'fill',
-                      source: 'regions-legend',
-                      paint: {
-                        'fill-color': [
-                          'match',
-                          ['get', 'region'],
-                          'West',
-                          '#e41a1c',
-                          'Southwest',
-                          '#377eb8',
-                          'Midwest',
-                          '#4daf4a',
-                          'Southeast',
-                          '#984ea3',
-                          'Northeast',
-                          '#ff7f00',
-                          '#999999',
-                        ],
-                        'fill-opacity': 0.7,
-                      },
-                    }"
-                  />
+            <VControlLegend
+              :layer-ids="['density-fill']"
+              type="gradient"
+              :items="[gradientLegendItem]"
+              title="Population Density"
+              :interactive="false"
+              position="bottom-left"
+            />
+          </VMap>
+        </template>
 
-                  <VLayerMaplibreGeojson
-                    source-id="regions-legend"
-                    layer-id="regions-line"
-                    :source="{ type: 'geojson', data: statesGeoJson }"
-                    :layer="{
-                      id: 'regions-line',
-                      type: 'line',
-                      source: 'regions-legend',
-                      paint: {
-                        'line-color': '#ffffff',
-                        'line-width': 1,
-                      },
-                    }"
-                  />
+        <!-- SIZE LEGEND -->
+        <template v-else-if="isTabActive('size')">
+          <VMap
+            :key="`size-${mapStyle}`"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
+          >
+            <VControlNavigation position="top-right" />
 
-                  <VControlLegend
-                    :layer-ids="['regions-fill']"
-                    type="category"
-                    :items="categoryLegendItems"
-                    property="fill-color"
-                    title="US Regions"
-                    :interactive="true"
-                    position="bottom-left"
-                    @filter-change="handleFilterChange"
-                  />
-                </VMap>
-              </template>
+            <VLayerMaplibreGeojson
+              source-id="cities-legend"
+              layer-id="cities-circles"
+              :source="{ type: 'geojson', data: citiesGeoJson }"
+              :layer="{
+                id: 'cities-circles',
+                type: 'circle',
+                source: 'cities-legend',
+                paint: {
+                  'circle-radius': [
+                    'match',
+                    ['get', 'popClass'],
+                    'large',
+                    20,
+                    'medium',
+                    14,
+                    'small',
+                    8,
+                    6,
+                  ],
+                  'circle-color': '#3b82f6',
+                  'circle-stroke-color': '#ffffff',
+                  'circle-stroke-width': 2,
+                  'circle-opacity': 0.8,
+                },
+              }"
+            />
 
-              <!-- GRADIENT LEGEND -->
-              <template
-                v-else-if="isTabActive('gradient') && statesWithDensity"
-              >
-                <VMap
-                  :key="`gradient-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
+            <VControlLegend
+              :layer-ids="['cities-circles']"
+              type="size"
+              :items="sizeLegendItems"
+              title="City Population"
+              :interactive="false"
+              position="bottom-left"
+            />
+          </VMap>
+        </template>
 
-                  <VLayerMaplibreGeojson
-                    source-id="density-legend"
-                    layer-id="density-fill"
-                    :source="{ type: 'geojson', data: statesWithDensity }"
-                    :layer="{
-                      id: 'density-fill',
-                      type: 'fill',
-                      source: 'density-legend',
-                      paint: {
-                        'fill-color': [
-                          'interpolate',
-                          ['linear'],
-                          ['get', 'density'],
-                          0,
-                          '#ffffcc',
-                          100,
-                          '#a1dab4',
-                          200,
-                          '#41b6c4',
-                          350,
-                          '#2c7fb8',
-                          500,
-                          '#253494',
-                        ],
-                        'fill-opacity': 0.8,
-                      },
-                    }"
-                  />
-
-                  <VLayerMaplibreGeojson
-                    source-id="density-legend"
-                    layer-id="density-line"
-                    :source="{ type: 'geojson', data: statesWithDensity }"
-                    :layer="{
-                      id: 'density-line',
-                      type: 'line',
-                      source: 'density-legend',
-                      paint: {
-                        'line-color': '#ffffff',
-                        'line-width': 1,
-                      },
-                    }"
-                  />
-
-                  <VControlLegend
-                    :layer-ids="['density-fill']"
-                    type="gradient"
-                    :items="[gradientLegendItem]"
-                    title="Population Density"
-                    :interactive="false"
-                    position="bottom-left"
-                  />
-                </VMap>
-              </template>
-
-              <!-- SIZE LEGEND -->
-              <template v-else-if="isTabActive('size')">
-                <VMap
-                  :key="`size-${mapStyle}`"
-                  :options="mapOptions"
-                  class="size-full"
-                  @loaded="handleMapLoad"
-                >
-                  <VControlNavigation position="top-right" />
-
-                  <VLayerMaplibreGeojson
-                    source-id="cities-legend"
-                    layer-id="cities-circles"
-                    :source="{ type: 'geojson', data: citiesGeoJson }"
-                    :layer="{
-                      id: 'cities-circles',
-                      type: 'circle',
-                      source: 'cities-legend',
-                      paint: {
-                        'circle-radius': [
-                          'match',
-                          ['get', 'popClass'],
-                          'large',
-                          20,
-                          'medium',
-                          14,
-                          'small',
-                          8,
-                          6,
-                        ],
-                        'circle-color': '#3b82f6',
-                        'circle-stroke-color': '#ffffff',
-                        'circle-stroke-width': 2,
-                        'circle-opacity': 0.8,
-                      },
-                    }"
-                  />
-
-                  <VControlLegend
-                    :layer-ids="['cities-circles']"
-                    type="size"
-                    :items="sizeLegendItems"
-                    title="City Population"
-                    :interactive="false"
-                    position="bottom-left"
-                  />
-                </VMap>
-              </template>
-
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
+        <template #fallback>
+          <div class="flex h-full items-center justify-center bg-muted">
+            <Icon
+              name="lucide:loader-2"
+              class="size-8 animate-spin text-muted-foreground"
+            />
           </div>
-
-          <div class="mt-4 bg-muted/50 p-4">
-            <h3 class="mb-2 font-medium">
-              {{
-                isTabActive('category')
-                  ? 'Category Legend'
-                  : isTabActive('gradient')
-                    ? 'Gradient Legend'
-                    : 'Size Legend'
-              }}
-            </h3>
-            <ul class="space-y-2 text-sm text-muted-foreground">
-              <template v-if="isTabActive('category')">
-                <li>
-                  <strong class="text-foreground">Click to Filter:</strong>
-                  Click any legend item to toggle visibility of that category.
-                </li>
-                <li>
-                  <strong class="text-foreground">Visual Feedback:</strong>
-                  Hidden items appear faded with strikethrough text.
-                </li>
-                <li>
-                  <strong class="text-foreground">MapLibre Integration:</strong>
-                  Automatically applies filters using MapLibre expressions.
-                </li>
-              </template>
-              <template v-else-if="isTabActive('gradient')">
-                <li>
-                  <strong class="text-foreground">Color Ramp:</strong>
-                  Displays continuous color gradients for numeric data.
-                </li>
-                <li>
-                  <strong class="text-foreground">Min/Max Labels:</strong>
-                  Custom labels for the value range endpoints.
-                </li>
-                <li>
-                  <strong class="text-foreground">Auto-Generate:</strong>
-                  Can parse interpolate/step expressions from paint properties.
-                </li>
-              </template>
-              <template v-else>
-                <li>
-                  <strong class="text-foreground">Proportional Symbols:</strong>
-                  Shows size-based visualization with scaled circles.
-                </li>
-                <li>
-                  <strong class="text-foreground">Size Classes:</strong>
-                  Define discrete size classes with labels.
-                </li>
-                <li>
-                  <strong class="text-foreground">Visual Reference:</strong>
-                  Circles in legend match the map symbol sizes.
-                </li>
-              </template>
-            </ul>
-          </div>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Legend Item Types</h3>
-        <div class="space-y-3 text-sm">
-          <div>
-            <code class="text-primary">CategoryLegendItem</code>
-            <p class="mt-1 text-muted-foreground">
-              <code>{ value, label, color, visible?, count? }</code>
-            </p>
-          </div>
-          <div>
-            <code class="text-primary">GradientLegendItem</code>
-            <p class="mt-1 text-muted-foreground">
-              <code>{ min, max, colors, stops, minLabel?, maxLabel? }</code>
-            </p>
-          </div>
-          <div>
-            <code class="text-primary">SizeLegendItem</code>
-            <p class="mt-1 text-muted-foreground">
-              <code>{ value, label, size }</code>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Common Props</h3>
-        <div class="space-y-1 text-sm">
-          <div class="flex justify-between">
-            <code class="text-primary">layer-ids</code>
-            <span class="text-muted-foreground">string[] (required)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">type</code>
-            <span class="text-muted-foreground"
-              >"category" | "gradient" | "size"</span
-            >
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">items</code>
-            <span class="text-muted-foreground">LegendItem[]</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">title</code>
-            <span class="text-muted-foreground">string</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">interactive</code>
-            <span class="text-muted-foreground">boolean (category only)</span>
-          </div>
-          <div class="flex justify-between">
-            <code class="text-primary">auto-generate</code>
-            <span class="text-muted-foreground">boolean</span>
-          </div>
-        </div>
-      </div>
-
-      <ExampleNavigation />
+        </template>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

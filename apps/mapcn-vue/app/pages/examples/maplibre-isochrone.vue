@@ -225,209 +225,152 @@
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="Isochrone Map"
+    description="Visualize travel time or distance zones showing areas reachable from a point. Drag the marker to change the origin."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap
+          :key="mapStyle"
+          :options="mapOptions"
+          class="size-full"
+          @loaded="handleMapLoad"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Isochrone Map
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Visualize travel time or distance zones showing areas reachable from a
-          point. Drag the marker to change the origin.
-        </p>
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerMaplibreIsochrone
+            v-if="mapLoaded && isochroneData"
+            id="isochrone"
+            :data="isochroneData"
+            :fill-opacity="0.85"
+            :line-width="0"
+            :line-opacity="0"
+            :reverse-order="false"
+          />
+
+          <VMarker
+            :coordinates="originPoint"
+            :options="{ draggable: true, color: '#ef4444' }"
+            @dragend="handleMarkerDragEnd"
+          />
+
+          <VControlLegend
+            :layer-ids="['isochrone-fill', 'isochrone-line']"
+            type="category"
+            :items="legendItems"
+            :title="legendTitle"
+            position="bottom-left"
+            :interactive="false"
+          />
+
+          <VControlLayer
+            layer-id="isochrone-fill"
+            title="Isochrone Opacity"
+            position="top-left"
+            :visible="true"
+            :opacity="0.85"
+          />
+        </VMap>
+        <template #fallback>
+          <div class="flex h-full items-center justify-center bg-muted">
+            <Icon
+              name="lucide:loader-2"
+              class="size-8 animate-spin text-muted-foreground"
+            />
+          </div>
+        </template>
+      </ClientOnly>
+
+      <div
+        v-if="isLoading"
+        class="absolute inset-0 z-10 flex items-center justify-center bg-background/50"
+      >
+        <div class="flex items-center gap-2 text-sm">
+          <Icon name="lucide:loader-2" class="size-4 animate-spin" />
+          Calculating travel zones...
+        </div>
       </div>
 
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="mapStyle"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="handleMapLoad"
-              >
-                <VControlNavigation position="top-right" />
-                <VControlScale position="bottom-left" />
+      <div
+        v-if="error"
+        class="absolute inset-0 z-10 flex items-center justify-center bg-background/80"
+      >
+        <div class="text-center">
+          <Icon
+            name="lucide:alert-circle"
+            class="mx-auto size-8 text-destructive"
+          />
+          <p class="mt-2 text-sm text-destructive">{{ error }}</p>
+        </div>
+      </div>
 
-                <!-- VLayerMaplibreIsochrone handles:
-                             - Color formatting (adds # prefix if needed)
-                             - Reversing feature order for proper stacking
-                             - Both fill and line layers -->
-                <VLayerMaplibreIsochrone
-                  v-if="mapLoaded && isochroneData"
-                  id="isochrone"
-                  :data="isochroneData"
-                  :fill-opacity="0.85"
-                  :line-width="0"
-                  :line-opacity="0"
-                  :reverse-order="false"
-                />
-
-                <VMarker
-                  :coordinates="originPoint"
-                  :options="{ draggable: true, color: '#ef4444' }"
-                  @dragend="handleMarkerDragEnd"
-                />
-
-                <VControlLegend
-                  :layer-ids="['isochrone-fill', 'isochrone-line']"
-                  type="category"
-                  :items="legendItems"
-                  :title="legendTitle"
-                  position="bottom-left"
-                  :interactive="false"
-                />
-
-                <VControlLayer
-                  layer-id="isochrone-fill"
-                  title="Isochrone Opacity"
-                  position="top-left"
-                  :visible="true"
-                  :opacity="0.85"
-                />
-              </VMap>
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
-
-            <div
-              v-if="isLoading"
-              class="absolute inset-0 z-10 flex items-center justify-center bg-background/50"
+      <!-- Controls overlay -->
+      <div
+        class="absolute bottom-4 left-4 z-10 w-64 rounded-xl bg-background/95 p-4 shadow-lg backdrop-blur-sm"
+      >
+        <div class="mb-3">
+          <h3 class="mb-2 text-xs font-medium">Metric</h3>
+          <div class="flex gap-1.5">
+            <button
+              class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors"
+              :class="[
+                selectedMetric === 'time'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted hover:bg-muted/80',
+              ]"
+              :disabled="isLoading"
+              @click="handleMetricChange('time')"
             >
-              <div class="flex items-center gap-2 text-sm">
-                <Icon name="lucide:loader-2" class="size-4 animate-spin" />
-                Calculating travel zones...
-              </div>
-            </div>
-
-            <div
-              v-if="error"
-              class="absolute inset-0 z-10 flex items-center justify-center bg-background/80"
+              <Icon name="lucide:clock" class="size-3.5" />
+              Time
+            </button>
+            <button
+              class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors"
+              :class="[
+                selectedMetric === 'distance'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted hover:bg-muted/80',
+              ]"
+              :disabled="isLoading"
+              @click="handleMetricChange('distance')"
             >
-              <div class="text-center">
-                <Icon
-                  name="lucide:alert-circle"
-                  class="mx-auto size-8 text-destructive"
-                />
-                <p class="mt-2 text-sm text-destructive">
-                  {{ error }}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Controls -->
-          <div class="mt-4 bg-card p-4">
-            <div class="mb-4">
-              <h3 class="mb-3 font-medium">Metric</h3>
-              <div class="flex gap-2">
-                <button
-                  class="flex items-center gap-2 px-4 py-2 text-sm transition-colors"
-                  :class="[
-                    selectedMetric === 'time'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : `border-border hover:bg-muted`,
-                  ]"
-                  :disabled="isLoading"
-                  @click="handleMetricChange('time')"
-                >
-                  <Icon name="lucide:clock" class="size-4" />
-                  Time
-                </button>
-                <button
-                  class="flex items-center gap-2 px-4 py-2 text-sm transition-colors"
-                  :class="[
-                    selectedMetric === 'distance'
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : `border-border hover:bg-muted`,
-                  ]"
-                  :disabled="isLoading"
-                  @click="handleMetricChange('distance')"
-                >
-                  <Icon name="lucide:ruler" class="size-4" />
-                  Distance
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="mb-3 font-medium">Transport Mode</h3>
-              <div class="flex gap-2">
-                <button
-                  v-for="mode in transportModes"
-                  :key="mode.value"
-                  class="flex items-center gap-2 px-4 py-2 text-sm transition-colors"
-                  :class="[
-                    selectedMode === mode.value
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : `border-border hover:bg-muted`,
-                  ]"
-                  :disabled="isLoading"
-                  @click="handleModeChange(mode.value)"
-                >
-                  <Icon :name="mode.icon" class="size-4" />
-                  {{ mode.label }}
-                </button>
-              </div>
-            </div>
-
-            <div class="mt-4 text-sm text-muted-foreground">
-              <p>
-                <strong class="text-foreground">Tip:</strong> Drag the red
-                marker to calculate travel zones from a different location.
-              </p>
-            </div>
+              <Icon name="lucide:ruler" class="size-3.5" />
+              Distance
+            </button>
           </div>
         </div>
-      </ComponentDemo>
 
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">What is an Isochrone?</h3>
-        <p class="text-sm text-muted-foreground">
-          An isochrone shows all areas reachable from a point within a specific
-          time or distance. It accounts for actual road networks, one-way
-          streets, and travel mode. Unlike simple radius circles, isochrones
-          follow real roads for accurate coverage estimates.
+        <div>
+          <h3 class="mb-2 text-xs font-medium">Transport</h3>
+          <div class="flex gap-1.5">
+            <button
+              v-for="mode in transportModes"
+              :key="mode.value"
+              class="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors"
+              :class="[
+                selectedMode === mode.value
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted hover:bg-muted/80',
+              ]"
+              :disabled="isLoading"
+              @click="handleModeChange(mode.value)"
+            >
+              <Icon :name="mode.icon" class="size-3.5" />
+              {{ mode.label }}
+            </button>
+          </div>
+        </div>
+
+        <p class="mt-3 text-xs text-muted-foreground">
+          Drag the red marker to change origin.
         </p>
       </div>
-
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Use Cases</h3>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <strong class="text-foreground">Real Estate:</strong> Show commute
-            times to office locations for home buyers.
-          </li>
-          <li>
-            <strong class="text-foreground">Logistics:</strong> Determine
-            delivery coverage areas for warehouses.
-          </li>
-          <li>
-            <strong class="text-foreground">Urban Planning:</strong> Analyze
-            accessibility of public services and transit.
-          </li>
-          <li>
-            <strong class="text-foreground">Emergency Services:</strong>
-            Visualize response time coverage for fire/ambulance stations.
-          </li>
-        </ul>
-      </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

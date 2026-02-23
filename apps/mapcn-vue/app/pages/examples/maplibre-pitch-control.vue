@@ -191,166 +191,121 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Pitch & Bearing Control
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Adjust map pitch (tilt angle) and bearing (rotation) with interactive
-          sliders. Create stunning 3D perspectives of your maps.
-        </p>
+  <ComponentDemo
+    title="Pitch & Bearing Control"
+    description="Adjust map pitch (tilt angle) and bearing (rotation) with interactive sliders. Create stunning 3D perspectives of your maps."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="min-w-0">
+      <div class="relative h-125 overflow-hidden">
+        <ClientOnly>
+          <VMap
+            :key="mapStyle"
+            :options="mapOptions"
+            class="size-full"
+            @loaded="handleMapLoad"
+          >
+            <VControlNavigation position="top-right" />
+          </VMap>
+          <template #fallback>
+            <div class="flex h-full items-center justify-center bg-muted">
+              <Icon
+                name="lucide:loader-2"
+                class="size-8 animate-spin text-muted-foreground"
+              />
+            </div>
+          </template>
+        </ClientOnly>
       </div>
 
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="mapStyle"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="handleMapLoad"
-              >
-                <VControlNavigation position="top-right" />
-              </VMap>
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
+      <!-- Controls Panel -->
+      <div class="mt-4 bg-card p-4">
+        <!-- Preset buttons -->
+        <div class="mb-4 flex gap-2">
+          <button
+            class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
+            @click="resetView"
+          >
+            <Icon name="lucide:compass" class="mr-1 inline-block size-4" />
+            Top View
+          </button>
+          <button
+            class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
+            @click="set3DView"
+          >
+            <Icon name="lucide:box" class="mr-1 inline-block size-4" />
+            3D View
+          </button>
+          <button
+            class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
+            @click="setBirdsEye"
+          >
+            <Icon name="lucide:eye" class="mr-1 inline-block size-4" />
+            Bird's Eye
+          </button>
+        </div>
+
+        <!-- Pitch slider -->
+        <div class="mb-4">
+          <div class="mb-2 flex items-center justify-between">
+            <label class="text-sm font-medium">Pitch (Tilt)</label>
+            <span class="text-sm text-muted-foreground">{{ pitch }}°</span>
           </div>
-
-          <!-- Controls Panel -->
-          <div class="mt-4 bg-card p-4">
-            <!-- Preset buttons -->
-            <div class="mb-4 flex gap-2">
-              <button
-                class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
-                @click="resetView"
-              >
-                <Icon name="lucide:compass" class="mr-1 inline-block size-4" />
-                Top View
-              </button>
-              <button
-                class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
-                @click="set3DView"
-              >
-                <Icon name="lucide:box" class="mr-1 inline-block size-4" />
-                3D View
-              </button>
-              <button
-                class="flex-1 rounded-md border border-border px-3 py-2 text-sm transition-colors hover:bg-muted"
-                @click="setBirdsEye"
-              >
-                <Icon name="lucide:eye" class="mr-1 inline-block size-4" />
-                Bird's Eye
-              </button>
-            </div>
-
-            <!-- Pitch slider -->
-            <div class="mb-4">
-              <div class="mb-2 flex items-center justify-between">
-                <label class="text-sm font-medium">Pitch (Tilt)</label>
-                <span class="text-sm text-muted-foreground">{{ pitch }}°</span>
-              </div>
-              <Slider
-                :model-value="[pitch]"
-                :min="0"
-                :max="85"
-                :step="1"
-                @update:model-value="(val) => updatePitch(val[0])"
-              />
-              <div
-                class="mt-1 flex justify-between text-xs text-muted-foreground"
-              >
-                <span>0° (Flat)</span>
-                <span>85° (Max)</span>
-              </div>
-            </div>
-
-            <!-- Bearing slider -->
-            <div class="mb-4">
-              <div class="mb-2 flex items-center justify-between">
-                <label class="text-sm font-medium">Bearing (Rotation)</label>
-                <span class="text-sm text-muted-foreground"
-                  >{{ bearing }}°</span
-                >
-              </div>
-              <Slider
-                :model-value="[bearing]"
-                :min="-180"
-                :max="180"
-                :step="1"
-                @update:model-value="(val) => updateBearing(val[0])"
-              />
-              <div
-                class="mt-1 flex justify-between text-xs text-muted-foreground"
-              >
-                <span>-180° (South)</span>
-                <span>0° (North)</span>
-                <span>180° (South)</span>
-              </div>
-            </div>
-
-            <!-- Zoom slider -->
-            <div>
-              <div class="mb-2 flex items-center justify-between">
-                <label class="text-sm font-medium">Zoom</label>
-                <span class="text-sm text-muted-foreground">{{ zoom }}</span>
-              </div>
-              <Slider
-                :model-value="[zoom]"
-                :min="10"
-                :max="20"
-                :step="0.1"
-                @update:model-value="(val) => updateZoom(val[0])"
-              />
-              <div
-                class="mt-1 flex justify-between text-xs text-muted-foreground"
-              >
-                <span>10 (Far)</span>
-                <span>20 (Close)</span>
-              </div>
-            </div>
+          <Slider
+            :model-value="[pitch]"
+            :min="0"
+            :max="85"
+            :step="1"
+            @update:model-value="(val) => updatePitch(val[0])"
+          />
+          <div class="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>0° (Flat)</span>
+            <span>85° (Max)</span>
           </div>
         </div>
-      </ComponentDemo>
 
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Understanding Pitch & Bearing</h3>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <strong class="text-foreground">Pitch (0-85°):</strong> The angle of
-            the camera looking down at the map. 0° is straight down, 85° is
-            nearly horizontal.
-          </li>
-          <li>
-            <strong class="text-foreground">Bearing (-180° to 180°):</strong>
-            The rotation of the map around the center. 0° points north, 90°
-            points east.
-          </li>
-          <li>
-            <strong class="text-foreground">Gestures:</strong> The map also
-            responds to touch/mouse gestures - right-click + drag to rotate,
-            ctrl + drag to pitch.
-          </li>
-        </ul>
+        <!-- Bearing slider -->
+        <div class="mb-4">
+          <div class="mb-2 flex items-center justify-between">
+            <label class="text-sm font-medium">Bearing (Rotation)</label>
+            <span class="text-sm text-muted-foreground">{{ bearing }}°</span>
+          </div>
+          <Slider
+            :model-value="[bearing]"
+            :min="-180"
+            :max="180"
+            :step="1"
+            @update:model-value="(val) => updateBearing(val[0])"
+          />
+          <div class="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>-180° (South)</span>
+            <span>0° (North)</span>
+            <span>180° (South)</span>
+          </div>
+        </div>
+
+        <!-- Zoom slider -->
+        <div>
+          <div class="mb-2 flex items-center justify-between">
+            <label class="text-sm font-medium">Zoom</label>
+            <span class="text-sm text-muted-foreground">{{ zoom }}</span>
+          </div>
+          <Slider
+            :model-value="[zoom]"
+            :min="10"
+            :max="20"
+            :step="0.1"
+            @update:model-value="(val) => updateZoom(val[0])"
+          />
+          <div class="mt-1 flex justify-between text-xs text-muted-foreground">
+            <span>10 (Far)</span>
+            <span>20 (Close)</span>
+          </div>
+        </div>
       </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

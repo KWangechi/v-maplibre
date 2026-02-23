@@ -330,203 +330,159 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="Proximity Map"
+    description="Visualize distances and connections between multiple locations. Useful for logistics planning, network analysis, and proximity calculations."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap
+          :key="mapStyle"
+          :options="mapOptions"
+          class="size-full"
+          @loaded="handleMapLoad"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Proximity Map
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Visualize distances and connections between multiple locations. Useful
-          for logistics planning, network analysis, and proximity calculations.
-        </p>
-      </div>
+          <VControlNavigation position="top-right" />
 
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="min-w-0">
-          <div class="relative h-125 overflow-hidden">
-            <ClientOnly>
-              <VMap
-                :key="mapStyle"
-                :options="mapOptions"
-                class="size-full"
-                @loaded="handleMapLoad"
-              >
-                <VControlNavigation position="top-right" />
+          <VLayerMaplibreGeojson
+            v-if="mapLoaded && linesWithColor.features.length > 0"
+            source-id="proximity-connections"
+            layer-id="connection-lines"
+            :source="{ type: 'geojson', data: linesWithColor }"
+            :layer="{
+              id: 'connection-lines',
+              type: 'line',
+              source: 'proximity-connections',
+              paint: {
+                'line-color': ['get', 'lineColor'],
+                'line-width': 2,
+                'line-dasharray': [4, 4],
+              },
+            }"
+          />
 
-                <!-- Connection lines -->
-                <VLayerMaplibreGeojson
-                  v-if="mapLoaded && linesWithColor.features.length > 0"
-                  source-id="proximity-connections"
-                  layer-id="connection-lines"
-                  :source="{ type: 'geojson', data: linesWithColor }"
-                  :layer="{
-                    id: 'connection-lines',
-                    type: 'line',
-                    source: 'proximity-connections',
-                    paint: {
-                      'line-color': ['get', 'lineColor'],
-                      'line-width': 2,
-                      'line-dasharray': [4, 4],
-                    },
-                  }"
-                />
+          <VMarker
+            v-for="loc in locations"
+            :key="loc.id"
+            :coordinates="loc.coordinates"
+            :options="{ color: getMarkerColor(loc.type) }"
+            @click="toggleLocation(loc.id)"
+          />
 
-                <!-- Location markers - use default markers to avoid v-for + custom slot issues -->
-                <VMarker
-                  v-for="loc in locations"
-                  :key="loc.id"
-                  :coordinates="loc.coordinates"
-                  :options="{ color: getMarkerColor(loc.type) }"
-                  @click="toggleLocation(loc.id)"
-                />
+          <VControlLegend
+            :layer-ids="['connection-lines']"
+            type="category"
+            :items="distanceLegendItems"
+            title="Road Distance"
+            position="bottom-left"
+            :interactive="false"
+          />
+        </VMap>
+        <template #fallback>
+          <div class="flex h-full items-center justify-center bg-muted">
+            <Icon
+              name="lucide:loader-2"
+              class="size-8 animate-spin text-muted-foreground"
+            />
+          </div>
+        </template>
+      </ClientOnly>
 
-                <VControlLegend
-                  :layer-ids="['connection-lines']"
-                  type="category"
-                  :items="distanceLegendItems"
-                  title="Road Distance"
-                  position="bottom-left"
-                  :interactive="false"
-                />
-              </VMap>
-              <template #fallback>
-                <div class="flex h-full items-center justify-center bg-muted">
-                  <Icon
-                    name="lucide:loader-2"
-                    class="size-8 animate-spin text-muted-foreground"
-                  />
-                </div>
-              </template>
-            </ClientOnly>
+      <!-- Controls overlay -->
+      <div
+        class="absolute bottom-4 left-4 z-10 w-72 max-h-[calc(100%-2rem)] overflow-auto rounded-xl bg-background/95 shadow-lg backdrop-blur-sm"
+      >
+        <div class="p-4">
+          <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-sm font-medium">Connections</h3>
+            <label class="flex items-center gap-2 text-xs">
+              <input
+                v-model="showAllConnections"
+                type="checkbox"
+                class="rounded-sm border-border"
+              />
+              Show all
+            </label>
           </div>
 
-          <!-- Controls -->
-          <div class="mt-4 bg-card p-4">
-            <div class="mb-4 flex items-center justify-between">
-              <h3 class="font-medium">Connections</h3>
-              <label class="flex items-center gap-2 text-sm">
-                <input
-                  v-model="showAllConnections"
-                  type="checkbox"
-                  class="rounded-sm border-border"
-                />
-                Show all
-              </label>
-            </div>
-
-            <div class="space-y-2">
-              <button
-                v-for="loc in locations"
-                :key="loc.id"
-                class="flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors"
-                :class="[
-                  selectedLocation === loc.id
-                    ? 'border-primary bg-primary/10'
-                    : `border-border hover:bg-muted`,
-                ]"
-                @click="toggleLocation(loc.id)"
-              >
-                <div
-                  class="flex size-6 items-center justify-center rounded-full"
-                  :style="{ backgroundColor: getMarkerColor(loc.type) }"
-                >
-                  <Icon
-                    :name="getMarkerIcon(loc.type)"
-                    class="size-3 text-white"
-                  />
-                </div>
-                <span>{{ loc.name }}</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Distance table -->
-          <div class="mt-4 bg-card">
-            <div class="flex items-center justify-between border-b px-4 py-2">
-              <h3 class="font-medium">
-                Road Distances ({{ visibleConnections.length }} connections)
-              </h3>
+          <div class="space-y-1">
+            <button
+              v-for="loc in locations"
+              :key="loc.id"
+              class="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs transition-colors"
+              :class="[
+                selectedLocation === loc.id
+                  ? 'bg-primary/10'
+                  : 'hover:bg-muted',
+              ]"
+              @click="toggleLocation(loc.id)"
+            >
               <div
-                v-if="distancesLoading"
-                class="flex items-center gap-2 text-xs text-muted-foreground"
+                class="flex size-5 items-center justify-center rounded-full"
+                :style="{ backgroundColor: getMarkerColor(loc.type) }"
               >
-                <Icon name="lucide:loader-2" class="size-3 animate-spin" />
-                Loading...
+                <Icon
+                  :name="getMarkerIcon(loc.type)"
+                  class="size-2.5 text-white"
+                />
               </div>
-              <div v-else-if="distancesError" class="text-xs text-destructive">
-                {{ distancesError }}
-              </div>
-            </div>
-            <div class="max-h-40 overflow-y-auto">
-              <table class="w-full text-sm">
-                <thead class="sticky top-0 bg-card">
-                  <tr class="border-b">
-                    <th class="px-4 py-2 text-left font-medium">From</th>
-                    <th class="px-4 py-2 text-left font-medium">To</th>
-                    <th class="px-4 py-2 text-right font-medium">Distance</th>
-                    <th class="px-4 py-2 text-right font-medium">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="conn in visibleConnections"
-                    :key="`${conn.from.id}-${conn.to.id}`"
-                    class="border-b last:border-0"
-                  >
-                    <td class="px-4 py-2">
-                      {{ conn.from.name }}
-                    </td>
-                    <td class="px-4 py-2">
-                      {{ conn.to.name }}
-                    </td>
-                    <td class="px-4 py-2 text-right tabular-nums">
-                      {{ conn.distance.toFixed(1) }} km
-                    </td>
-                    <td
-                      class="px-4 py-2 text-right text-muted-foreground tabular-nums"
-                    >
-                      {{ formatDuration(conn.duration) }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+              <span>{{ loc.name }}</span>
+            </button>
           </div>
         </div>
-      </ComponentDemo>
 
-      <div class="mt-4 rounded-lg border bg-muted/50 p-4">
-        <h3 class="mb-2 font-medium">Use Cases</h3>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <strong class="text-foreground">Logistics:</strong> Find the nearest
-            warehouse to each customer for optimal delivery routing.
-          </li>
-          <li>
-            <strong class="text-foreground">Network Analysis:</strong>
-            Visualize connections between nodes in a distribution network.
-          </li>
-          <li>
-            <strong class="text-foreground">Site Selection:</strong> Analyze
-            distances when choosing new store or facility locations.
-          </li>
-          <li>
-            <strong class="text-foreground">Service Areas:</strong>
-            Determine which locations can serve which customers based on
-            distance thresholds.
-          </li>
-        </ul>
+        <div class="border-t">
+          <div class="flex items-center justify-between px-4 py-2">
+            <span class="text-xs font-medium">
+              {{ visibleConnections.length }} connections
+            </span>
+            <div
+              v-if="distancesLoading"
+              class="flex items-center gap-1 text-xs text-muted-foreground"
+            >
+              <Icon name="lucide:loader-2" class="size-3 animate-spin" />
+              Loading...
+            </div>
+            <div v-else-if="distancesError" class="text-xs text-destructive">
+              {{ distancesError }}
+            </div>
+          </div>
+          <div class="max-h-32 overflow-y-auto">
+            <table class="w-full text-xs">
+              <thead class="sticky top-0 bg-background/95">
+                <tr class="border-b">
+                  <th class="px-3 py-1 text-left font-medium">From</th>
+                  <th class="px-3 py-1 text-left font-medium">To</th>
+                  <th class="px-3 py-1 text-right font-medium">Dist</th>
+                  <th class="px-3 py-1 text-right font-medium">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="conn in visibleConnections"
+                  :key="`${conn.from.id}-${conn.to.id}`"
+                  class="border-b last:border-0"
+                >
+                  <td class="px-3 py-1">{{ conn.from.name }}</td>
+                  <td class="px-3 py-1">{{ conn.to.name }}</td>
+                  <td class="px-3 py-1 text-right tabular-nums">
+                    {{ conn.distance.toFixed(1) }} km
+                  </td>
+                  <td
+                    class="px-3 py-1 text-right text-muted-foreground tabular-nums"
+                  >
+                    {{ formatDuration(conn.duration) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-
-      <ExampleNavigation />
     </div>
-  </div>
+  </ComponentDemo>
 </template>

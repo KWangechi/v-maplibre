@@ -105,72 +105,57 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          GeoJSON Layer
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render GeoJSON polygons and lines on the map.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['geojson-fill', 'geojson-line']"
-                position="bottom-left"
-                type="category"
-                title="GeoJSON Features"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerMaplibreGeojson
-                source-id="geojson-source"
-                layer-id="geojson-fill"
-                :source="{ type: 'geojson', data: geojsonData }"
-                :layer="{
-                  id: 'geojson-fill',
-                  type: 'fill',
-                  source: 'geojson-source',
-                  paint: {
-                    'fill-color': '#10b981',
-                    'fill-opacity': 0.5,
-                  },
-                }"
-              />
-              <VLayerMaplibreGeojson
-                source-id="geojson-line-source"
-                layer-id="geojson-line"
-                :source="{ type: 'geojson', data: geojsonData }"
-                :layer="{
-                  id: 'geojson-line',
-                  type: 'line',
-                  source: 'geojson-line-source',
-                  paint: {
-                    'line-color': '#10b981',
-                    'line-width': 3,
-                  },
-                }"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="GeoJSON Layer"
+    description="Render GeoJSON polygons and lines on the map."
+    :code="codeExample"
+    registry="map-layers"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['geojson-fill', 'geojson-line']"
+            position="bottom-left"
+            type="category"
+            title="GeoJSON Features"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerMaplibreGeojson
+            source-id="geojson-source"
+            layer-id="geojson-fill"
+            :source="{ type: 'geojson', data: geojsonData }"
+            :layer="{
+              id: 'geojson-fill',
+              type: 'fill',
+              source: 'geojson-source',
+              paint: {
+                'fill-color': '#10b981',
+                'fill-opacity': 0.5,
+              },
+            }"
+          />
+          <VLayerMaplibreGeojson
+            source-id="geojson-line-source"
+            layer-id="geojson-line"
+            :source="{ type: 'geojson', data: geojsonData }"
+            :layer="{
+              id: 'geojson-line',
+              type: 'line',
+              source: 'geojson-line-source',
+              paint: {
+                'line-color': '#10b981',
+                'line-width': 3,
+              },
+            }"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

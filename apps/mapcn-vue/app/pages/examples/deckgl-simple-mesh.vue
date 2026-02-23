@@ -155,63 +155,38 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Simple Mesh Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render instanced 3D meshes using luma.gl geometries or custom OBJ
-          models.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglSimpleMesh
-                id="simple-mesh-layer"
-                :data="cubes"
-                :mesh="cubeMesh"
-                :get-position="getPosition"
-                :get-color="getColor"
-                :get-scale="getScale"
-                :get-orientation="getOrientation"
-                :pickable="true"
-              />
-              <VControlLegend
-                position="bottom-left"
-                type="category"
-                title="Mesh Instances"
-                :layer-ids="['simple-mesh-layer']"
-                :items="legendItems"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> SimpleMeshLayer is ideal for rendering many
-          instances of the same 3D object efficiently. For complex glTF models,
-          use ScenegraphLayer instead. Supports luma.gl geometries (Cube,
-          Sphere, Cone) and OBJ file URLs.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Simple Mesh Layer (deck.gl)"
+    description="Render instanced 3D meshes using luma.gl geometries or custom OBJ models."
+    :code="codeExample"
+    registry="map-deckgl-mesh"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglSimpleMesh
+            id="simple-mesh-layer"
+            :data="cubes"
+            :mesh="cubeMesh"
+            :get-position="getPosition"
+            :get-color="getColor"
+            :get-scale="getScale"
+            :get-orientation="getOrientation"
+            :pickable="true"
+          />
+          <VControlLegend
+            position="bottom-left"
+            type="category"
+            title="Mesh Instances"
+            :layer-ids="['simple-mesh-layer']"
+            :items="legendItems"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

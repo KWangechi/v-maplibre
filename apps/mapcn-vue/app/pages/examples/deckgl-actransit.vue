@@ -236,271 +236,205 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+  <ComponentDemo
+    title="AC Transit Live (deck.gl)"
+    description="Real-time bus tracking for AC Transit (Oakland/East Bay) using deck.gl layers. Click a bus to see its trail, or zoom in to see stops."
+    :code="codeExample"
+    registry="map-deckgl-core"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap
+          :key="mapStyle"
+          :options="mapOptions"
+          class="size-full"
+          @loaded="handleMapLoad"
         >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          AC Transit Live (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Real-time bus tracking for AC Transit (Oakland/East Bay) using deck.gl
-          layers. Click a bus to see its trail, or zoom in to see stops.
-        </p>
-      </div>
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
 
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="relative h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap
-              :key="mapStyle"
-              :options="mapOptions"
-              class="size-full"
-              @loaded="handleMapLoad"
-            >
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
+          <VLayerDeckglPath
+            v-if="selectedTrail"
+            id="selected-trail"
+            :data="[selectedTrail]"
+            :get-path="getTrailPath"
+            :get-color="
+              () => [255, 102, 102, 140] as [number, number, number, number]
+            "
+            :get-width="3"
+            :width-min-pixels="2"
+            :cap-rounded="true"
+            :joint-rounded="true"
+          />
 
-              <VLayerDeckglPath
-                v-if="selectedTrail"
-                id="selected-trail"
-                :data="[selectedTrail]"
-                :get-path="getTrailPath"
-                :get-color="
-                  () => [255, 102, 102, 140] as [number, number, number, number]
-                "
-                :get-width="3"
-                :width-min-pixels="2"
-                :cap-rounded="true"
-                :joint-rounded="true"
-              />
+          <VLayerDeckglPath
+            id="bus-trails"
+            :data="trails"
+            :get-path="getTrailPath"
+            :get-color="getTrailColor"
+            :get-width="getTrailWidth"
+            :width-min-pixels="1"
+            :cap-rounded="true"
+            :joint-rounded="true"
+            :opacity="0.6"
+          />
 
-              <VLayerDeckglPath
-                id="bus-trails"
-                :data="trails"
-                :get-path="getTrailPath"
-                :get-color="getTrailColor"
-                :get-width="getTrailWidth"
-                :width-min-pixels="1"
-                :cap-rounded="true"
-                :joint-rounded="true"
-                :opacity="0.6"
-              />
+          <VLayerDeckglIcon
+            v-if="busIconAtlas"
+            id="buses"
+            :data="buses"
+            :get-position="getBusPosition"
+            :get-size="getBusSize"
+            :get-angle="getBusAngle"
+            :icon-atlas="busIconAtlas"
+            :icon-mapping="BUS_ICON_MAPPING"
+            :get-icon="() => 'bus'"
+            size-units="meters"
+            :size-min-pixels="12"
+            :size-max-pixels="64"
+            :billboard="false"
+            :pickable="true"
+            @click="handleBusClick"
+          />
 
-              <VLayerDeckglIcon
-                v-if="busIconAtlas"
-                id="buses"
-                :data="buses"
-                :get-position="getBusPosition"
-                :get-size="getBusSize"
-                :get-angle="getBusAngle"
-                :icon-atlas="busIconAtlas"
-                :icon-mapping="BUS_ICON_MAPPING"
-                :get-icon="() => 'bus'"
-                size-units="meters"
-                :size-min-pixels="12"
-                :size-max-pixels="64"
-                :billboard="false"
-                :pickable="true"
-                @click="handleBusClick"
-              />
+          <VControlLegend
+            :layer-ids="['buses', 'bus-trails', 'stops']"
+            position="bottom-left"
+            type="category"
+            title="Transit Features"
+            :items="transitLegendItems"
+            :interactive="false"
+          />
 
-              <VControlLegend
-                :layer-ids="['buses', 'bus-trails', 'stops']"
-                position="bottom-left"
-                type="category"
-                title="Transit Features"
-                :items="transitLegendItems"
-                :interactive="false"
-              />
+          <!-- Bus stops - visible at higher zoom levels -->
+          <VLayerDeckglScatterplot
+            v-if="showStops"
+            id="stops"
+            :data="stops"
+            :get-position="getStopPosition"
+            :get-fill-color="getStopColor"
+            :get-radius="6"
+            :radius-min-pixels="4"
+            :radius-max-pixels="12"
+            :pickable="true"
+            :stroked="true"
+            :get-line-color="() => [255, 255, 255, 255]"
+            :line-width-min-pixels="1"
+            @click="handleStopClick"
+          />
+        </VMap>
 
-              <!-- Bus stops - visible at higher zoom levels -->
-              <VLayerDeckglScatterplot
-                v-if="showStops"
-                id="stops"
-                :data="stops"
-                :get-position="getStopPosition"
-                :get-fill-color="getStopColor"
-                :get-radius="6"
-                :radius-min-pixels="4"
-                :radius-max-pixels="12"
-                :pickable="true"
-                :stroked="true"
-                :get-line-color="() => [255, 255, 255, 255]"
-                :line-width-min-pixels="1"
-                @click="handleStopClick"
-              />
-            </VMap>
-
-            <!-- Bus popup -->
-            <AnimatePresence>
-              <motion.div
-                v-if="selectedBus"
-                :initial="{ opacity: 0, y: 10, scale: 0.95 }"
-                :animate="{ opacity: 1, y: 0, scale: 1 }"
-                :exit="{ opacity: 0, y: 10, scale: 0.95 }"
-                :transition="{ type: 'spring', stiffness: 400, damping: 30 }"
-                class="absolute bottom-4 left-1/2 z-20 w-56 -translate-x-1/2 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
-              >
-                <button
-                  class="absolute top-2 right-2 flex size-6 items-center justify-center rounded-md hover:bg-muted"
-                  @click="closeBusPopup"
-                >
-                  <Icon name="lucide:x" class="size-4" />
-                </button>
-                <div class="space-y-1.5">
-                  <div class="font-semibold">
-                    Route: {{ selectedBus.routeId }}
-                  </div>
-                  <div class="text-sm text-muted-foreground">
-                    Trip: {{ selectedBus.tripId }}
-                  </div>
-                  <div class="text-sm text-muted-foreground">
-                    Bearing: {{ Math.round(selectedBus.bearing) }}°
-                  </div>
-                  <div class="text-sm text-muted-foreground">
-                    Speed: {{ msToMph(selectedBus.speed) }} mph
-                  </div>
-                  <div
-                    v-if="selectedBusAvgSpeed !== null"
-                    class="text-sm text-muted-foreground"
-                  >
-                    Avg Speed: {{ msToMph(selectedBusAvgSpeed) }} mph
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            <!-- Stop popup -->
-            <AnimatePresence>
-              <motion.div
-                v-if="selectedStopData && !selectedBus"
-                :initial="{ opacity: 0, y: 10, scale: 0.95 }"
-                :animate="{ opacity: 1, y: 0, scale: 1 }"
-                :exit="{ opacity: 0, y: 10, scale: 0.95 }"
-                :transition="{ type: 'spring', stiffness: 400, damping: 30 }"
-                class="absolute bottom-4 left-1/2 z-20 w-72 -translate-x-1/2 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
-              >
-                <button
-                  class="absolute top-2 right-2 flex size-6 items-center justify-center rounded-md hover:bg-muted"
-                  @click="closeStopPopup"
-                >
-                  <Icon name="lucide:x" class="size-4" />
-                </button>
-                <div class="space-y-2">
-                  <div class="font-semibold">
-                    Stop ID: {{ selectedStopData.stpid }}
-                  </div>
-                  <div class="text-sm text-muted-foreground">
-                    Name: {{ selectedStopData.name }}
-                  </div>
-                  <div class="text-sm text-muted-foreground">
-                    Routes: {{ selectedStopData.routeNames.join(', ') }}
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            <!-- Toggle button - always visible -->
-            <button
-              class="absolute top-4 left-4 z-10 flex size-9 items-center justify-center rounded-lg bg-background/95 shadow-lg backdrop-blur-sm transition-colors hover:bg-accent"
-              :class="{
-                'bg-primary text-primary-foreground hover:bg-primary/90':
-                  !panelOpen,
-              }"
-              @click="togglePanel"
-            >
-              <Icon
-                :name="
-                  panelOpen
-                    ? 'lucide:panel-left-close'
-                    : 'lucide:panel-left-open'
-                "
-                class="size-4"
-              />
-            </button>
-
-            <!-- Collapsible control panel with motion-v -->
-            <AnimatePresence>
-              <motion.div
-                v-if="panelOpen"
-                :initial="{ opacity: 0, x: -20, scale: 0.95 }"
-                :animate="{ opacity: 1, x: 0, scale: 1 }"
-                :exit="{ opacity: 0, x: -20, scale: 0.95 }"
-                :transition="{ type: 'spring', stiffness: 300, damping: 25 }"
-                class="absolute top-16 left-4 z-10"
-              >
-                <ExamplesActransitControlPanel
-                  :bus-count="buses.length"
-                  :total-buses="totalBuses"
-                  :loading="loading"
-                  :error="error"
-                  :route-filter="routeFilter"
-                  :selected-bus="selectedBus"
-                  :trip-average-speeds="tripAverageSpeeds"
-                  @update:route-filter="routeFilter = $event"
-                  @refresh="fetchData"
-                  @clear-filters="clearFilters"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-8 rounded-lg border bg-muted/30 p-6">
-        <h3 class="mb-3 text-lg font-semibold">About This Example</h3>
-        <p class="mb-4 text-muted-foreground">
-          This example demonstrates real-time transit visualization using
-          deck.gl layers. The original
-          <a
-            href="https://github.com/kuanb/actransit"
-            target="_blank"
-            class="text-primary hover:underline"
+        <!-- Bus popup -->
+        <AnimatePresence>
+          <motion.div
+            v-if="selectedBus"
+            :initial="{ opacity: 0, y: 10, scale: 0.95 }"
+            :animate="{ opacity: 1, y: 0, scale: 1 }"
+            :exit="{ opacity: 0, y: 10, scale: 0.95 }"
+            :transition="{ type: 'spring', stiffness: 400, damping: 30 }"
+            class="absolute bottom-4 left-1/2 z-20 w-56 -translate-x-1/2 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
           >
-            actransit project
-          </a>
-          by kuanb uses native MapLibre GL layers, while this implementation
-          uses deck.gl for high-performance rendering.
-        </p>
-        <ul class="space-y-2 text-sm text-muted-foreground">
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>VLayerDeckglIcon</strong> - Directional bus icons rotated
-              by bearing to show travel direction
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>VLayerDeckglPath</strong> - Historical bus trails showing
-              recent movement
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              <strong>VLayerDeckglScatterplot</strong> - Bus stops shown at zoom
-              14+ with click-to-view details
-            </span>
-          </li>
-          <li class="flex items-start gap-2">
-            <Icon name="lucide:check" class="mt-0.5 size-4 text-primary" />
-            <span>
-              Auto-refresh every 30 seconds with route filtering support
-            </span>
-          </li>
-        </ul>
-      </div>
+            <button
+              class="absolute top-2 right-2 flex size-6 items-center justify-center rounded-md hover:bg-muted"
+              @click="closeBusPopup"
+            >
+              <Icon name="lucide:x" class="size-4" />
+            </button>
+            <div class="space-y-1.5">
+              <div class="font-semibold">Route: {{ selectedBus.routeId }}</div>
+              <div class="text-sm text-muted-foreground">
+                Trip: {{ selectedBus.tripId }}
+              </div>
+              <div class="text-sm text-muted-foreground">
+                Bearing: {{ Math.round(selectedBus.bearing) }}°
+              </div>
+              <div class="text-sm text-muted-foreground">
+                Speed: {{ msToMph(selectedBus.speed) }} mph
+              </div>
+              <div
+                v-if="selectedBusAvgSpeed !== null"
+                class="text-sm text-muted-foreground"
+              >
+                Avg Speed: {{ msToMph(selectedBusAvgSpeed) }} mph
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
-      <ExampleNavigation />
+        <!-- Stop popup -->
+        <AnimatePresence>
+          <motion.div
+            v-if="selectedStopData && !selectedBus"
+            :initial="{ opacity: 0, y: 10, scale: 0.95 }"
+            :animate="{ opacity: 1, y: 0, scale: 1 }"
+            :exit="{ opacity: 0, y: 10, scale: 0.95 }"
+            :transition="{ type: 'spring', stiffness: 400, damping: 30 }"
+            class="absolute bottom-4 left-1/2 z-20 w-72 -translate-x-1/2 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
+          >
+            <button
+              class="absolute top-2 right-2 flex size-6 items-center justify-center rounded-md hover:bg-muted"
+              @click="closeStopPopup"
+            >
+              <Icon name="lucide:x" class="size-4" />
+            </button>
+            <div class="space-y-2">
+              <div class="font-semibold">
+                Stop ID: {{ selectedStopData.stpid }}
+              </div>
+              <div class="text-sm text-muted-foreground">
+                Name: {{ selectedStopData.name }}
+              </div>
+              <div class="text-sm text-muted-foreground">
+                Routes: {{ selectedStopData.routeNames.join(', ') }}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        <!-- Toggle button - always visible -->
+        <button
+          class="absolute top-4 left-4 z-10 flex size-9 items-center justify-center rounded-lg bg-background/95 shadow-lg backdrop-blur-sm transition-colors hover:bg-accent"
+          :class="{
+            'bg-primary text-primary-foreground hover:bg-primary/90':
+              !panelOpen,
+          }"
+          @click="togglePanel"
+        >
+          <Icon
+            :name="
+              panelOpen ? 'lucide:panel-left-close' : 'lucide:panel-left-open'
+            "
+            class="size-4"
+          />
+        </button>
+
+        <!-- Collapsible control panel with motion-v -->
+        <AnimatePresence>
+          <motion.div
+            v-if="panelOpen"
+            :initial="{ opacity: 0, x: -20, scale: 0.95 }"
+            :animate="{ opacity: 1, x: 0, scale: 1 }"
+            :exit="{ opacity: 0, x: -20, scale: 0.95 }"
+            :transition="{ type: 'spring', stiffness: 300, damping: 25 }"
+            class="absolute top-16 left-4 z-10"
+          >
+            <ExamplesActransitControlPanel
+              :bus-count="buses.length"
+              :total-buses="totalBuses"
+              :loading="loading"
+              :error="error"
+              :route-filter="routeFilter"
+              :selected-bus="selectedBus"
+              :trip-average-speeds="tripAverageSpeeds"
+              @update:route-filter="routeFilter = $event"
+              @refresh="fetchData"
+              @clear-filters="clearFilters"
+            />
+          </motion.div>
+        </AnimatePresence>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

@@ -98,61 +98,37 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl py-10">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          MVT Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render Mapbox Vector Tiles with custom styling using deck.gl.
-        </p>
-        <p class="mt-2 text-sm text-muted-foreground">
-          Data source:
-          <a
-            href="https://carto.com/"
-            target="_blank"
-            class="text-primary hover:underline"
-            >CARTO</a
-          >
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglMVT
-                id="mvt-layer"
-                :data="MVT_URL"
-                :get-fill-color="getFillColor"
-                :get-line-color="getLineColor"
-                :line-width-min-pixels="1"
-                :pickable="true"
-              />
-              <VControlLegend
-                :layer-ids="['mvt-layer']"
-                position="bottom-left"
-                type="category"
-                title="Feature Type"
-                :items="legendItems"
-                :interactive="false"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="MVT Layer (deck.gl)"
+    description="Render Mapbox Vector Tiles with custom styling using deck.gl."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglMVT
+            id="mvt-layer"
+            :data="MVT_URL"
+            :get-fill-color="getFillColor"
+            :get-line-color="getLineColor"
+            :line-width-min-pixels="1"
+            :pickable="true"
+          />
+          <VControlLegend
+            :layer-ids="['mvt-layer']"
+            position="bottom-left"
+            type="category"
+            title="Feature Type"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

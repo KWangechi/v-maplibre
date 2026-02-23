@@ -131,65 +131,40 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Geohash Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Visualize spatially indexed data using Geohash encoding with automatic
-          cell boundaries.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['geohash-layer']"
-                position="bottom-left"
-                type="gradient"
-                title="Cell Value"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerDeckglGeohash
-                id="geohash-layer"
-                :data="geohashData"
-                :get-geohash="getGeohash"
-                :get-fill-color="getFillColor"
-                :get-elevation="getElevation"
-                :extruded="true"
-                :pickable="true"
-                :auto-highlight="true"
-                :elevation-scale="1"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> Geohash is a hierarchical spatial indexing
-          system. Precision levels: 5 (~5km), 6 (~1.2km), 7 (~150m), 8 (~40m).
-          The layer automatically converts geohash strings to polygon
-          boundaries.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Geohash Layer (deck.gl)"
+    description="Visualize spatially indexed data using Geohash encoding with automatic cell boundaries."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['geohash-layer']"
+            position="bottom-left"
+            type="gradient"
+            title="Cell Value"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerDeckglGeohash
+            id="geohash-layer"
+            :data="geohashData"
+            :get-geohash="getGeohash"
+            :get-fill-color="getFillColor"
+            :get-elevation="getElevation"
+            :extruded="true"
+            :pickable="true"
+            :auto-highlight="true"
+            :elevation-scale="1"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

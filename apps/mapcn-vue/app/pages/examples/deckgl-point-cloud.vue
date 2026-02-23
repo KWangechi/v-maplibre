@@ -152,63 +152,38 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Point Cloud Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Visualize 3D point cloud data from LiDAR, photogrammetry, or other
-          sources.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VLayerDeckglPointCloud
-                id="point-cloud-layer"
-                :data="pointCloudData"
-                :get-position="getPosition"
-                :get-color="getColor"
-                :get-normal="getNormal"
-                :point-size="3"
-                size-units="pixels"
-                :pickable="true"
-              />
-              <VControlLegend
-                position="bottom-left"
-                type="gradient"
-                title="Elevation"
-                :layer-ids="['point-cloud-layer']"
-                :items="legendItems"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> This example uses procedurally generated point
-          cloud data. In production, you would typically load data from LAZ/LAS
-          files, PLY, or other point cloud formats. The layer supports millions
-          of points with WebGL-accelerated rendering.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Point Cloud Layer (deck.gl)"
+    description="Visualize 3D point cloud data from LiDAR, photogrammetry, or other sources."
+    :code="codeExample"
+    registry="map-deckgl-core"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VLayerDeckglPointCloud
+            id="point-cloud-layer"
+            :data="pointCloudData"
+            :get-position="getPosition"
+            :get-color="getColor"
+            :get-normal="getNormal"
+            :point-size="3"
+            size-units="pixels"
+            :pickable="true"
+          />
+          <VControlLegend
+            position="bottom-left"
+            type="gradient"
+            title="Elevation"
+            :layer-ids="['point-cloud-layer']"
+            :items="legendItems"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

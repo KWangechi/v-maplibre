@@ -129,63 +129,39 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          Quadkey Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render data indexed using Bing Maps Quadkey tile system.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['quadkey-layer']"
-                position="bottom-left"
-                type="category"
-                title="Category"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerDeckglQuadkey
-                id="quadkey-layer"
-                :data="quadkeyData"
-                :get-quadkey="getQuadkey"
-                :get-fill-color="getFillColor"
-                :get-elevation="getElevation"
-                :extruded="true"
-                :pickable="true"
-                :auto-highlight="true"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> Quadkey is the tile indexing system used by
-          Bing Maps. Each character represents a zoom level (0-3). A
-          12-character quadkey corresponds to zoom level 12. Commonly used for
-          pre-aggregated tile-based analytics.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="Quadkey Layer (deck.gl)"
+    description="Render data indexed using Bing Maps Quadkey tile system."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['quadkey-layer']"
+            position="bottom-left"
+            type="category"
+            title="Category"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerDeckglQuadkey
+            id="quadkey-layer"
+            :data="quadkeyData"
+            :get-quadkey="getQuadkey"
+            :get-fill-color="getFillColor"
+            :get-elevation="getElevation"
+            :extruded="true"
+            :pickable="true"
+            :auto-highlight="true"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>

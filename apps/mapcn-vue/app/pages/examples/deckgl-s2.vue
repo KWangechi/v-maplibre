@@ -127,64 +127,39 @@ ${SCRIPT_END}
 </script>
 
 <template>
-  <div class="container max-w-screen-2xl overflow-x-hidden py-4">
-    <div class="mx-auto w-full max-w-300">
-      <div class="mb-4">
-        <NuxtLink
-          to="/examples"
-          class="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
-        >
-          <Icon name="lucide:arrow-left" class="size-3.5" />
-          Examples
-        </NuxtLink>
-        <h1 class="mt-1.5 text-xl font-semibold tracking-tight">
-          S2 Layer (deck.gl)
-        </h1>
-        <p class="mt-0.5 text-sm text-muted-foreground">
-          Render data using Google S2 geometry spherical cells for uniform
-          global coverage.
-        </p>
-      </div>
-
-      <ComponentDemo :code="codeExample" full-width class="h-125">
-        <div class="h-125 min-w-0 overflow-hidden">
-          <ClientOnly>
-            <VMap :key="mapStyle" :options="mapOptions" class="size-full">
-              <VControlNavigation position="top-right" />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                :layer-ids="['s2-layer']"
-                position="bottom-left"
-                type="category"
-                title="Density"
-                :items="legendItems"
-                :interactive="false"
-              />
-              <VLayerDeckglS2
-                id="s2-layer"
-                :data="s2Data"
-                :get-s2-token="getS2Token"
-                :get-fill-color="getFillColor"
-                :get-elevation="getElevation"
-                :extruded="true"
-                :pickable="true"
-                :auto-highlight="true"
-              />
-            </VMap>
-          </ClientOnly>
-        </div>
-      </ComponentDemo>
-
-      <div class="mt-6 rounded-lg border border-border bg-muted/50 p-4">
-        <p class="text-sm text-muted-foreground">
-          <strong>Note:</strong> S2 is Google's spherical geometry library that
-          divides the Earth into hierarchical cells. Unlike H3, S2 uses
-          quadrilateral cells. Common levels: 13 (~1km²), 15 (~150m²), 17
-          (~20m²). Used by Google Maps, Foursquare, and others.
-        </p>
-      </div>
-
-      <ExampleNavigation />
+  <ComponentDemo
+    title="S2 Layer (deck.gl)"
+    description="Render data using Google S2 geometry spherical cells for uniform global coverage."
+    :code="codeExample"
+    registry="map-deckgl-geo"
+    full-width
+    class="h-full"
+  >
+    <div class="size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+          <VControlLegend
+            :layer-ids="['s2-layer']"
+            position="bottom-left"
+            type="category"
+            title="Density"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VLayerDeckglS2
+            id="s2-layer"
+            :data="s2Data"
+            :get-s2-token="getS2Token"
+            :get-fill-color="getFillColor"
+            :get-elevation="getElevation"
+            :extruded="true"
+            :pickable="true"
+            :auto-highlight="true"
+          />
+        </VMap>
+      </ClientOnly>
     </div>
-  </div>
+  </ComponentDemo>
 </template>
