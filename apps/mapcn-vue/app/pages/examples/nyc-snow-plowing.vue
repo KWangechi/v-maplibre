@@ -8,10 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import type { NYCBorough } from '~/types/nyc-snow';
-  import {
-    PLOW_STATUS_LEGEND,
-    SNOW_PRIORITY_LEGEND,
-  } from '~/types/nyc-snow';
+  import { PLOW_STATUS_LEGEND, SNOW_PRIORITY_LEGEND } from '~/types/nyc-snow';
   import { motion, AnimatePresence } from 'motion-v';
   // TODO: re-enable @geoql/maplibre-gl-snow once particle sizing is tuned
 
@@ -55,7 +52,6 @@
   }));
 
   const mapRef = ref<MaplibreMap | null>(null);
-
 
   function handleMapLoad(map: MaplibreMap): void {
     mapRef.value = map;

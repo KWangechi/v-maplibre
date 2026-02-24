@@ -1,8 +1,5 @@
 import type { Feature, FeatureCollection, Polygon } from 'geojson';
-import type {
-  CategoryLegendItem,
-  GradientLegendItem,
-} from '@geoql/v-maplibre';
+import type { CategoryLegendItem, GradientLegendItem } from '@geoql/v-maplibre';
 
 export type NYCBorough = '1' | '2' | '3' | '4' | '5';
 

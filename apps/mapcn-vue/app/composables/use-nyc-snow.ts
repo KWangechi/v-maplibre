@@ -69,11 +69,7 @@ function lineToPolygon(
   const firstLeft = left[0];
   if (!firstLeft) return [];
 
-  const ring: [number, number][] = [
-    ...left,
-    ...right.reverse(),
-    firstLeft,
-  ];
+  const ring: [number, number][] = [...left, ...right.reverse(), firstLeft];
 
   return [ring];
 }
@@ -100,9 +96,11 @@ function buildSnowFeature(
   const polygon = lineToPolygon(record.line.coordinates, BUFFER_WIDTH);
   if (polygon.length === 0) return null;
 
-  const priority = (['C', 'S', 'H', 'V'].includes(record.snowpriority)
-    ? record.snowpriority
-    : 'V') as SnowPriority;
+  const priority = (
+    ['C', 'S', 'H', 'V'].includes(record.snowpriority)
+      ? record.snowpriority
+      : 'V'
+  ) as SnowPriority;
 
   const hoursSincePlowed = simulatePlowHours(
     priority,
@@ -176,9 +174,7 @@ export function useNYCSnow() {
       }
 
       const data = (await response.json()) as DSNYStreetRecord[];
-      rawStreets.value = data.filter(
-        (r) => r.line?.coordinates?.length >= 2,
-      );
+      rawStreets.value = data.filter((r) => r.line?.coordinates?.length >= 2);
     } catch (e) {
       error.value =
         e instanceof Error ? e.message : 'Failed to fetch street data';
