@@ -1,6 +1,12 @@
 <script setup lang="ts">
-  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
-  import type { Map } from 'maplibre-gl';
+  import {
+    VMap,
+    VControlNavigation,
+    VControlLegend,
+    VPopup,
+  } from '@geoql/v-maplibre';
+  import type { GradientLegendItem } from '@geoql/v-maplibre';
+  import type { Map, LngLatLike } from 'maplibre-gl';
   import { motion, AnimatePresence } from 'motion-v';
   import {
     Select,
@@ -32,6 +38,11 @@
   const mapId = useId();
   const mapInstance = shallowRef<Map | null>(null);
   const panelOpen = ref(true);
+
+  // Hover popup state
+  const popupVisible = ref(false);
+  const popupLngLat = ref<LngLatLike>([0, 0]);
+  const hoveredHhi = ref<number | null>(null);
 
   // Map options - center on US with initial zoom
   const mapOptions = computed(() => ({
@@ -96,6 +107,24 @@
     years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
   }));
 
+  // Legend gradient items matching the fill-color interpolation
+  const legendItems: GradientLegendItem[] = [
+    {
+      min: 0,
+      max: 1.0,
+      minLabel: 'Low (0)',
+      maxLabel: 'High (1.0)',
+      colors: [
+        '#2166ac',
+        '#67a9cf',
+        '#fddbc7',
+        '#f46d43',
+        '#d73027',
+        '#a50026',
+      ],
+    },
+  ];
+
   // Selected values
   const selectedGroup = ref(hhiConfig.value.groupVars[0].code);
   const selectedLevel = ref(hhiConfig.value.groupVars[0].levels[0].code);
@@ -129,12 +158,36 @@
       `${selectedGroup.value}_${selectedLevel.value}_${selectedHhi.value}_${selectedYear.value[0]}`,
   );
 
+  // Shared fill-color expression (avoids duplication between addLayer and setPaintProperty)
+  const buildFillColor = (col: string) => [
+    'case',
+    ['has', col],
+    [
+      'interpolate',
+      ['linear'],
+      ['get', col],
+      0,
+      '#2166ac',
+      0.1,
+      '#67a9cf',
+      0.15,
+      '#fddbc7',
+      0.25,
+      '#f46d43',
+      0.5,
+      '#d73027',
+      1.0,
+      '#a50026',
+    ],
+    '#e0e0e0',
+  ];
+
   const onMapLoad = (map: Map) => {
     // Prevent double initialization
     if (mapInstance.value) return;
     mapInstance.value = map;
 
-    // Add PMTiles vector source - must use pmtiles:// prefix
+    // Add PMTiles vector source
     map.addSource('hhi-tracts', {
       type: 'vector',
       url: `pmtiles://${pmtilesUrl}`,
@@ -147,30 +200,30 @@
       source: 'hhi-tracts',
       'source-layer': 'tracts',
       paint: {
-        'fill-color': [
-          'case',
-          ['has', columnName.value],
-          [
-            'interpolate',
-            ['linear'],
-            ['get', columnName.value],
-            0,
-            '#2166ac',
-            0.1,
-            '#67a9cf',
-            0.15,
-            '#fddbc7',
-            0.25,
-            '#f46d43',
-            0.5,
-            '#d73027',
-            1.0,
-            '#a50026',
-          ],
-          '#e0e0e0',
-        ],
+        'fill-color': buildFillColor(
+          columnName.value,
+        ) as maplibregl.ExpressionSpecification,
         'fill-opacity': 0.7,
       },
+    });
+
+    // Hover: show popup with HHI value
+    map.on('mousemove', 'hhi-fill', (e) => {
+      if (!e.features || e.features.length === 0) return;
+      const raw = e.features[0].properties?.[columnName.value];
+      const value = typeof raw === 'number' ? raw : Number.parseFloat(String(raw));
+      if (!Number.isNaN(value)) {
+        popupLngLat.value = [e.lngLat.lng, e.lngLat.lat];
+        hoveredHhi.value = value;
+        popupVisible.value = true;
+      }
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', 'hhi-fill', () => {
+      popupVisible.value = false;
+      hoveredHhi.value = null;
+      map.getCanvas().style.cursor = '';
     });
   };
 
@@ -179,28 +232,11 @@
     [selectedGroup, selectedLevel, selectedHhi, () => selectedYear.value[0]],
     () => {
       if (mapInstance.value && mapInstance.value.getLayer('hhi-fill')) {
-        mapInstance.value.setPaintProperty('hhi-fill', 'fill-color', [
-          'case',
-          ['has', columnName.value],
-          [
-            'interpolate',
-            ['linear'],
-            ['get', columnName.value],
-            0,
-            '#2166ac',
-            0.1,
-            '#67a9cf',
-            0.15,
-            '#fddbc7',
-            0.25,
-            '#f46d43',
-            0.5,
-            '#d73027',
-            1.0,
-            '#a50026',
-          ],
-          '#e0e0e0',
-        ]);
+        mapInstance.value.setPaintProperty(
+          'hhi-fill',
+          'fill-color',
+          buildFillColor(columnName.value),
+        );
       }
     },
   );
@@ -261,9 +297,31 @@ ${SCRIPT_END}
           @loaded="onMapLoad"
         >
           <VControlNavigation position="top-right" />
+          <VControlLegend
+            :layer-ids="['hhi-fill']"
+            type="gradient"
+            title="Market Concentration"
+            position="bottom-left"
+            :items="legendItems"
+            :interactive="false"
+          />
+          <VPopup
+            v-if="popupVisible && hoveredHhi !== null"
+            :coordinates="popupLngLat"
+            :options="{
+              closeButton: false,
+              closeOnClick: false,
+              offset: 12,
+              className: 'hhi-hover-popup',
+            }"
+          >
+            <span class="hhi-popup-label"
+              >HHI: {{ hoveredHhi.toFixed(3) }}</span
+            >
+          </VPopup>
         </VMap>
         <template #fallback>
-          <div class="size-full bg-muted animate-pulse" ></div>
+          <div class="size-full animate-pulse bg-muted"></div>
         </template>
       </ClientOnly>
 
@@ -355,7 +413,7 @@ ${SCRIPT_END}
           </div>
 
           <!-- Year slider -->
-          <div class="mb-4">
+          <div class="mb-3">
             <label class="mb-1.5 block text-xs font-medium"
               >Year: {{ selectedYear[0] }}</label
             >
@@ -367,35 +425,8 @@ ${SCRIPT_END}
             />
           </div>
 
-          <!-- Legend -->
-          <div class="pt-3 border-t">
-            <h4 class="mb-2 text-xs font-semibold">Market Concentration</h4>
-            <div class="space-y-1 text-xs">
-              <div class="flex items-center gap-1.5">
-                <div class="w-3 h-3 rounded-sm bg-[#2166ac]" ></div>
-                <span>&lt; 0.10</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <div class="w-3 h-3 rounded-sm bg-[#67a9cf]" ></div>
-                <span>0.10 – 0.15</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <div class="w-3 h-3 rounded-sm bg-[#fddbc7]" ></div>
-                <span>0.15 – 0.25</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <div class="w-3 h-3 rounded-sm bg-[#f46d43]" ></div>
-                <span>0.25 – 0.50</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <div class="w-3 h-3 rounded-sm bg-[#a50026]" ></div>
-                <span>&gt; 0.50</span>
-              </div>
-            </div>
-          </div>
-
           <!-- Current column display -->
-          <div class="mt-3 pt-3 border-t text-xs text-muted-foreground">
+          <div class="border-t pt-3 text-xs text-muted-foreground">
             Showing: {{ columnName }}
           </div>
         </motion.div>
@@ -403,3 +434,35 @@ ${SCRIPT_END}
     </div>
   </ComponentDemo>
 </template>
+
+<style>
+  .hhi-hover-popup .maplibregl-popup-content {
+    background: #1a1a1a;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 6px 12px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
+  }
+
+  .hhi-hover-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+    border-top-color: #1a1a1a;
+  }
+
+  .hhi-hover-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+    border-bottom-color: #1a1a1a;
+  }
+
+  .hhi-hover-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: #1a1a1a;
+  }
+
+  .hhi-hover-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: #1a1a1a;
+  }
+
+  .hhi-popup-label {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+</style>
