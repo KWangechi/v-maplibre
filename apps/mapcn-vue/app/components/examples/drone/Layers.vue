@@ -9,20 +9,9 @@
     mapBearing: number;
   }>();
 
-  // Top-down quadcopter silhouette: X arms, 4 motor rings, center hub, forward arrow.
+  // Public quadcopter SVG (X arms, 4 motor rings, center hub, forward arrow).
   // White fill — visible against the dark 3D basemap without masking.
-  const DRONE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <line x1="26" y1="26" x2="102" y2="102" stroke="white" stroke-width="7" stroke-linecap="round"/>
-  <line x1="102" y1="26" x2="26" y2="102" stroke="white" stroke-width="7" stroke-linecap="round"/>
-  <circle cx="23" cy="23" r="17" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="5"/>
-  <circle cx="105" cy="23" r="17" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="5"/>
-  <circle cx="23" cy="105" r="17" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="5"/>
-  <circle cx="105" cy="105" r="17" fill="rgba(255,255,255,0.18)" stroke="white" stroke-width="5"/>
-  <circle cx="64" cy="64" r="11" fill="white"/>
-  <polygon points="64,5 74,20 54,20" fill="white"/>
-</svg>`;
-
-  const DRONE_ICON_URL = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(DRONE_SVG)}`;
+  const DRONE_ICON_URL = '/drone-icon.svg';
 
   function getPath(d: unknown): [number, number][] {
     return (d as DroneTrip).path;
@@ -128,7 +117,7 @@
         getIcon: getDroneIcon,
         getPosition: getDronePosition,
         getAngle: getDroneAngle,
-        getSize: 72,
+        getSize: 96,
         sizeUnits: 'pixels' as const,
         billboard: true, // always face the camera — visible at any pitch
         pickable: false,
