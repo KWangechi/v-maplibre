@@ -5,8 +5,10 @@
     VMap,
     VControlNavigation,
     VControlScale,
+    VControlLegend,
     VLayerDeckglScatterplot,
     VPopup,
+    type CategoryLegendItem,
   } from '@geoql/v-maplibre';
   import type {
     ZipRenderPoint,
@@ -47,6 +49,20 @@
     minZoom: 2,
     maxZoom: 16,
   }));
+
+  const legendTitle = computed(() => {
+    const base = props.viewMode === 'levels' ? 'Median Price' : 'YoY Change';
+    return props.localView ? `${base} (local)` : base;
+  });
+
+  const legendItems = computed((): CategoryLegendItem[] =>
+    props.legendBuckets.map((bucket, i) => ({
+      value: i,
+      label: bucket.label,
+      color: `rgb(${bucket.color[0]}, ${bucket.color[1]}, ${bucket.color[2]})`,
+      visible: true,
+    })),
+  );
 
   function getPosition(d: unknown): [number, number] {
     return (d as ZipRenderPoint).coordinates;
@@ -105,6 +121,14 @@
     >
       <VControlNavigation position="top-right" />
       <VControlScale position="bottom-left" />
+      <VControlLegend
+        :layer-ids="['promap-bubbles']"
+        type="category"
+        :items="legendItems"
+        :title="legendTitle"
+        position="bottom-left"
+        :interactive="false"
+      />
 
       <VLayerDeckglScatterplot
         id="promap-bubbles"
@@ -158,36 +182,6 @@
       <div class="size-full animate-pulse bg-muted"></div>
     </template>
   </ClientOnly>
-
-  <!-- Legend overlay -->
-  <div
-    v-if="legendBuckets.length > 0"
-    class="absolute bottom-12 left-4 z-10 rounded-lg border border-border/50 bg-background/95 p-3 shadow-sm backdrop-blur-sm"
-  >
-    <p
-      class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
-    >
-      {{ viewMode === 'levels' ? 'Median Price' : 'YoY Change' }}
-      <span v-if="localView" class="ml-1 text-primary">(local)</span>
-    </p>
-    <div class="flex flex-col gap-1">
-      <div
-        v-for="(bucket, i) in legendBuckets"
-        :key="i"
-        class="flex items-center gap-2"
-      >
-        <span
-          class="inline-block size-3 rounded-full"
-          :style="{
-            backgroundColor: `rgb(${bucket.color[0]}, ${bucket.color[1]}, ${bucket.color[2]})`,
-          }"
-        ></span>
-        <span class="text-[11px] text-muted-foreground">{{
-          bucket.label
-        }}</span>
-      </div>
-    </div>
-  </div>
 </template>
 
 <style>
