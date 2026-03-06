@@ -402,6 +402,31 @@ const mapStyle = computed(() =>
 );
 ```
 
+### Rule #16: Bun Catalog Dependencies (CRITICAL)
+
+All dependency versions are managed centrally via Bun workspace catalogs in the root `package.json`. **NEVER** use direct version strings in this package's `package.json`.
+
+```jsonc
+// CORRECT
+"dependencies": {
+  "@vueuse/core": "catalog:app:mapcn-vue",
+  "reka-ui": "catalog:app:mapcn-vue",
+  "vue": "catalog:"
+}
+
+// WRONG - Direct version strings are forbidden
+"dependencies": {
+  "@vueuse/core": "^14.2.1",
+  "reka-ui": "^2.9.0"
+}
+```
+
+**When adding a new dependency:**
+
+1. Add the version to the `app:mapcn-vue` catalog in root `package.json` under `workspaces.catalogs`
+2. Reference it here as `"catalog:app:mapcn-vue"`
+3. Use `workspace:*` only for internal monorepo packages (e.g., `@geoql/v-maplibre`)
+
 ---
 
 ## Tech Stack & Architecture

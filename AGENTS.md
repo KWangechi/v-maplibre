@@ -157,6 +157,33 @@ const data: SomeType = response;
 | Linting    | oxlint                                  |
 | Formatting | Prettier                                |
 
+### Rule #5: Bun Catalog Dependencies (CRITICAL)
+
+This monorepo uses **Bun workspace catalogs** for centralized dependency version management. All versions are defined in root `package.json` under `workspaces.catalogs`.
+
+**Available catalogs:** `default`, `pkg:v-maplibre`, `pkg:mapcn-vue`, `app:mapcn-vue`
+
+```jsonc
+// CORRECT - Always use catalog reference in sub-package package.json
+"dependencies": {
+  "vue": "catalog:",                  // uses default catalog
+  "three": "catalog:pkg:v-maplibre"    // uses named catalog
+}
+
+// WRONG - Never use direct version strings in sub-packages
+"dependencies": {
+  "vue": "^3.5.29"
+}
+```
+
+**When adding a new dependency:**
+
+1. Add the version to the appropriate catalog in root `package.json` under `workspaces.catalogs`
+2. Reference it in the sub-package as `"catalog:"` (default) or `"catalog:catalog-name"`
+3. Use `workspace:*` only for internal monorepo package references
+
+**Exception:** `apps/docs` is excluded from workspaces and manages its own versions directly.
+
 ---
 
 ## Release Workflow

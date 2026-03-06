@@ -164,6 +164,30 @@ src/
 └── index.ts
 ```
 
+### Rule #9: Bun Catalog Dependencies (CRITICAL)
+
+All dependency versions are managed centrally via Bun workspace catalogs in the root `package.json`. **NEVER** use direct version strings in this package's `package.json`.
+
+```jsonc
+// CORRECT
+"dependencies": {
+  "maplibre-gl": "catalog:",               // uses default catalog
+  "three": "catalog:pkg:v-maplibre"         // uses named catalog
+}
+
+// WRONG - Direct version strings are forbidden
+"dependencies": {
+  "maplibre-gl": "^5.5.0",
+  "three": "^0.183.2"
+}
+```
+
+**When adding a new dependency:**
+
+1. Add the version to the `pkg:v-maplibre` catalog in root `package.json` under `workspaces.catalogs`
+2. Reference it here as `"catalog:pkg:v-maplibre"`
+3. Shared deps (vue, typescript) go in the `default` catalog, reference as `"catalog:"`
+
 ---
 
 ## Tech Stack

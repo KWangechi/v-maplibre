@@ -19,8 +19,7 @@
   });
 
   const mapId = useId();
-  const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } =
-    useSunPosition();
+  const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } = useSunPosition();
 
   const mapOptions = computed(() => ({
     container: `globe-day-night-${mapId}`,
@@ -36,9 +35,7 @@
           tileSize: 256,
         },
       },
-      layers: [
-        { id: 'satellite', type: 'raster' as const, source: 'satellite' },
-      ],
+      layers: [{ id: 'satellite', type: 'raster' as const, source: 'satellite' }],
       sky: {
         'atmosphere-blend': [
           'interpolate',
@@ -61,23 +58,23 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-  import { VMap, VLayerMaplibreStarfield, VControlNavigation } from '@geoql/v-maplibre';
-  // Geocentric sun position (subsolar lng + declination) + local altitude for fading
-  const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } = useSunPosition();
-${SCRIPT_END}
-  <VMap :options="mapOptions" class="h-125 w-full">
-    <VLayerMaplibreStarfield
-      galaxy-texture-url="/milkyway.jpg"
-      :sun-enabled="true"
-      :sun-azimuth="sunAzimuth"
-      :sun-altitude="sunAltitude"
-      :fade-altitude="localSunAltitude"
-      before="satellite"
-    />
-    <VControlNavigation position="top-right" />
-  </VMap>
-  <p>Current mode: {{ skyMode }}</p>
-</template>`;
+            import { VMap, VLayerMaplibreStarfield, VControlNavigation } from '@geoql/v-maplibre';
+            // Geocentric sun position (subsolar lng + declination) + local altitude for fading
+            const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } = useSunPosition();
+          ${SCRIPT_END}
+            <VMap :options="mapOptions" class="h-125 w-full">
+              <VLayerMaplibreStarfield
+                galaxy-texture-url="/milkyway.jpg"
+                :sun-enabled="true"
+                :sun-azimuth="sunAzimuth"
+                :sun-altitude="sunAltitude"
+                :fade-altitude="localSunAltitude"
+                before="satellite"
+              />
+              <VControlNavigation position="top-right" />
+            </VMap>
+            <p>Current mode: {{ skyMode }}</p>
+          </template>`;
 </script>
 
 <template>

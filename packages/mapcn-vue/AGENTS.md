@@ -134,6 +134,30 @@ export { default as MapPopup } from './MapPopup.vue';
 export default { Map, MapMarker, MapPopup };
 ```
 
+### Rule #7: Bun Catalog Dependencies (CRITICAL)
+
+All dependency versions are managed centrally via Bun workspace catalogs in the root `package.json`. **NEVER** use direct version strings in this package's `package.json`.
+
+```jsonc
+// CORRECT
+"dependencies": {
+  "vue": "catalog:",                         // uses default catalog
+  "shadcn-vue": "catalog:pkg:mapcn-vue"       // uses named catalog
+}
+
+// WRONG - Direct version strings are forbidden
+"dependencies": {
+  "vue": "^3.5.29",
+  "shadcn-vue": "^0.0.4"
+}
+```
+
+**When adding a new dependency:**
+
+1. Add the version to the `pkg:mapcn-vue` catalog in root `package.json` under `workspaces.catalogs`
+2. Reference it here as `"catalog:pkg:mapcn-vue"`
+3. Shared deps (vue, typescript) go in the `default` catalog, reference as `"catalog:"`
+
 ---
 
 ## Tech Stack

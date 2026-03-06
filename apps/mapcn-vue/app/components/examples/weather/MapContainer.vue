@@ -8,10 +8,7 @@
     VControlNavigation,
     VControlLegend,
   } from '@geoql/v-maplibre';
-  import type {
-    GradientLegendItem,
-    CategoryLegendItem,
-  } from '@geoql/v-maplibre';
+  import type { GradientLegendItem, CategoryLegendItem } from '@geoql/v-maplibre';
 
   const props = defineProps<{
     citiesWeather: CityWeather[];
