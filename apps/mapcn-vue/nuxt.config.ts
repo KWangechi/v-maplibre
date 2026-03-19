@@ -100,6 +100,9 @@ export default defineNuxtConfig({
         '@luma.gl/shadertools',
       ],
     },
+    worker: {
+      format: 'es',
+    },
   },
 
   postcss: {
