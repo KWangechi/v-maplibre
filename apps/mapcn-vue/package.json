@@ -50,8 +50,6 @@
     "class-variance-authority": "catalog:app:mapcn-vue",
     "clsx": "catalog:app:mapcn-vue",
     "flatbush": "catalog:app:mapcn-vue",
-    "geotiff": "catalog:app:mapcn-vue",
-    "geotiff-geokeys-to-proj4": "catalog:app:mapcn-vue",
     "idb": "catalog:app:mapcn-vue",
     "maplibre-gl": "catalog:default",
     "maplibre-gl-interpolate-heatmap": "catalog:app:mapcn-vue",

@@ -92,13 +92,11 @@
     "@vitest/coverage-v8": "catalog:pkg:v-maplibre",
     "@vitest/ui": "catalog:pkg:v-maplibre",
     "@vue/test-utils": "catalog:pkg:v-maplibre",
-    "geotiff": "catalog:pkg:v-maplibre",
     "happy-dom": "catalog:pkg:v-maplibre",
     "maplibre-gl-lidar": "catalog:pkg:v-maplibre",
     "maplibre-gl-wind": "catalog:pkg:v-maplibre",
     "oxfmt": "catalog:default",
     "oxlint": "catalog:default",
-    "proj4": "catalog:pkg:v-maplibre",
     "three": "catalog:pkg:v-maplibre",
     "typescript": "catalog:default",
     "vite": "catalog:pkg:v-maplibre",
@@ -113,14 +111,11 @@
     "@deck.gl/layers": "^9.2.6",
     "@deck.gl/mapbox": "^9.2.6",
     "@deck.gl/mesh-layers": "^9.2.6",
-    "@developmentseed/deck.gl-geotiff": "^0.2.0",
-    "@developmentseed/deck.gl-raster": "^0.2.0",
+    "@developmentseed/deck.gl-geotiff": "^0.3.0",
+    "@developmentseed/deck.gl-raster": "^0.3.0",
     "@geoql/maplibre-gl-starfield": "^0.1.0",
-    "geotiff": "2.1.3",
-    "geotiff-geokeys-to-proj4": "^2024.4.0",
     "maplibre-gl-lidar": "^0.11.1",
     "maplibre-gl-wind": "^0.2.0",
-    "proj4": "^2.20.2",
     "three": ">=0.176.0",
     "vue": "^3.5.0"
   },
@@ -147,15 +142,6 @@
       "optional": true
     },
     "@developmentseed/deck.gl-raster": {
-      "optional": true
-    },
-    "geotiff-geokeys-to-proj4": {
-      "optional": true
-    },
-    "geotiff": {
-      "optional": true
-    },
-    "proj4": {
       "optional": true
     },
     "@geoql/maplibre-gl-starfield": {

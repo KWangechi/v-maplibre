@@ -16,17 +16,16 @@
     toRaw,
   } from 'vue';
   import type { Color, PickingInfo } from '@deck.gl/core';
-  import type { GeoTIFF } from '@developmentseed/geotiff';
-  import type { Overview } from '@developmentseed/geotiff';
-  import type { Device, Texture } from '@luma.gl/core';
+  import type { GeoTIFF, Overview } from '@developmentseed/geotiff';
+  import type { Texture } from '@luma.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
   import type {
     COGLayerProps,
+    EpsgResolver,
     GetTileDataOptions,
     MosaicLayerProps,
     MosaicSource as BaseMosaicSource,
   } from '@developmentseed/deck.gl-geotiff';
-  import type { EpsgResolver } from '@developmentseed/deck.gl-geotiff';
   import { injectStrict, MapKey } from '../../../utils';
   import { useDeckOverlay } from '../_shared/useDeckOverlay';
 
@@ -139,7 +138,7 @@
     MosaicLayer: typeof import('@developmentseed/deck.gl-geotiff').MosaicLayer;
     COGLayer: typeof import('@developmentseed/deck.gl-geotiff').COGLayer;
     CreateTexture: RasterModule['module'];
-    fromUrl: typeof import('geotiff').fromUrl;
+    fromUrl: typeof GeoTIFF.fromUrl;
     resolveEpsg: EpsgResolver;
   }
 
@@ -349,17 +348,17 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
 
   async function initializeLayer() {
     try {
-      const [geotiffModule, rasterModule, geotiffLib] = await Promise.all([
+      const [geotiffModule, rasterModule, devGeotiff] = await Promise.all([
         import('@developmentseed/deck.gl-geotiff'),
         import('@developmentseed/deck.gl-raster/gpu-modules'),
-        import('geotiff'),
+        import('@developmentseed/geotiff'),
       ]);
 
       modules.value = markRaw({
         MosaicLayer: geotiffModule.MosaicLayer,
         COGLayer: geotiffModule.COGLayer,
         CreateTexture: rasterModule.CreateTexture,
-        fromUrl: geotiffLib.fromUrl,
+        fromUrl: devGeotiff.GeoTIFF.fromUrl,
         resolveEpsg: geotiffModule.epsgResolver,
       });
 
@@ -370,7 +369,7 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
     } catch (error) {
       console.error('[deck.gl-mosaic] Error loading MosaicLayer:', error);
       console.error(
-        'Make sure @developmentseed/deck.gl-geotiff, @developmentseed/deck.gl-raster, and geotiff are installed',
+        'Make sure @developmentseed/deck.gl-geotiff, @developmentseed/deck.gl-raster, and @developmentseed/geotiff are installed',
       );
       emit('error', error as Error);
     }
