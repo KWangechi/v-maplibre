@@ -80,7 +80,6 @@ updates:
           - 'oxfmt'
           - 'husky'
           - 'lint-staged'
-          - 'eslint*'
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: 'github-actions'

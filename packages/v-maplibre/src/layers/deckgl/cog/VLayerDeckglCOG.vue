@@ -118,9 +118,7 @@
   const createLayer = () => {
     if (!COGLayerClass.value) return null;
 
-    // Use toRaw() to unwrap Vue reactive proxies - required for web worker serialization
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const layerProps: Record<string, any> = {
+    const layerProps: Record<string, unknown> = {
       id: toRaw(props.id),
       geotiff: toRaw(props.geotiff),
       opacity: toRaw(props.opacity),
