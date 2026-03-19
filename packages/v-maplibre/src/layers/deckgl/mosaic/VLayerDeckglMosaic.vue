@@ -16,11 +16,13 @@
     toRaw,
   } from 'vue';
   import type { Color, PickingInfo } from '@deck.gl/core';
-  import type { GeoTIFF } from '@developmentseed/geotiff';
+  import type { GeoTIFF, Overview } from '@developmentseed/geotiff';
   import type { Texture } from '@luma.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
   import type {
+    COGLayerProps,
     EpsgResolver,
+    GetTileDataOptions,
     MosaicLayerProps,
     MosaicSource as BaseMosaicSource,
   } from '@developmentseed/deck.gl-geotiff';
@@ -124,6 +126,13 @@
 
   const map = injectStrict(MapKey);
   const { addLayer, removeLayer } = useDeckOverlay(map);
+  let activeLayerId = '';
+
+  interface TextureData {
+    texture: Texture;
+    width: number;
+    height: number;
+  }
 
   interface LoadedModules {
     MosaicLayer: typeof import('@developmentseed/deck.gl-geotiff').MosaicLayer;
@@ -199,45 +208,12 @@
     },
   };
 
-  const NDVI_FILTER_MODULE_NAME = 'ndviRangeFilter';
-
-  const ndviFilterUniformBlock = `\
-uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
-  float ndviMin;
-  float ndviMax;
-} ${NDVI_FILTER_MODULE_NAME};
-`;
-
-  const NDVIRangeFilter = {
-    name: NDVI_FILTER_MODULE_NAME,
-    fs: ndviFilterUniformBlock,
-    inject: {
-      'fs:DECKGL_FILTER_COLOR': `
-        float filter_nir = color[3];
-        float filter_red = color[0];
-        float filter_sum = filter_nir + filter_red;
-        float filter_ndvi = filter_sum > 0.001 ? (filter_nir - filter_red) / filter_sum : 0.0;
-        if (filter_ndvi < ${NDVI_FILTER_MODULE_NAME}.ndviMin || filter_ndvi > ${NDVI_FILTER_MODULE_NAME}.ndviMax) {
-          discard;
-        }
-      `,
-    },
-    defaultUniforms: {
-      ndviMin: -1,
-      ndviMax: 1,
-    },
-  };
-
-  /**
-   * Get render modules based on render mode
-   */
   function getRenderModules(
     mode: MosaicRenderMode,
     texture: Texture,
     mods: {
       CreateTexture: RasterModule['module'];
     },
-    ndviRange: [number, number],
     customModules?: (texture: Texture) => RenderModule[],
   ): RasterModule[] {
     if (mode === 'custom' && customModules) {
@@ -256,15 +232,7 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
       return [...base, { module: FalseColorInfrared }, { module: SetAlpha1 }];
     }
 
-    return [
-      ...base,
-      {
-        module: NDVIRangeFilter,
-        props: { ndviMin: ndviRange[0], ndviMax: ndviRange[1] },
-      },
-      { module: NDVIWithColormap },
-      { module: SetAlpha1 },
-    ];
+    return [...base, { module: NDVIWithColormap }, { module: SetAlpha1 }];
   }
 
   function createLayer() {
@@ -275,11 +243,11 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
 
     const rawSources = toRaw(props.sources);
     const renderMode = toRaw(props.renderMode);
-    const ndviRange = toRaw(props.ndviRange) ?? ([-1, 1] as [number, number]);
     const customRenderModules = props.customRenderModules;
 
+    const newId = `${toRaw(props.id)}-${renderMode}`;
     const layer = new MosaicLayer<MosaicSource, GeoTIFF>({
-      id: toRaw(props.id),
+      id: newId,
       sources: rawSources,
       maxCacheSize: toRaw(props.maxCacheSize),
 
@@ -297,24 +265,48 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
       renderSource: (source, { data, signal }) => {
         if (!data) return null;
 
-        return new COGLayer({
+        return new COGLayer<TextureData>({
           id: `cog-${source.assets.image.href}-${renderMode}`,
           geotiff: data,
           epsgResolver: resolveEpsg,
-          renderTile: (tileData) =>
+          getTileData: async (
+            image: GeoTIFF | Overview,
+            options: GetTileDataOptions,
+          ) => {
+            const { device, x, y } = options;
+            const tile = await image.fetchTile(x, y, {
+              signal,
+              boundless: false,
+            });
+            const { array } = tile;
+            if (array.layout === 'band-separate') {
+              throw new Error('Band-separate COGs are not supported');
+            }
+            const texture = device.createTexture({
+              data: array.data,
+              format: 'rgba8unorm',
+              width: array.width,
+              height: array.height,
+            });
+            return {
+              texture,
+              width: array.width,
+              height: array.height,
+            };
+          },
+          renderTile: (tileData: TextureData) =>
             getRenderModules(
               renderMode,
               tileData.texture,
               { CreateTexture },
-              ndviRange,
               customRenderModules,
             ),
           signal,
-        });
+        } as COGLayerProps<TextureData>);
       },
     } as MosaicLayerProps<MosaicSource, GeoTIFF>);
 
-    return markRaw(layer);
+    return layer;
   }
 
   async function initializeLayer() {
@@ -335,6 +327,7 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
 
       const layer = createLayer();
       if (layer) {
+        activeLayerId = (layer as { id: string }).id;
         addLayer(layer);
       }
     } catch (error) {
@@ -364,9 +357,12 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
     ],
     () => {
       if (modules.value) {
-        removeLayer(props.id);
+        if (activeLayerId) {
+          removeLayer(activeLayerId);
+        }
         const layer = createLayer();
         if (layer) {
+          activeLayerId = (layer as { id: string }).id;
           addLayer(layer);
         }
       }
@@ -375,7 +371,9 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
   );
 
   onBeforeUnmount(() => {
-    removeLayer(props.id);
+    if (activeLayerId) {
+      removeLayer(activeLayerId);
+    }
   });
 </script>
 
