@@ -2,7 +2,7 @@
   /**
    * VLayerDeckglMosaic - Client-side COG mosaic layer for STAC items
    *
-   * Uses @developmentseed/deck.gl-geotiff v0.2.0 MosaicLayer for efficient
+   * Uses @developmentseed/deck.gl-geotiff v0.3.0 MosaicLayer for efficient
    * client-side rendering of multiple COGs from STAC APIs.
    *
    * @see https://github.com/developmentseed/deck.gl-raster/blob/main/examples/naip-mosaic/src/App.tsx
@@ -19,6 +19,7 @@
   import type { GeoTIFF, Overview } from '@developmentseed/geotiff';
   import type { Texture } from '@luma.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
+  import type { ShaderModule } from '@luma.gl/shadertools';
   import type {
     COGLayerProps,
     EpsgResolver,
@@ -162,43 +163,74 @@
     },
   };
 
-  // NDVI with built-in colormap (cfastie-inspired gradient)
-  // This applies the colormap directly in the shader for reliability
-  const NDVIWithColormap = {
-    name: 'ndvi-with-colormap',
+  // --- NDVI Pipeline: 3 separate modules matching upstream pattern ---
+  // Uniforms update per-draw via MeshTextureLayer.draw() → setProps() without
+  // re-rendering tiles. Baked constants don't work because renderTile only runs
+  // when tiles are FIRST FETCHED — cached tiles keep old shader modules.
+
+  // Step 1: Compute NDVI from raw RGBA bands, store in color.r
+  const NDVICompute = {
+    name: 'ndvi-compute',
     inject: {
       'fs:DECKGL_FILTER_COLOR': `
-        float nir = color[3];
-        float red = color[0];
-        float sum = nir + red;
+        float nir_c = color[3];
+        float red_c = color[0];
+        float sum_c = nir_c + red_c;
+        float ndvi_c = sum_c > 0.001 ? (nir_c - red_c) / sum_c : 0.0;
+        color = vec4(ndvi_c, ndvi_c, ndvi_c, 1.0);
+      `,
+    },
+  };
+
+  // Step 2: Filter by NDVI range — uniforms update per-draw without tile re-render
+  const ndviFilterUniformBlock = `\
+uniform ndviFilterUniforms {
+  float ndviMin;
+  float ndviMax;
+} ndviFilter;
+`;
+
+  const NDVIFilter = {
+    name: 'ndviFilter',
+    fs: ndviFilterUniformBlock,
+    inject: {
+      'fs:DECKGL_FILTER_COLOR': `
+        if (color.r < ndviFilter.ndviMin || color.r > ndviFilter.ndviMax) {
+          discard;
+        }
+      `,
+    },
+    uniformTypes: {
+      ndviMin: 'f32',
+      ndviMax: 'f32',
+    },
+    getUniforms: (uniformProps: Record<string, unknown>) => ({
+      ndviMin: (uniformProps.ndviMin as number) ?? -1.0,
+      ndviMax: (uniformProps.ndviMax as number) ?? 1.0,
+    }),
+  } as const satisfies ShaderModule<{ ndviMin: number; ndviMax: number }>;
+
+  // Step 3: Apply cfastie-inspired colormap gradient from color.r (NDVI value)
+  const NDVIColormap = {
+    name: 'ndvi-colormap',
+    inject: {
+      'fs:DECKGL_FILTER_COLOR': `
+        float t = clamp((color.r + 1.0) / 2.0, 0.0, 1.0);
         
-        // Prevent division by zero
-        float ndvi = sum > 0.001 ? (nir - red) / sum : 0.0;
-        
-        // Normalize from [-1, 1] to [0, 1]
-        float t = clamp((ndvi + 1.0) / 2.0, 0.0, 1.0);
-        
-        // Cfastie-inspired colormap gradient
-        // Low NDVI (water/bare): blue/cyan -> Mid (sparse): yellow -> High (vegetation): green
         vec3 result;
         if (t < 0.4) {
-          // Water/bare soil: blue to cyan (NDVI < -0.2)
           float localT = t / 0.4;
           result = mix(vec3(0.0, 0.0, 0.5), vec3(0.5, 0.8, 0.9), localT);
         } else if (t < 0.5) {
-          // Bare/sparse: cyan to yellow (NDVI -0.2 to 0)
           float localT = (t - 0.4) / 0.1;
           result = mix(vec3(0.5, 0.8, 0.9), vec3(0.9, 0.9, 0.4), localT);
         } else if (t < 0.6) {
-          // Sparse vegetation: yellow to light green (NDVI 0 to 0.2)
           float localT = (t - 0.5) / 0.1;
           result = mix(vec3(0.9, 0.9, 0.4), vec3(0.6, 0.8, 0.2), localT);
         } else if (t < 0.75) {
-          // Moderate vegetation: light green to green (NDVI 0.2 to 0.5)
           float localT = (t - 0.6) / 0.15;
           result = mix(vec3(0.6, 0.8, 0.2), vec3(0.1, 0.6, 0.1), localT);
         } else {
-          // Dense vegetation: green to dark green (NDVI > 0.5)
           float localT = (t - 0.75) / 0.25;
           result = mix(vec3(0.1, 0.6, 0.1), vec3(0.0, 0.3, 0.0), localT);
         }
@@ -214,6 +246,7 @@
     mods: {
       CreateTexture: RasterModule['module'];
     },
+    ndviRange: [number, number],
     customModules?: (texture: Texture) => RenderModule[],
   ): RasterModule[] {
     if (mode === 'custom' && customModules) {
@@ -232,7 +265,19 @@
       return [...base, { module: FalseColorInfrared }, { module: SetAlpha1 }];
     }
 
-    return [...base, { module: NDVIWithColormap }, { module: SetAlpha1 }];
+    // NDVI pipeline: compute → filter → colormap → alpha
+    // NDVIFilter uses uniformTypes + getUniforms so uniform values update
+    // per-draw via MeshTextureLayer.draw() WITHOUT re-rendering tiles.
+    return [
+      ...base,
+      { module: NDVICompute },
+      {
+        module: NDVIFilter,
+        props: { ndviMin: ndviRange[0], ndviMax: ndviRange[1] },
+      },
+      { module: NDVIColormap },
+      { module: SetAlpha1 },
+    ];
   }
 
   function createLayer() {
@@ -243,9 +288,12 @@
 
     const rawSources = toRaw(props.sources);
     const renderMode = toRaw(props.renderMode);
+    const ndviRange = toRaw(props.ndviRange) as [number, number];
     const customRenderModules = props.customRenderModules;
 
-    const newId = `${toRaw(props.id)}-${renderMode}`;
+    // Fixed ID matching upstream pattern — deck.gl diffs old vs new layer
+    // via setProps, detecting changed renderSource/renderTile callbacks.
+    const newId = `${toRaw(props.id)}-mosaic`;
     const layer = new MosaicLayer<MosaicSource, GeoTIFF>({
       id: newId,
       sources: rawSources,
@@ -299,6 +347,7 @@
               renderMode,
               tileData.texture,
               { CreateTexture },
+              ndviRange,
               customRenderModules,
             ),
           signal,
@@ -357,9 +406,6 @@
     ],
     () => {
       if (modules.value) {
-        if (activeLayerId) {
-          removeLayer(activeLayerId);
-        }
         const layer = createLayer();
         if (layer) {
           activeLayerId = (layer as { id: string }).id;
