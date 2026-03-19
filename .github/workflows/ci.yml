@@ -37,7 +37,6 @@ jobs:
               - 'bun.lock'
             docs:
               - 'apps/docs/**'
-              - 'packages/v-maplibre/**'
 
   quality:
     name: 'Lint & Format'
