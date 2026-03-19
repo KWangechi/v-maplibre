@@ -123,7 +123,7 @@
   }>();
 
   const map = injectStrict(MapKey);
-  const { addLayer, removeLayer, updateLayer } = useDeckOverlay(map);
+  const { addLayer, removeLayer } = useDeckOverlay(map);
 
   interface LoadedModules {
     MosaicLayer: typeof import('@developmentseed/deck.gl-geotiff').MosaicLayer;
@@ -364,9 +364,10 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
     ],
     () => {
       if (modules.value) {
+        removeLayer(props.id);
         const layer = createLayer();
         if (layer) {
-          updateLayer(props.id, layer);
+          addLayer(layer);
         }
       }
     },
