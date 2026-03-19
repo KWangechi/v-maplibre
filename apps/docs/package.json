@@ -6,8 +6,8 @@
     "dev": "nuxt dev --extends docus",
     "build": "nuxt build --extends docus",
     "preview": "nuxt preview",
-    "lint": "oxlint && eslint .",
-    "lint:fix": "oxlint --fix && eslint . --fix",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -16,11 +16,8 @@
     "nuxt": "^4.4.2"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^1.15.2",
     "@nuxtjs/plausible": "^3.0.2",
     "agents": "^0.7.9",
-    "eslint": "^10.0.3",
-    "eslint-plugin-oxlint": "^1.56.0",
     "oxlint": "^1.56.0",
     "wrangler": "^4.75.0"
   },
