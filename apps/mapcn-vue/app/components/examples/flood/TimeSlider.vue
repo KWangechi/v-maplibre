@@ -30,7 +30,8 @@
   });
 
   const isFiltered = computed(
-    () => props.modelValue[0] !== props.min || props.modelValue[1] !== props.max,
+    () =>
+      props.modelValue[0] !== props.min || props.modelValue[1] !== props.max,
   );
 
   const playbackProgress = computed(() => {

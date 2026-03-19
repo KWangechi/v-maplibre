@@ -48,7 +48,14 @@
       for (let y = 0; y < 20; y++) {
         for (let z = 0; z < 15; z++) {
           // Only create points on the surface
-          if (x === 0 || x === 19 || y === 0 || y === 19 || z === 0 || z === 14) {
+          if (
+            x === 0 ||
+            x === 19 ||
+            y === 0 ||
+            y === 19 ||
+            z === 0 ||
+            z === 14
+          ) {
             points.push({
               position: [
                 centerLng + (x - 10) * 0.0001,

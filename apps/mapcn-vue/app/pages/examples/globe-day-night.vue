@@ -19,7 +19,8 @@
   });
 
   const mapId = useId();
-  const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } = useSunPosition();
+  const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } =
+    useSunPosition();
 
   const mapOptions = computed(() => ({
     container: `globe-day-night-${mapId}`,
@@ -35,7 +36,9 @@
           tileSize: 256,
         },
       },
-      layers: [{ id: 'satellite', type: 'raster' as const, source: 'satellite' }],
+      layers: [
+        { id: 'satellite', type: 'raster' as const, source: 'satellite' },
+      ],
       sky: {
         'atmosphere-blend': [
           'interpolate',

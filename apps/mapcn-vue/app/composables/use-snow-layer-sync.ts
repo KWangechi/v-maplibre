@@ -22,9 +22,7 @@ export function useSnowLayerSync(
     const layer = snowLayer.value;
     if (!map || !layer) return;
     const zoom = map.getZoom();
-    const pitch = map.getPitch();
     const zoomFactor = Math.max(0, Math.min(1, (zoom - 8) / 7));
-    const pitchFactor = Math.max(0, Math.min(1, pitch / 70));
     layer.setDensity(0.25 + zoomFactor * 0.25); // 0.25 at z8, 0.5 at z15
     layer.setFlakeSize(1.5 + zoomFactor * 1.5);
   }

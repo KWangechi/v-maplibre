@@ -9,7 +9,10 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
   import type { PickingInfo } from '@deck.gl/core';
-  import type { CategoryLegendItem, GradientLegendItem } from '@geoql/v-maplibre';
+  import type {
+    CategoryLegendItem,
+    GradientLegendItem,
+  } from '@geoql/v-maplibre';
   import type { Map } from 'maplibre-gl';
   import type { FloodPoint } from '~/types/flood';
 
@@ -148,7 +151,14 @@
       max: 500,
       minLabel: 'Low',
       maxLabel: 'High',
-      colors: ['#38bdf8', '#3b82f6', '#8b5cf6', '#f97316', '#dc2626', '#991b1b'],
+      colors: [
+        '#38bdf8',
+        '#3b82f6',
+        '#8b5cf6',
+        '#f97316',
+        '#dc2626',
+        '#991b1b',
+      ],
     },
   ];
 

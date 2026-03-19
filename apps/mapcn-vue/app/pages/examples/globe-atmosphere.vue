@@ -21,8 +21,14 @@
   });
 
   const mapId = useId();
-  const { currentMode, currentPreset, sunAzimuth, sunAltitude, setMode, modes } =
-    useGlobeAtmosphere('night');
+  const {
+    currentMode,
+    currentPreset,
+    sunAzimuth,
+    sunAltitude,
+    setMode,
+    modes,
+  } = useGlobeAtmosphere('night');
 
   const mapRef = ref<MaplibreMap | null>(null);
 
@@ -40,7 +46,9 @@
           tileSize: 256,
         },
       },
-      layers: [{ id: 'satellite', type: 'raster' as const, source: 'satellite' }],
+      layers: [
+        { id: 'satellite', type: 'raster' as const, source: 'satellite' },
+      ],
       sky: {
         'atmosphere-blend': currentPreset.value.atmosphereBlend,
         'sky-color': currentPreset.value.skyColor,

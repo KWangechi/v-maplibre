@@ -150,7 +150,10 @@
     return colorScale[0].color;
   }
 
-  function hexToRgba(hex: string, alpha = 200): [number, number, number, number] {
+  function hexToRgba(
+    hex: string,
+    alpha = 200,
+  ): [number, number, number, number] {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     if (result) {
       return [

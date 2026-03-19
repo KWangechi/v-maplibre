@@ -87,7 +87,8 @@
       const stacUrl = `https://planetarycomputer.microsoft.com/api/stac/v1/search?${queryString}`;
 
       const response = await fetch(stacUrl);
-      if (!response.ok) throw new Error(`STAC API error: ${response.statusText}`);
+      if (!response.ok)
+        throw new Error(`STAC API error: ${response.statusText}`);
 
       const data = await response.json();
       stacItems.value = data.features as MosaicSource[];

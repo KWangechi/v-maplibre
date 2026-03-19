@@ -1,6 +1,11 @@
 <script setup lang="ts">
   import type { Map as MaplibreMap } from 'maplibre-gl';
-  import type { FeatureCollection, Polygon, MultiPolygon, Point } from 'geojson';
+  import type {
+    FeatureCollection,
+    Polygon,
+    MultiPolygon,
+    Point,
+  } from 'geojson';
   import {
     VMap,
     VControlNavigation,

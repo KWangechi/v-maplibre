@@ -11,7 +11,11 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import { motion, AnimatePresence } from 'motion-v';
-  import type { RouteStop, RouteLegInfo, ValhallaResponse } from '~/types/route';
+  import type {
+    RouteStop,
+    RouteLegInfo,
+    ValhallaResponse,
+  } from '~/types/route';
   import {
     useRouteUtils,
     decodePolyline,
@@ -92,7 +96,12 @@
 
   function onMapLoaded(map: MaplibreMap) {
     const coords = stops.value.map((s) => s.coordinates);
-    fitMapToBounds(map, coords, { top: 60, bottom: 60, left: 60, right: 60 }, 14);
+    fitMapToBounds(
+      map,
+      coords,
+      { top: 60, bottom: 60, left: 60, right: 60 },
+      14,
+    );
   }
 
   async function fetchMultiStopRoute() {

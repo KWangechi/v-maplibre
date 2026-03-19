@@ -38,7 +38,9 @@
           tileSize: 256,
         },
       },
-      layers: [{ id: 'satellite', type: 'raster' as const, source: 'satellite' }],
+      layers: [
+        { id: 'satellite', type: 'raster' as const, source: 'satellite' },
+      ],
       sky: {
         'atmosphere-blend': [
           'interpolate',

@@ -114,7 +114,14 @@
       max: 1.0,
       minLabel: 'Low (0)',
       maxLabel: 'High (1.0)',
-      colors: ['#2166ac', '#67a9cf', '#fddbc7', '#f46d43', '#d73027', '#a50026'],
+      colors: [
+        '#2166ac',
+        '#67a9cf',
+        '#fddbc7',
+        '#f46d43',
+        '#d73027',
+        '#a50026',
+      ],
     },
   ];
 
