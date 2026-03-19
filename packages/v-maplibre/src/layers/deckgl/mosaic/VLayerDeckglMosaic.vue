@@ -104,6 +104,11 @@
      */
     highlightColor?: Color;
     /**
+     * NDVI range filter: pixels outside [min, max] are discarded.
+     * Only applies when renderMode is 'ndvi'. Range: [-1, 1].
+     */
+    ndviRange?: [number, number];
+    /**
      * Insert layer before this layer id
      */
     beforeId?: string;
@@ -116,6 +121,7 @@
     visible: true,
     pickable: false,
     autoHighlight: false,
+    ndviRange: () => [-1, 1] as [number, number],
   });
 
   const emit = defineEmits<{
@@ -234,6 +240,35 @@
     },
   };
 
+  const NDVI_FILTER_MODULE_NAME = 'ndviRangeFilter';
+
+  const ndviFilterUniformBlock = `\
+uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
+  float ndviMin;
+  float ndviMax;
+} ${NDVI_FILTER_MODULE_NAME};
+`;
+
+  const NDVIRangeFilter = {
+    name: NDVI_FILTER_MODULE_NAME,
+    fs: ndviFilterUniformBlock,
+    inject: {
+      'fs:DECKGL_FILTER_COLOR': `
+        float filter_nir = color[3];
+        float filter_red = color[0];
+        float filter_sum = filter_nir + filter_red;
+        float filter_ndvi = filter_sum > 0.001 ? (filter_nir - filter_red) / filter_sum : 0.0;
+        if (filter_ndvi < ${NDVI_FILTER_MODULE_NAME}.ndviMin || filter_ndvi > ${NDVI_FILTER_MODULE_NAME}.ndviMax) {
+          discard;
+        }
+      `,
+    },
+    defaultUniforms: {
+      ndviMin: -1,
+      ndviMax: 1,
+    },
+  };
+
   /**
    * Get render modules based on render mode
    */
@@ -243,6 +278,7 @@
     mods: {
       CreateTexture: RasterModule['module'];
     },
+    ndviRange: [number, number],
     customModules?: (texture: Texture) => RenderModule[],
   ): RasterModule[] {
     if (mode === 'custom' && customModules) {
@@ -261,8 +297,15 @@
       return [...base, { module: FalseColorInfrared }, { module: SetAlpha1 }];
     }
 
-    // NDVI - use built-in colormap shader for reliability
-    return [...base, { module: NDVIWithColormap }, { module: SetAlpha1 }];
+    return [
+      ...base,
+      {
+        module: NDVIRangeFilter,
+        props: { ndviMin: ndviRange[0], ndviMax: ndviRange[1] },
+      },
+      { module: NDVIWithColormap },
+      { module: SetAlpha1 },
+    ];
   }
 
   /**
@@ -276,6 +319,7 @@
 
     const rawSources = toRaw(props.sources);
     const renderMode = toRaw(props.renderMode);
+    const ndviRange = toRaw(props.ndviRange) ?? ([-1, 1] as [number, number]);
     const customRenderModules = props.customRenderModules;
 
     // Create geoKeysParser that resolves EPSG codes to proj4 strings
@@ -354,6 +398,7 @@
               renderMode,
               tileData.texture,
               { CreateTexture },
+              ndviRange,
               customRenderModules,
             ),
           signal,
@@ -418,7 +463,13 @@
   });
 
   watch(
-    () => [props.sources, props.renderMode, props.opacity, props.visible],
+    () => [
+      props.sources,
+      props.renderMode,
+      props.ndviRange,
+      props.opacity,
+      props.visible,
+    ],
     () => {
       if (modules.value) {
         const layer = createLayer();
