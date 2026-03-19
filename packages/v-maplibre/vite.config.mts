@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -25,7 +25,8 @@ export default defineConfig({
         '@luma.gl/shadertools',
         // Raster packages (optional peer deps)
         '@developmentseed/deck.gl-geotiff',
-        'geotiff-geokeys-to-proj4',
+        '@developmentseed/deck.gl-raster',
+        '@developmentseed/geotiff',
         // LiDAR package (optional peer dep)
         'maplibre-gl-lidar',
       ],

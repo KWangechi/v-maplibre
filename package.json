@@ -35,6 +35,7 @@
         "@deck.gl/mesh-layers": "^9.2.11",
         "@developmentseed/deck.gl-geotiff": "^0.3.0",
         "@developmentseed/deck.gl-raster": "^0.3.0",
+        "@developmentseed/geotiff": "^0.3.0",
         "@geoql/maplibre-gl-starfield": "^0.1.1",
         "@luma.gl/core": "^9.2.6",
         "@luma.gl/engine": "^9.2.6",

@@ -83,6 +83,7 @@
     "@deck.gl/mesh-layers": "catalog:pkg:v-maplibre",
     "@developmentseed/deck.gl-geotiff": "catalog:pkg:v-maplibre",
     "@developmentseed/deck.gl-raster": "catalog:pkg:v-maplibre",
+    "@developmentseed/geotiff": "catalog:pkg:v-maplibre",
     "@geoql/maplibre-gl-starfield": "catalog:pkg:v-maplibre",
     "@luma.gl/core": "catalog:pkg:v-maplibre",
     "@luma.gl/engine": "catalog:pkg:v-maplibre",
