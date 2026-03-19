@@ -64,6 +64,7 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    googleFloodApiKey: '',
     public: {
       mapsguruApiKey: '',
     },
