@@ -96,6 +96,14 @@ export function useExamplesData() {
           icon: 'lucide:home',
           badge: 'ProMap',
         },
+        {
+          title: 'Flood Forecasting',
+          description:
+            'Global flood event visualization powered by GDACS and Google Groundsource across 150+ countries.',
+          href: '/examples/flood-forecasting',
+          icon: 'lucide:droplets',
+          badge: 'GDACS',
+        },
       ],
     },
     {
