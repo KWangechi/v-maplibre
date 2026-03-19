@@ -20,6 +20,7 @@
     SelectTrigger,
     SelectValue,
   } from '~/components/ui/select';
+  import { Slider } from '~/components/ui/slider';
 
   useSeoMeta({
     title: 'NAIP Mosaic - mapcn-vue Examples',
@@ -61,6 +62,8 @@
   }));
 
   const renderMode = ref<MosaicRenderMode>('trueColor');
+  const ndviRange = ref<[number, number]>([-1, 1]);
+  const showNdviSlider = computed(() => renderMode.value === 'ndvi');
   const loading = ref(true);
   const error = ref<string | null>(null);
   const stacItems = ref<MosaicSource[]>([]);
@@ -129,6 +132,10 @@
 
   function togglePanel() {
     panelOpen.value = !panelOpen.value;
+  }
+
+  function handleNdviRangeUpdate(value: number[]) {
+    ndviRange.value = [value[0], value[1]];
   }
 
   function getRenderModeLabel(value: MosaicRenderMode) {
@@ -213,6 +220,7 @@
             id="naip-mosaic"
             :sources="stacItems"
             :render-mode="renderMode"
+            :ndvi-range="ndviRange"
             @source-load="handleSourceLoad"
             @error="handleError"
           />
@@ -293,6 +301,29 @@
                 </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div v-if="showNdviSlider" class="mt-4">
+            <label class="mb-1.5 block text-xs font-medium">NDVI Range</label>
+            <Slider
+              :model-value="ndviRange"
+              :min="-1"
+              :max="1"
+              :step="0.01"
+              :min-steps-between-thumbs="0.02"
+              class="mt-2"
+              @update:model-value="handleNdviRangeUpdate"
+            />
+            <div
+              class="mt-1.5 flex justify-between text-[10px] text-muted-foreground"
+            >
+              <span>-1</span>
+              <span
+                >{{ ndviRange[0].toFixed(2) }} –
+                {{ ndviRange[1].toFixed(2) }}</span
+              >
+              <span>+1</span>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
