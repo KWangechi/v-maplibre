@@ -111,35 +111,12 @@
   const COGLayerClass = shallowRef<
     typeof import('@developmentseed/deck.gl-geotiff').COGLayer | null
   >(null);
-  const projModule = shallowRef<
-    typeof import('@developmentseed/deck.gl-geotiff').proj | null
+  const epsgResolverFn = shallowRef<
+    typeof import('@developmentseed/deck.gl-geotiff').epsgResolver | null
   >(null);
-  const toProj4Fn = shallowRef<
-    typeof import('geotiff-geokeys-to-proj4').toProj4 | null
-  >(null);
-
-  // Create geoKeysParser using geotiff-geokeys-to-proj4 (like official example)
-  const createGeoKeysParser = () => {
-    if (!projModule.value || !toProj4Fn.value) return undefined;
-
-    const proj = projModule.value;
-    const toProj4 = toProj4Fn.value;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return async (geoKeys: any) => {
-      const projDefinition = toProj4(geoKeys);
-      return {
-        def: projDefinition.proj4,
-        parsed: proj.parseCrs(projDefinition.proj4),
-        coordinatesUnits: projDefinition.coordinatesUnits as 'degree' | 'metre',
-      };
-    };
-  };
 
   const createLayer = () => {
     if (!COGLayerClass.value) return null;
-
-    const geoKeysParser = createGeoKeysParser();
 
     // Use toRaw() to unwrap Vue reactive proxies - required for web worker serialization
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,8 +131,8 @@
       debugOpacity: toRaw(props.debugOpacity),
     };
 
-    if (geoKeysParser) {
-      layerProps.geoKeysParser = geoKeysParser;
+    if (epsgResolverFn.value) {
+      layerProps.epsgResolver = epsgResolverFn.value;
     }
 
     layerProps.onGeoTIFFLoad = (
@@ -192,14 +169,10 @@
 
   const initializeLayer = async () => {
     try {
-      const [geotiffModule, proj4Module] = await Promise.all([
-        import('@developmentseed/deck.gl-geotiff'),
-        import('geotiff-geokeys-to-proj4'),
-      ]);
+      const geotiffModule = await import('@developmentseed/deck.gl-geotiff');
 
       COGLayerClass.value = markRaw(geotiffModule.COGLayer);
-      projModule.value = markRaw(geotiffModule.proj);
-      toProj4Fn.value = markRaw(proj4Module.toProj4);
+      epsgResolverFn.value = geotiffModule.epsgResolver;
 
       const layer = createLayer();
       if (layer) {
@@ -207,9 +180,7 @@
       }
     } catch (error) {
       console.error('[deck.gl-raster] Error loading COGLayer:', error);
-      console.error(
-        'Make sure @developmentseed/deck.gl-geotiff and geotiff-geokeys-to-proj4 are installed',
-      );
+      console.error('Make sure @developmentseed/deck.gl-geotiff is installed');
     }
   };
 

@@ -16,25 +16,19 @@
     toRaw,
   } from 'vue';
   import type { Color, PickingInfo } from '@deck.gl/core';
-  import type { GeoTIFF, GeoTIFFImage } from 'geotiff';
+  import type { GeoTIFF } from '@developmentseed/geotiff';
+  import type { Overview } from '@developmentseed/geotiff';
   import type { Device, Texture } from '@luma.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
   import type {
     COGLayerProps,
+    GetTileDataOptions,
     MosaicLayerProps,
     MosaicSource as BaseMosaicSource,
   } from '@developmentseed/deck.gl-geotiff';
-  import type { Pool } from 'geotiff';
+  import type { EpsgResolver } from '@developmentseed/deck.gl-geotiff';
   import { injectStrict, MapKey } from '../../../utils';
   import { useDeckOverlay } from '../_shared/useDeckOverlay';
-
-  // GetTileDataOptions is not exported from @developmentseed/deck.gl-geotiff, define locally
-  interface GetTileDataOptions {
-    device: Device;
-    window?: [number, number, number, number];
-    signal?: AbortSignal;
-    pool: Pool;
-  }
 
   /**
    * A STAC-like item with bounding box and COG asset URL
@@ -141,40 +135,15 @@
     height: number;
   }
 
-  // Loaded module references
   interface LoadedModules {
     MosaicLayer: typeof import('@developmentseed/deck.gl-geotiff').MosaicLayer;
     COGLayer: typeof import('@developmentseed/deck.gl-geotiff').COGLayer;
     CreateTexture: RasterModule['module'];
     fromUrl: typeof import('geotiff').fromUrl;
-    proj4Defs: (
-      name: string,
-      def?: string,
-    ) => import('proj4').ProjectionDefinition | undefined;
+    resolveEpsg: EpsgResolver;
   }
 
   const modules = shallowRef<LoadedModules | null>(null);
-
-  /**
-   * Get proj4 definition string for an EPSG code.
-   * Based on: https://github.com/developmentseed/deck.gl-raster/blob/main/examples/naip-mosaic/src/proj.ts
-   */
-  const getProj4Def = (epsgCode: number): string | null => {
-    // NAD83 / UTM zones (26910-26920 for continental US)
-    if (epsgCode >= 26910 && epsgCode <= 26920) {
-      const zone = epsgCode - 26900;
-      return `+proj=utm +zone=${zone} +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs`;
-    }
-    // WGS84
-    if (epsgCode === 4326) {
-      return '+proj=longlat +datum=WGS84 +no_defs +type=crs';
-    }
-    // Web Mercator
-    if (epsgCode === 3857) {
-      return '+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs';
-    }
-    return null;
-  };
 
   // Shader modules for different render modes
   const SetAlpha1 = {
@@ -308,71 +277,22 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
     ];
   }
 
-  /**
-   * Create the mosaic layer using deck.gl-geotiff v0.2.0 MosaicLayer
-   */
   function createLayer() {
     const mods = modules.value;
     if (!mods || !props.sources.length) return null;
 
-    const { MosaicLayer, COGLayer, CreateTexture, fromUrl, proj4Defs } = mods;
+    const { MosaicLayer, COGLayer, CreateTexture, fromUrl, resolveEpsg } = mods;
 
     const rawSources = toRaw(props.sources);
     const renderMode = toRaw(props.renderMode);
     const ndviRange = toRaw(props.ndviRange) ?? ([-1, 1] as [number, number]);
     const customRenderModules = props.customRenderModules;
 
-    // Create geoKeysParser that resolves EPSG codes to proj4 strings
-    const geoKeysParser = async (geoKeys: Record<string, unknown>) => {
-      const code =
-        (geoKeys.ProjectedCSTypeGeoKey as number) ||
-        (geoKeys.GeographicTypeGeoKey as number);
-      if (!code) throw new Error('No projection code found in geoKeys');
-
-      const crsString = `EPSG:${code}`;
-      const crs = proj4Defs(crsString);
-      if (!crs) throw new Error(`Unknown CRS: ${crsString}`);
-
-      // Get proj4 string for the def field (required by deck.gl-geotiff's parseCrs)
-      const proj4String = getProj4Def(code);
-      if (!proj4String) {
-        throw new Error(
-          `Unknown EPSG code: ${code}. Add proj4 definition to getProj4Def().`,
-        );
-      }
-
-      return {
-        def: proj4String,
-        parsed: crs,
-        coordinatesUnits: crs.units as 'm' | 'metre' | 'degree',
-      };
-    };
-
-    // Create getTileData function for COGLayer
-    const getTileData: COGLayerProps<TextureData>['getTileData'] = async (
-      image: GeoTIFFImage,
-      options: GetTileDataOptions,
-    ) => {
-      const rasterData = await image.readRasters({
-        ...options,
-        interleave: true,
-      });
-      const texture = options.device.createTexture({
-        data: rasterData as unknown as Uint8Array,
-        format: 'rgba8unorm',
-        width: rasterData.width,
-        height: rasterData.height,
-      });
-      return { texture, width: rasterData.width, height: rasterData.height };
-    };
-
-    // Use the built-in MosaicLayer from deck.gl-geotiff v0.2.0
     const layer = new MosaicLayer<MosaicSource, GeoTIFF>({
       id: toRaw(props.id),
       sources: rawSources,
       maxCacheSize: toRaw(props.maxCacheSize),
 
-      // Fetch GeoTIFF for each source
       getSource: async (source, { signal }) => {
         try {
           const tiff = await fromUrl(source.assets.image.href, {}, signal);
@@ -384,16 +304,34 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
         }
       },
 
-      // Render each source as a COGLayer
       renderSource: (source, { data, signal }) => {
         if (!data) return null;
 
         return new COGLayer<TextureData>({
           id: `cog-${source.assets.image.href}-${renderMode}`,
           geotiff: data,
-          geoKeysParser,
-          getTileData,
-          renderTile: (tileData) =>
+          epsgResolver: resolveEpsg,
+          getTileData: async (
+            image: GeoTIFF | Overview,
+            options: GetTileDataOptions,
+          ) => {
+            const rasterData = await image.readRasters({
+              ...options,
+              interleave: true,
+            });
+            const texture = options.device.createTexture({
+              data: rasterData as unknown as Uint8Array,
+              format: 'rgba8unorm',
+              width: rasterData.width,
+              height: rasterData.height,
+            });
+            return {
+              texture,
+              width: rasterData.width,
+              height: rasterData.height,
+            };
+          },
+          renderTile: (tileData: TextureData) =>
             getRenderModules(
               renderMode,
               tileData.texture,
@@ -411,36 +349,20 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
 
   async function initializeLayer() {
     try {
-      const [geotiffModule, rasterModule, geotiffLib, proj4Module] =
-        await Promise.all([
-          import('@developmentseed/deck.gl-geotiff'),
-          import('@developmentseed/deck.gl-raster/gpu-modules'),
-          import('geotiff'),
-          import('proj4'),
-        ]);
-
-      // Get proj4.defs function
-      const proj4Fn = proj4Module.default;
-
-      // Register UTM projections for NAIP (zones 10-20 cover continental US)
-      // Based on: https://github.com/developmentseed/deck.gl-raster/blob/main/examples/naip-mosaic/src/proj.ts
-      for (let zone = 10; zone <= 20; zone++) {
-        const epsgCode = 26900 + zone;
-        const def = getProj4Def(epsgCode);
-        if (def) {
-          proj4Fn.defs(`EPSG:${epsgCode}`, def);
-        }
-      }
+      const [geotiffModule, rasterModule, geotiffLib] = await Promise.all([
+        import('@developmentseed/deck.gl-geotiff'),
+        import('@developmentseed/deck.gl-raster/gpu-modules'),
+        import('geotiff'),
+      ]);
 
       modules.value = markRaw({
         MosaicLayer: geotiffModule.MosaicLayer,
         COGLayer: geotiffModule.COGLayer,
         CreateTexture: rasterModule.CreateTexture,
         fromUrl: geotiffLib.fromUrl,
-        proj4Defs: proj4Fn.defs,
+        resolveEpsg: geotiffModule.epsgResolver,
       });
 
-      // Create and add the layer using deck overlay
       const layer = createLayer();
       if (layer) {
         addLayer(layer);
@@ -448,7 +370,7 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
     } catch (error) {
       console.error('[deck.gl-mosaic] Error loading MosaicLayer:', error);
       console.error(
-        'Make sure @developmentseed/deck.gl-geotiff, @developmentseed/deck.gl-raster, geotiff, and proj4 are installed',
+        'Make sure @developmentseed/deck.gl-geotiff, @developmentseed/deck.gl-raster, and geotiff are installed',
       );
       emit('error', error as Error);
     }
