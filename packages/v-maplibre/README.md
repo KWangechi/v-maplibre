@@ -44,10 +44,10 @@ Install these packages based on the features you need:
 
 ```bash
 # Raster/COG layers (Cloud-Optimized GeoTIFF)
-bun add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff geotiff
+bun add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff @developmentseed/geotiff
 
 # COG Mosaic layers (client-side mosaicking of multiple COGs)
-bun add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff geotiff proj4
+bun add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff @developmentseed/geotiff
 
 # LiDAR viewer control
 bun add maplibre-gl-lidar
