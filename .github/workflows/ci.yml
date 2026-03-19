@@ -1,19 +1,48 @@
-name: CI
+name: 'Continuous Integration'
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
+  workflow_call:
+    outputs:
+      mapcn-changed:
+        description: 'Whether mapcn-vue app files changed'
+        value: ${{ jobs.changes.outputs.mapcn }}
+      docs-changed:
+        description: 'Whether docs app files changed'
+        value: ${{ jobs.changes.outputs.docs }}
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: read
 
 jobs:
-  check:
-    name: Lint & Test
+  changes:
+    name: Detect Changes
     runs-on: ubuntu-latest
+    outputs:
+      mapcn: ${{ steps.filter.outputs.mapcn }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            mapcn:
+              - 'apps/mapcn-vue/**'
+              - 'packages/v-maplibre/**'
+              - 'packages/mapcn-vue/**'
+              - 'bun.lock'
+            docs:
+              - 'apps/docs/**'
+              - 'packages/v-maplibre/**'
+
+  quality:
+    name: 'Lint & Format'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -32,6 +61,23 @@ jobs:
       - name: Check formatting
         run: bun run format:check
 
+  test:
+    name: 'Test'
+    needs: [quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Run tests
         run: bun run test:coverage
 
@@ -42,10 +88,11 @@ jobs:
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  build:
-    name: Build Library
+  build-lib:
+    name: 'Build Library'
+    needs: [quality]
     runs-on: ubuntu-latest
-    needs: check
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -60,18 +107,63 @@ jobs:
 
       - name: Build library
         run: bun run --cwd packages/v-maplibre build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
-      - name: Upload build artifacts
+      - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
-          name: dist
+          name: lib-dist
           path: packages/v-maplibre/dist/
-          retention-days: 7
+          retention-days: 1
 
-  docs:
-    name: Build Docs
+  build-mapcn:
+    name: 'Build mapcn-vue'
+    needs: [changes, build-lib]
+    if: needs.changes.outputs.mapcn == 'true'
     runs-on: ubuntu-latest
-    needs: check
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Download library artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: lib-dist
+          path: packages/v-maplibre/dist/
+
+      - name: Generate ProMap data
+        run: bun run apps/mapcn-vue/scripts/prepare-promap-data.ts
+
+      - name: Build mapcn-vue
+        run: bun run build:mapcn
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          NITRO_PRESET: cloudflare-pages
+          NUXT_PUBLIC_MAPSGURU_API_KEY: ${{ secrets.NUXT_PUBLIC_MAPSGURU_API_KEY }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: mapcn-dist
+          path: apps/mapcn-vue/dist/
+          retention-days: 1
+
+  build-docs:
+    name: 'Build Docs'
+    needs: [changes, quality]
+    if: needs.changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -88,30 +180,13 @@ jobs:
       - name: Build documentation
         working-directory: ./apps/docs
         run: bun run build
-
-  mapcn:
-    name: Build mapcn-vue
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Download library artifacts
-        uses: actions/download-artifact@v8
-        with:
-          name: dist
-          path: packages/v-maplibre/dist/
-
-      - name: Build mapcn-vue
-        run: bun run build:mapcn
         env:
-          NUXT_PUBLIC_MAPSGURU_API_KEY: ${{ secrets.NUXT_PUBLIC_MAPSGURU_API_KEY }}
+          NODE_OPTIONS: --max-old-space-size=8192
+          NITRO_PRESET: cloudflare-pages
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: docs-dist
+          path: apps/docs/dist/
+          retention-days: 1

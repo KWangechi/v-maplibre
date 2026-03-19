@@ -1,0 +1,73 @@
+name: 'The Pipeline'
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+    types: [opened, reopened, synchronize, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+  deployments: write
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # --- Lint gates (PR only) ---
+
+  commitlint:
+    name: 'Commit Lint'
+    if: github.event_name == 'pull_request' && github.event.action != 'edited'
+    uses: ./.github/workflows/commitlint.yml
+
+  # --- CI: lint, test, build, upload artifacts ---
+
+  ci:
+    name: 'CI'
+    needs: [commitlint]
+    if: |
+      always() &&
+      github.event.action != 'edited' &&
+      (needs.commitlint.result == 'success' || needs.commitlint.result == 'skipped')
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  # --- CD: deploy only on push to main (after CI passes) ---
+
+  deploy-mapcn:
+    name: 'Deploy mapcn-vue'
+    needs: [ci]
+    if: |
+      always() &&
+      needs.ci.result == 'success' &&
+      needs.ci.outputs.mapcn-changed == 'true' &&
+      (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        github.event_name == 'workflow_dispatch'
+      )
+    uses: ./.github/workflows/deploy-mapcn.yml
+    with:
+      skip-build: true
+    secrets: inherit
+
+  deploy-docs:
+    name: 'Deploy Docs'
+    needs: [ci]
+    if: |
+      always() &&
+      needs.ci.result == 'success' &&
+      needs.ci.outputs.docs-changed == 'true' &&
+      (
+        (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+        github.event_name == 'workflow_dispatch'
+      )
+    uses: ./.github/workflows/deploy-docs.yml
+    with:
+      skip-build: true
+    secrets: inherit

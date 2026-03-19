@@ -1,21 +1,28 @@
 name: Deploy Docs
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'apps/docs/**'
-      - 'packages/v-maplibre/**'
+  workflow_call:
+    inputs:
+      skip-build:
+        description: 'Download build artifact from CI instead of rebuilding'
+        default: false
+        required: false
+        type: boolean
   workflow_dispatch:
+
+concurrency:
+  group: deploy-docs-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     name: Deploy to Cloudflare Pages
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       deployments: write
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -25,14 +32,23 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Download build artifact
+        if: inputs.skip-build == true
+        uses: actions/download-artifact@v8
+        with:
+          name: docs-dist
+          path: apps/docs/dist/
+
       - name: Install dependencies
         working-directory: ./apps/docs
         run: bun install
 
       - name: Build docs
+        if: inputs.skip-build != true
         working-directory: ./apps/docs
         run: bun run build
         env:
+          NODE_OPTIONS: --max-old-space-size=8192
           NITRO_PRESET: cloudflare-pages
 
       - name: Deploy to Cloudflare Pages

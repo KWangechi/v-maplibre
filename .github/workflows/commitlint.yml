@@ -1,15 +1,13 @@
 name: Commit Lint
 
 on:
-  pull_request:
-    branches:
-      - main
-      - develop
+  workflow_call:
 
 jobs:
   commitlint:
     name: Commit Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v6
