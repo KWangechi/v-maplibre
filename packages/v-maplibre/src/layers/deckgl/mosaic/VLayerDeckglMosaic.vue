@@ -16,13 +16,11 @@
     toRaw,
   } from 'vue';
   import type { Color, PickingInfo } from '@deck.gl/core';
-  import type { GeoTIFF, Overview } from '@developmentseed/geotiff';
+  import type { GeoTIFF } from '@developmentseed/geotiff';
   import type { Texture } from '@luma.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
   import type {
-    COGLayerProps,
     EpsgResolver,
-    GetTileDataOptions,
     MosaicLayerProps,
     MosaicSource as BaseMosaicSource,
   } from '@developmentseed/deck.gl-geotiff';
@@ -126,13 +124,6 @@
 
   const map = injectStrict(MapKey);
   const { addLayer, removeLayer, updateLayer } = useDeckOverlay(map);
-
-  // Texture data type returned by getTileData
-  interface TextureData {
-    texture: Texture;
-    width: number;
-    height: number;
-  }
 
   interface LoadedModules {
     MosaicLayer: typeof import('@developmentseed/deck.gl-geotiff').MosaicLayer;
@@ -292,9 +283,9 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
       sources: rawSources,
       maxCacheSize: toRaw(props.maxCacheSize),
 
-      getSource: async (source, { signal }) => {
+      getSource: async (source) => {
         try {
-          const tiff = await fromUrl(source.assets.image.href, {}, signal);
+          const tiff = await fromUrl(source.assets.image.href);
           emit('sourceLoad', source);
           return tiff;
         } catch (error) {
@@ -306,31 +297,11 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
       renderSource: (source, { data, signal }) => {
         if (!data) return null;
 
-        return new COGLayer<TextureData>({
+        return new COGLayer({
           id: `cog-${source.assets.image.href}-${renderMode}`,
           geotiff: data,
           epsgResolver: resolveEpsg,
-          getTileData: async (
-            image: GeoTIFF | Overview,
-            options: GetTileDataOptions,
-          ) => {
-            const rasterData = await image.readRasters({
-              ...options,
-              interleave: true,
-            });
-            const texture = options.device.createTexture({
-              data: rasterData as unknown as Uint8Array,
-              format: 'rgba8unorm',
-              width: rasterData.width,
-              height: rasterData.height,
-            });
-            return {
-              texture,
-              width: rasterData.width,
-              height: rasterData.height,
-            };
-          },
-          renderTile: (tileData: TextureData) =>
+          renderTile: (tileData) =>
             getRenderModules(
               renderMode,
               tileData.texture,
@@ -339,7 +310,7 @@ uniform ${NDVI_FILTER_MODULE_NAME}Uniforms {
               customRenderModules,
             ),
           signal,
-        } as COGLayerProps<TextureData>);
+        });
       },
     } as MosaicLayerProps<MosaicSource, GeoTIFF>);
 
