@@ -3,7 +3,7 @@
     "target": "ES2020",
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "DOM"],
     "skipLibCheck": true,
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -19,10 +19,11 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     /* Path resolution */
-    "baseUrl": ".",
+    "rootDir": "./src",
     "paths": {
       "@/*": ["./src/*"]
     },
+    "types": ["node"],
     /* Type declaration output */
     "declaration": true,
     "declarationDir": "./dist",
