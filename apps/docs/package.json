@@ -19,7 +19,7 @@
     "@nuxtjs/plausible": "^3.0.2",
     "agents": "^0.7.9",
     "oxlint": "^1.56.0",
-    "wrangler": "^4.75.0"
+    "wrangler": "^4.76.0"
   },
   "packageManager": "bun@1.3.11"
 }
