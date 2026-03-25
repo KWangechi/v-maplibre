@@ -161,6 +161,30 @@ export function useExamplesData() {
           icon: 'lucide:triangle-alert',
           badge: 'Planning',
         },
+        {
+          title: 'Troop Navigation',
+          description:
+            'Multi-waypoint infantry route planning with Valhalla pedestrian routing and elevation profile.',
+          href: '/examples/defense-troop-nav',
+          icon: 'lucide:footprints',
+          badge: 'Routing',
+        },
+        {
+          title: 'Artillery Range',
+          description:
+            'Place gun positions with range fan arc polygons for howitzer, mortar, and MLRS.',
+          href: '/examples/defense-artillery',
+          icon: 'lucide:target',
+          badge: 'Fire Control',
+        },
+        {
+          title: 'Comms Network',
+          description:
+            'Tactical communication nodes with signal strength links and network simulation.',
+          href: '/examples/defense-comms',
+          icon: 'lucide:radio',
+          badge: 'C4',
+        },
       ],
     },
     {
