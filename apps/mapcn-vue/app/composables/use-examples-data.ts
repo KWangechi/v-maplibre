@@ -137,6 +137,30 @@ export function useExamplesData() {
           icon: 'lucide:radio-tower',
           badge: 'EW',
         },
+        {
+          title: 'Convoy Tracker',
+          description:
+            'Military logistics convoy tracking with checkpoints, ETA, and cargo status.',
+          href: '/examples/defense-convoy',
+          icon: 'lucide:truck',
+          badge: 'Logistics',
+        },
+        {
+          title: 'Multi-Spectral Compare',
+          description:
+            'Swipe comparison of visual, thermal, and night-vision imagery bands.',
+          href: '/examples/defense-spectral',
+          icon: 'lucide:scan-eye',
+          badge: 'ISR',
+        },
+        {
+          title: 'Zone Planner',
+          description:
+            'Draw danger zones (minefields, restricted areas) with safe corridor planning.',
+          href: '/examples/defense-zone-planner',
+          icon: 'lucide:triangle-alert',
+          badge: 'Planning',
+        },
       ],
     },
     {
