@@ -51,27 +51,83 @@ function buildCoverageCone(
   return cone;
 }
 
-/** ~20 coordinate pairs along the Ladakh LAC sector */
+/** Dense coordinate pairs along the Ladakh LAC sector following terrain features */
 const LAC_BORDER_COORDS: [number, number][] = [
   [76.85, 33.55],
+  [76.88, 33.57],
+  [76.91, 33.59],
+  [76.93, 33.61],
   [76.95, 33.62],
+  [76.98, 33.64],
+  [77.0, 33.67],
+  [77.03, 33.69],
   [77.05, 33.7],
+  [77.07, 33.72],
+  [77.09, 33.74],
+  [77.12, 33.76],
   [77.15, 33.78],
+  [77.17, 33.81],
+  [77.18, 33.84],
+  [77.2, 33.86],
   [77.22, 33.88],
+  [77.24, 33.9],
+  [77.27, 33.92],
+  [77.29, 33.94],
   [77.3, 33.95],
+  [77.32, 33.97],
+  [77.34, 33.99],
+  [77.36, 34.01],
   [77.38, 34.02],
+  [77.4, 34.04],
+  [77.42, 34.06],
+  [77.44, 34.08],
   [77.45, 34.1],
+  [77.47, 34.12],
+  [77.48, 34.14],
+  [77.49, 34.16],
   [77.5, 34.18],
+  [77.51, 34.19],
+  [77.53, 34.2],
+  [77.54, 34.21],
   [77.55, 34.22],
+  [77.57, 34.24],
+  [77.59, 34.25],
+  [77.61, 34.27],
   [77.62, 34.28],
+  [77.64, 34.3],
+  [77.66, 34.31],
+  [77.68, 34.33],
   [77.7, 34.35],
+  [77.72, 34.36],
+  [77.74, 34.37],
+  [77.76, 34.39],
   [77.78, 34.4],
+  [77.81, 34.41],
+  [77.84, 34.43],
+  [77.86, 34.44],
   [77.88, 34.45],
+  [77.91, 34.46],
+  [77.94, 34.48],
+  [77.96, 34.49],
   [77.98, 34.5],
+  [78.01, 34.51],
+  [78.04, 34.53],
+  [78.06, 34.54],
   [78.08, 34.55],
+  [78.11, 34.56],
+  [78.14, 34.58],
+  [78.16, 34.59],
   [78.18, 34.6],
+  [78.21, 34.61],
+  [78.24, 34.63],
+  [78.26, 34.64],
   [78.28, 34.65],
+  [78.31, 34.67],
+  [78.34, 34.69],
+  [78.36, 34.71],
   [78.38, 34.72],
+  [78.41, 34.74],
+  [78.44, 34.76],
   [78.48, 34.78],
 ];
 
@@ -115,37 +171,38 @@ function buildPatrolRoutes(): BorderPatrolRoute[] {
   const route2Path = offsetRoute(LAC_BORDER_COORDS.slice(4, 16), -0.1, -0.06);
 
   const ARC = 300;
+  const spline = (
+    p0: number,
+    p1: number,
+    p2: number,
+    p3: number,
+    t: number,
+  ): number =>
+    0.5 *
+    (2 * p1 +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+
   const interpolate = (
     path: [number, number][],
     n: number,
   ): [number, number][] => {
     if (path.length < 2) return path;
-    const segs: number[] = [0];
-    let total = 0;
-    for (let i = 1; i < path.length; i++) {
-      const dx = path[i]![0] - path[i - 1]![0];
-      const dy = path[i]![1] - path[i - 1]![1];
-      total += Math.sqrt(dx * dx + dy * dy);
-      segs.push(total);
-    }
+    const segs = path.length - 1;
     const result: [number, number][] = [];
     for (let i = 0; i < n; i++) {
-      const target = (i * total) / n;
-      let si = 0;
-      for (let j = 1; j < segs.length; j++) {
-        if (segs[j]! >= target) {
-          si = j - 1;
-          break;
-        }
-        si = j - 1;
-      }
-      const start = segs[si]!;
-      const end = segs[si + 1] ?? start;
-      const len = end - start;
-      const t = len > 0 ? (target - start) / len : 0;
-      const [x1, y1] = path[si]!;
-      const [x2, y2] = path[Math.min(si + 1, path.length - 1)]!;
-      result.push([x1 + (x2 - x1) * t, y1 + (y2 - y1) * t]);
+      const t = (i / (n - 1)) * segs;
+      const seg = Math.min(Math.floor(t), segs - 1);
+      const frac = t - seg;
+      const i0 = Math.max(seg - 1, 0);
+      const i1 = seg;
+      const i2 = Math.min(seg + 1, segs);
+      const i3 = Math.min(seg + 2, segs);
+      result.push([
+        spline(path[i0]![0], path[i1]![0], path[i2]![0], path[i3]![0], frac),
+        spline(path[i0]![1], path[i1]![1], path[i2]![1], path[i3]![1], frac),
+      ]);
     }
     return result;
   };

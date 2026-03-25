@@ -53,45 +53,57 @@ function generatePatrolLoop(
 }
 
 /** Interpolate waypoints into smooth arc with N points */
+function catmullRom(
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+  t: number,
+): number {
+  return (
+    0.5 *
+    (2 * p1 +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)
+  );
+}
+
 function interpolateLoop(
   waypoints: [number, number][],
   numPoints: number,
 ): [number, number][] {
   if (waypoints.length < 2) return waypoints;
 
-  const segments: number[] = [0];
-  let totalDist = 0;
-  for (let i = 1; i < waypoints.length; i++) {
-    const [x1, y1] = waypoints[i - 1]!;
-    const [x2, y2] = waypoints[i]!;
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    totalDist += Math.sqrt(dx * dx + dy * dy);
-    segments.push(totalDist);
-  }
-
+  const n = waypoints.length - 1;
   const result: [number, number][] = [];
-  const step = totalDist / numPoints;
 
   for (let i = 0; i < numPoints; i++) {
-    const targetDist = (i * totalDist) / numPoints;
-    let segIdx = 0;
-    for (let j = 1; j < segments.length; j++) {
-      if (segments[j]! >= targetDist) {
-        segIdx = j - 1;
-        break;
-      }
-      segIdx = j - 1;
-    }
+    const t = (i / numPoints) * n;
+    const seg = Math.min(Math.floor(t), n - 1);
+    const frac = t - seg;
 
-    const segStart = segments[segIdx]!;
-    const segEnd = segments[segIdx + 1] ?? segStart;
-    const segLen = segEnd - segStart;
-    const t = segLen > 0 ? (targetDist - segStart) / segLen : 0;
+    const i0 = (seg - 1 + waypoints.length) % waypoints.length;
+    const i1 = seg;
+    const i2 = (seg + 1) % waypoints.length;
+    const i3 = (seg + 2) % waypoints.length;
 
-    const [x1, y1] = waypoints[segIdx]!;
-    const [x2, y2] = waypoints[Math.min(segIdx + 1, waypoints.length - 1)]!;
-    result.push([x1 + (x2 - x1) * t, y1 + (y2 - y1) * t]);
+    result.push([
+      catmullRom(
+        waypoints[i0]![0],
+        waypoints[i1]![0],
+        waypoints[i2]![0],
+        waypoints[i3]![0],
+        frac,
+      ),
+      catmullRom(
+        waypoints[i0]![1],
+        waypoints[i1]![1],
+        waypoints[i2]![1],
+        waypoints[i3]![1],
+        frac,
+      ),
+    ]);
   }
 
   return result;

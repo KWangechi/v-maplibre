@@ -33,27 +33,56 @@ function calculateBearing(
   return (Math.atan2(y, x) * RAD_TO_DEG + 360) % 360;
 }
 
+function catmullRom(
+  p0: number,
+  p1: number,
+  p2: number,
+  p3: number,
+  t: number,
+): number {
+  return (
+    0.5 *
+    (2 * p1 +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t)
+  );
+}
+
 function interpolatePath(
   waypoints: [number, number][],
   numPoints: number,
 ): [number, number][] {
   if (waypoints.length < 2) return waypoints;
 
+  const n = waypoints.length - 1;
   const result: [number, number][] = [];
-  const totalSegments = waypoints.length - 1;
 
   for (let i = 0; i < numPoints; i++) {
-    const t = i / (numPoints - 1);
-    const segFloat = t * totalSegments;
-    const segIdx = Math.min(Math.floor(segFloat), totalSegments - 1);
-    const frac = segFloat - segIdx;
+    const t = (i / (numPoints - 1)) * n;
+    const seg = Math.min(Math.floor(t), n - 1);
+    const frac = t - seg;
 
-    const p0 = waypoints[segIdx]!;
-    const p1 = waypoints[segIdx + 1]!;
+    const i0 = Math.max(seg - 1, 0);
+    const i1 = seg;
+    const i2 = Math.min(seg + 1, n);
+    const i3 = Math.min(seg + 2, n);
 
     result.push([
-      p0[0] + (p1[0] - p0[0]) * frac,
-      p0[1] + (p1[1] - p0[1]) * frac,
+      catmullRom(
+        waypoints[i0]![0],
+        waypoints[i1]![0],
+        waypoints[i2]![0],
+        waypoints[i3]![0],
+        frac,
+      ),
+      catmullRom(
+        waypoints[i0]![1],
+        waypoints[i1]![1],
+        waypoints[i2]![1],
+        waypoints[i3]![1],
+        frac,
+      ),
     ]);
   }
 
