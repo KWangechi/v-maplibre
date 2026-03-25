@@ -185,6 +185,54 @@ export function useExamplesData() {
           icon: 'lucide:radio',
           badge: 'C4',
         },
+        {
+          title: 'Border Surveillance',
+          description:
+            'LAC border monitoring with camera coverage cones, patrol routes, and intrusion detection.',
+          href: '/examples/defense-border-surveillance',
+          icon: 'lucide:scan-line',
+          badge: 'ISR',
+        },
+        {
+          title: 'Air Defense Radar',
+          description:
+            'Layered SHORAD/MRSAM/LRSAM radar coverage with sweep animation and altitude filtering.',
+          href: '/examples/defense-air-defense',
+          icon: 'lucide:radar',
+          badge: 'AD',
+        },
+        {
+          title: 'SAR Grid',
+          description:
+            'Search & rescue sector grid with probability zones and helicopter sweep paths.',
+          href: '/examples/defense-sar',
+          icon: 'lucide:grid-3x3',
+          badge: 'SAR',
+        },
+        {
+          title: 'Terrain Viewshed',
+          description:
+            'Click to place observers and compute simulated line-of-sight visibility polygons.',
+          href: '/examples/defense-viewshed',
+          icon: 'lucide:eye',
+          badge: 'Recon',
+        },
+        {
+          title: 'NBC Plume',
+          description:
+            'Wind-driven nuclear/chemical hazard plume dispersion with concentric danger zones.',
+          href: '/examples/defense-nbc-plume',
+          icon: 'lucide:biohazard',
+          badge: 'NBC',
+        },
+        {
+          title: 'Maritime Domain',
+          description:
+            'Indian Navy coastal surveillance with ship tracking, EEZ boundary, and coastal radar.',
+          href: '/examples/defense-maritime',
+          icon: 'lucide:anchor',
+          badge: 'Navy',
+        },
       ],
     },
     {
