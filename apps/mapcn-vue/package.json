@@ -63,6 +63,8 @@
     "reka-ui": "catalog:app:mapcn-vue",
     "satori": "catalog:app:mapcn-vue",
     "shiki": "catalog:app:mapcn-vue",
+    "terra-draw": "catalog:app:mapcn-vue",
+    "terra-draw-maplibre-gl-adapter": "catalog:app:mapcn-vue",
     "tailwind-merge": "catalog:app:mapcn-vue",
     "tailwindcss-animate": "catalog:app:mapcn-vue",
     "three": "catalog:app:mapcn-vue",

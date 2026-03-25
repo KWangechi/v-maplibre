@@ -107,6 +107,39 @@ export function useExamplesData() {
       ],
     },
     {
+      id: 'defense',
+      title: 'Defense & C4ISR',
+      description:
+        'Command, control, communications, computers, intelligence, surveillance, and reconnaissance',
+      icon: 'lucide:shield',
+      examples: [
+        {
+          title: 'Multi-Drone C2',
+          description:
+            'Command & Control dashboard tracking 4 drones and 2 UGVs with real-time telemetry.',
+          href: '/examples/defense-drone-c2',
+          icon: 'lucide:radar',
+          badge: 'C2',
+        },
+        {
+          title: '3D Battlefield Terrain',
+          description:
+            '3D terrain visualization with animated troop movement replay in Ladakh.',
+          href: '/examples/defense-battlefield',
+          icon: 'lucide:mountain',
+          badge: '3D',
+        },
+        {
+          title: 'Sensor Network & EW',
+          description:
+            'Distributed sensor network with pulsating detection radii and EW coverage zones.',
+          href: '/examples/defense-sensor-network',
+          icon: 'lucide:radio-tower',
+          badge: 'EW',
+        },
+      ],
+    },
+    {
       id: 'globe',
       title: 'Globe',
       description: 'Globe projection visualizations with starfield backgrounds',
