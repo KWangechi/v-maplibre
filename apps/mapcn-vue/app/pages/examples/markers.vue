@@ -6,6 +6,7 @@
     VControlNavigation,
     VControlScale,
   } from '@geoql/v-maplibre';
+  import { Marker } from 'maplibre-gl';
 
   useSeoMeta({
     title: 'Markers & Popups - mapcn-vue Examples',
@@ -20,6 +21,8 @@
 
   const { mapStyle } = useMapStyle();
   const mapId = useId();
+
+  const markerInstances = ref<Record<string, any>>({});
 
   const mapOptions = computed(() => ({
     container: `markers-example-${mapId}`,
@@ -47,12 +50,26 @@
   ];
 
   const selectedMarker = ref<(typeof markers)[0] | null>(null);
+  const selectedMarkerRef = ref<Marker>();
+
+  const handleMarkerAdded = (event: any, marker: any) => {
+    markerInstances.value[marker.title] = event.marker;
+  };
+
+  const handleMarkerClicked = (marker: any) => {
+    selectedMarker.value = marker;
+    selectedMarkerRef.value = markerInstances.value[marker.title];
+  };
 
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
                   import { VMap, VMarker, VPopup, VControlNavigation } from '@geoql/v-maplibre';
+                  import { Marker } from 'maplibre-gl';
+
+
+                  const markerInstances = ref<Record<string, any>>({});
 
                   const mapOptions = {
                   style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -67,6 +84,18 @@
                   ];
 
                   const selectedMarker = ref(null);
+
+                  const selectedMarkerRef = ref<Marker>();
+
+                  const handleMarkerAdded = (event: any, marker: any) => {
+                    markerInstances.value[marker.title] = event.marker;
+                  };
+
+                  const handleMarkerClicked = (marker: any) => {
+                    selectedMarker.value = marker;
+                    selectedMarkerRef.value = markerInstances.value[marker.title];
+                  };
+
                 ${SCRIPT_END}
 
                 <template>
@@ -76,10 +105,12 @@
                       v-for="marker in markers"
                       :key="marker.title"
                       :coordinates="marker.coordinates"
-                      @click="selectedMarker = marker"
+                      @click="handleMarkerClicked(marker)"
+                      @added="(event: any) => handleMarkerAdded(event, marker)"
                     />
                     <VPopup
                       v-if="selectedMarker"
+                      :marker="selectedMarkerRef"
                       :coordinates="selectedMarker.coordinates"
                       :options="{}"
                       @close="selectedMarker = null"
@@ -111,10 +142,12 @@
             v-for="marker in markers"
             :key="marker.title"
             :coordinates="marker.coordinates"
-            @click="selectedMarker = marker"
+            @click="handleMarkerClicked(marker)"
+            @added="(event: any) => handleMarkerAdded(event, marker)"
           />
           <VPopup
             v-if="selectedMarker"
+            :marker="selectedMarkerRef"
             :coordinates="selectedMarker.coordinates"
             :options="{}"
             @close="selectedMarker = null"
