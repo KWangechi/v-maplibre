@@ -2,7 +2,6 @@
   import {
     VMap,
     VMarker,
-    VPopup,
     VControlNavigation,
     VControlScale,
   } from '@geoql/v-maplibre';
@@ -46,13 +45,11 @@
     },
   ];
 
-  const selectedMarker = ref<(typeof markers)[0] | null>(null);
-
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                  import { VMap, VMarker, VPopup, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VMap, VMarker, VControlNavigation } from '@geoql/v-maplibre';
 
                   const mapOptions = {
                   style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -65,8 +62,6 @@
                   { coordinates: [-73.985, 40.748], title: 'Empire State Building', description: 'Iconic skyscraper' },
                   { coordinates: [-74.0445, 40.6892], title: 'Statue of Liberty', description: 'Symbol of freedom' },
                   ];
-
-                  const selectedMarker = ref(null);
                 ${SCRIPT_END}
 
                 <template>
@@ -76,19 +71,12 @@
                       v-for="marker in markers"
                       :key="marker.title"
                       :coordinates="marker.coordinates"
-                      @click="selectedMarker = marker"
-                    />
-                    <VPopup
-                      v-if="selectedMarker"
-                      :coordinates="selectedMarker.coordinates"
-                      :options="{}"
-                      @close="selectedMarker = null"
                     >
                       <div class="p-2">
-                        <h3 class="font-bold">{{ selectedMarker.title }}</h3>
-                        <p>{{ selectedMarker.description }}</p>
+                        <h3 class="font-bold">{{ marker.title }}</h3>
+                        <p>{{ marker.description }}</p>
                       </div>
-                    </VPopup>
+                    </VMarker>
                   </VMap>
                 </template>`;
 </script>
@@ -111,23 +99,16 @@
             v-for="marker in markers"
             :key="marker.title"
             :coordinates="marker.coordinates"
-            @click="selectedMarker = marker"
-          />
-          <VPopup
-            v-if="selectedMarker"
-            :coordinates="selectedMarker.coordinates"
-            :options="{}"
-            @close="selectedMarker = null"
           >
             <div class="p-2">
               <h3 class="font-bold">
-                {{ selectedMarker.title }}
+                {{ marker.title }}
               </h3>
               <p class="text-sm text-muted-foreground">
-                {{ selectedMarker.description }}
+                {{ marker.description }}
               </p>
             </div>
-          </VPopup>
+          </VMarker>
         </VMap>
       </ClientOnly>
     </div>
