@@ -138,6 +138,51 @@ canvas {
   opacity: 0.6;
 }
 
+/* ─── MapLibre popup theming ─── */
+
+.maplibregl-popup-content {
+  background: var(--color-card);
+  color: var(--color-card-foreground);
+  border-radius: var(--radius);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+  border: 1px solid var(--color-border);
+  padding: 0;
+  font-family: inherit;
+}
+
+.maplibregl-popup-close-button {
+  color: var(--color-muted-foreground);
+  font-size: 16px;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: calc(var(--radius) - 4px);
+  right: 4px;
+  top: 4px;
+}
+
+.maplibregl-popup-close-button:hover {
+  color: var(--color-foreground);
+  background: var(--color-accent);
+}
+
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--color-card);
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--color-card);
+}
+
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--color-card);
+}
+
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--color-card);
+}
+
 /* Sidebar: always overlay, never push content */
 [data-slot='sidebar'][data-state='expanded'] > div:first-child {
   width: 0 !important;
