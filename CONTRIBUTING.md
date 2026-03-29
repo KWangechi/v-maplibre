@@ -7,7 +7,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 ### Prerequisites
 
 - Node.js (LTS version)
-- pnpm 9+
+- bun 1.3.11
 - Git
 
 ### Getting Started
@@ -22,13 +22,13 @@ cd v-maplibre
 2. **Install dependencies**
 
 ```bash
-pnpm install
+bun install
 ```
 
 3. **Set up git hooks**
 
 ```bash
-pnpm prepare
+bun prepare
 ```
 
 This installs Husky hooks for:
@@ -40,59 +40,66 @@ This installs Husky hooks for:
 
 ### Running the Development Server
 
+> **Note:** Remember to set the API keys for Google Flood Mapping and Maps Guru.
+> See [mapcn-vue setup instructions](./apps/mapcn-vue/README.md#setup-api-keys).
+
 ```bash
-pnpm dev
+bun run dev:lib      # Watch mode for library
+bun run dev:docs     # Docus documentation
+bun run dev:mapcn    # mapcn-vue site
 ```
 
 ### Running Tests
 
 ```bash
 # Run tests in watch mode
-pnpm test
+bun test
 
 # Run tests once
-pnpm test run
+bun test run
 
 # Run tests with coverage
-pnpm test:coverage
+bun test:coverage
 
 # Run tests with UI
-pnpm test:ui
+bun test:ui
 ```
 
 ### Linting and Formatting
 
 ```bash
 # Run Oxlint
-pnpm lint
+bun lint
 
 # Fix lint issues
-pnpm lint:fix
+bun lint:fix
 
 # Format code
-pnpm format
+bun format
 
 # Check formatting
-pnpm format:check
+bun format:check
 ```
 
 ### Building
 
 ```bash
-pnpm build
+bun run build        # Build all packages
+bun run build:docs   # Build docs
+bun run build:mapcn  # Build mapcn-vue
 ```
 
 ### Documentation
 
 ```bash
 # Start docs dev server
-pnpm docs:dev
+bun docs:dev
 
 # Build docs
-pnpm docs:build
+bun docs:build
 
 # Preview docs build
-pnpm docs:preview
+bun docs:preview
 ```
 
 ## Commit Convention
@@ -191,9 +198,9 @@ git push origin feat/my-new-feature
 
 ### Pull Request Checklist
 
-- [ ] Tests pass locally (`pnpm test`)
-- [ ] Code is linted (`pnpm lint`)
-- [ ] Code is formatted (`pnpm format`)
+- [ ] Tests pass locally (`bun test`)
+- [ ] Code is linted (`bun lint`)
+- [ ] Code is formatted (`bun format`)
 - [ ] Test coverage is maintained (90%+)
 - [ ] Documentation is updated
 - [ ] Commit messages follow conventional commits

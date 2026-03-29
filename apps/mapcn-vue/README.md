@@ -4,6 +4,14 @@
 
 Built with Nuxt 4, Tailwind CSS v4, and shadcn-nuxt.
 
+## Setup API Keys
+
+This project uses [Maps Guru](https://maps.guru) for map styles and the Google Flood API for flood data.
+
+1. Get your Maps Guru API key at [maps.guru/signup](https://maps.guru/signup) and set it as `mapsguruApiKey` in `nuxt.config.ts`
+2. Get your Google Flood Forecating API key from the [Google Cloud Console](https://console.cloud.google.com) and set it as `googleFloodApiKey` in `nuxt.config.ts`.
+   > **Note**: This API requires prior approval. If you don't have access yet, the link [API Access](https://developers.google.com/flood-forecasting#api-access) contains instructions on how to get an API Key. Once approved, you can enable it in the Google Cloud Console.
+
 ## Development
 
 ```bash
