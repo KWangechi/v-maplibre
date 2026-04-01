@@ -95,9 +95,16 @@ export default defineCachedEventHandler(
   },
   {
     maxAge: 60 * 15,
-    getKey: (event) => {
+    getKey: async (event) => {
       const query = getQuery(event);
       const endpoint = (query.endpoint as string) || 'significantEvents:search';
+
+      // Include POST body in cache key so different regions/params don't collide
+      if (POST_ENDPOINTS.has(endpoint)) {
+        const body = await readBody(event).catch(() => ({}));
+        return `flood-forecasting:${endpoint}:${JSON.stringify(query)}:${JSON.stringify(body)}`;
+      }
+
       return `flood-forecasting:${endpoint}:${JSON.stringify(query)}`;
     },
   },
