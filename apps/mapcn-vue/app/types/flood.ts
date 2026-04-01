@@ -170,6 +170,7 @@ export interface SelectedGauge {
   riverId?: string;
   riverName?: string;
   issuedTime: string;
+  hasInundationMap: boolean;
   forecast?: GoogleGaugeForecast;
   forecastLoading: boolean;
 }

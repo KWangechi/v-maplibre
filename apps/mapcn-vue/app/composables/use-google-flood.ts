@@ -186,6 +186,7 @@ export function useGoogleFlood() {
       riverId: marker.riverId,
       riverName: marker.riverName,
       issuedTime: marker.issuedTime,
+      hasInundationMap: marker.hasInundationMap,
       forecastLoading: true,
     };
 

@@ -117,7 +117,7 @@ ${SCRIPT_END}
     class="h-full"
   >
     <div class="relative size-full min-w-0 overflow-hidden">
-      <ExamplesGoogleFloodFloodMap
+      <ExamplesGoogleFloodMap
         :markers="floodMarkers"
         :polygons="polygons"
         :selected-gauge="selectedGauge"
