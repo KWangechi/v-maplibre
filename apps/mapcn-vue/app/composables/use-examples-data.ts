@@ -97,6 +97,14 @@ export function useExamplesData() {
           badge: 'ProMap',
         },
         {
+          title: 'Real-Time Flood Monitoring',
+          description:
+            'Live flood severity, inundation maps, and gauge forecasts from Google Flood Forecasting API across 20+ countries.',
+          href: '/examples/google-flood-forecasting',
+          icon: 'lucide:waves',
+          badge: 'Live',
+        },
+        {
           title: 'Flood Forecasting',
           description:
             'Global flood event visualization powered by GDACS and Google Groundsource across 150+ countries.',
