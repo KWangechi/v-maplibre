@@ -1,9 +1,36 @@
-const VALID_ENDPOINTS = [
+/**
+ * Google Flood Forecasting API proxy
+ *
+ * Supports both GET (query param based) and POST (body based) endpoints.
+ * POST endpoints: searchLatestFloodStatusByArea, gauges:searchGaugesByArea, significantEvents:search
+ * GET endpoints: queryLatestFloodStatusByGaugeIds, gauges:queryGaugeForecasts, gaugeModels:batchGet
+ *
+ * The `serializedPolygons/{id}` resource is handled via GET with the ID in the endpoint string.
+ */
+
+const VALID_ENDPOINT_PREFIXES = [
   'floodStatus:queryLatestFloodStatusByGaugeIds',
   'floodStatus:searchLatestFloodStatusByArea',
+  'gauges:searchGaugesByArea',
   'gauges:queryGaugeForecasts',
-  'significantEvents',
+  'gaugeModels:batchGet',
+  'significantEvents:search',
+  'serializedPolygons',
 ] as const;
+
+/** POST endpoints require a JSON body instead of query params */
+const POST_ENDPOINTS = new Set([
+  'floodStatus:searchLatestFloodStatusByArea',
+  'gauges:searchGaugesByArea',
+  'significantEvents:search',
+]);
+
+function isValidEndpoint(endpoint: string): boolean {
+  return VALID_ENDPOINT_PREFIXES.some(
+    (prefix) =>
+      endpoint === prefix || endpoint.startsWith('serializedPolygons/'),
+  );
+}
 
 export default defineCachedEventHandler(
   async (event) => {
@@ -19,31 +46,50 @@ export default defineCachedEventHandler(
     }
 
     const query = getQuery(event);
-    const endpoint = (query.endpoint as string) || 'significantEvents';
+    const endpoint = (query.endpoint as string) || 'significantEvents:search';
 
-    if (
-      !VALID_ENDPOINTS.includes(endpoint as (typeof VALID_ENDPOINTS)[number])
-    ) {
+    if (!isValidEndpoint(endpoint)) {
       throw createError({
         statusCode: 400,
-        message: `Invalid endpoint. Supported: ${VALID_ENDPOINTS.join(', ')}`,
+        message: `Invalid endpoint "${endpoint}". Supported prefixes: ${VALID_ENDPOINT_PREFIXES.join(', ')}`,
       });
     }
 
-    const { endpoint: _, ...apiParams } = query;
+    const apiUrl = `https://floodforecasting.googleapis.com/v1/${endpoint}`;
 
-    const data = await $fetch(
-      `https://floodforecasting.googleapis.com/v1/${endpoint}`,
-      {
+    if (POST_ENDPOINTS.has(endpoint)) {
+      // Read JSON body from the incoming request for POST endpoints
+      const body = (await readBody(event).catch(() => ({}))) as Record<
+        string,
+        unknown
+      >;
+
+      const data = await $fetch(apiUrl, {
+        method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        query: {
-          ...apiParams,
-          key: apiKey,
-        },
+        query: { key: apiKey },
+        body,
+      });
+
+      return data;
+    }
+
+    // GET endpoint — pass query params (minus 'endpoint' key)
+    const { endpoint: _endpoint, ...apiParams } = query;
+
+    const data = await $fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
       },
-    );
+      query: {
+        ...apiParams,
+        key: apiKey,
+      },
+    });
 
     return data;
   },
@@ -51,7 +97,8 @@ export default defineCachedEventHandler(
     maxAge: 60 * 15,
     getKey: (event) => {
       const query = getQuery(event);
-      return `flood-forecasting:${query.endpoint || 'significantEvents'}:${JSON.stringify(query)}`;
+      const endpoint = (query.endpoint as string) || 'significantEvents:search';
+      return `flood-forecasting:${endpoint}:${JSON.stringify(query)}`;
     },
   },
 );
