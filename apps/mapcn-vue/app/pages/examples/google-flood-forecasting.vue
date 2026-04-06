@@ -186,6 +186,7 @@ ${SCRIPT_END}
             <ExamplesGoogleFloodGaugeForecastChart
               :forecast="selectedGauge?.forecast"
               :loading="selectedGauge?.forecastLoading ?? false"
+              :selected="!!selectedGauge"
             />
           </div>
 

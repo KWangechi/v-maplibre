@@ -4,6 +4,7 @@
   const props = defineProps<{
     forecast: GoogleGaugeForecast | undefined;
     loading: boolean;
+    selected: boolean;
   }>();
 
   const SEVERITY_BAR_COLORS: Record<GoogleFloodSeverity, string> = {
@@ -52,6 +53,17 @@
           class="h-8 flex-1 animate-pulse rounded bg-muted"
         />
       </div>
+    </div>
+
+    <div
+      v-else-if="!forecast && selected"
+      class="py-3 text-center text-xs text-muted-foreground"
+    >
+      <Icon
+        name="lucide:cloud-off"
+        class="mb-1 size-5 text-muted-foreground/40"
+      />
+      <p>No forecast model for this gauge</p>
     </div>
 
     <div
