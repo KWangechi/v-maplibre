@@ -74,6 +74,8 @@ import { useColorMode } from '#imports';
 </style>
 ```
 
+**Accepted exception:** `MapPopup.vue` uses a `<style>` block because MapLibre renders popup DOM outside Vue's reactivity scope. The popup container is injected by MapLibre GL JS into its own DOM tree, so Tailwind classes applied in `<template>` cannot reach it — raw CSS targeting `.maplibregl-popup-content` is required.
+
 ### Rule #4: Props Must Support Customization
 
 ```typescript
