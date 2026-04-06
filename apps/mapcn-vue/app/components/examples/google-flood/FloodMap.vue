@@ -216,23 +216,32 @@
     backdrop-filter: blur(12px);
   }
 
-  .flood-gauge-popup .maplibregl-popup-tip {
+  .flood-gauge-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
     border-top-color: color-mix(
       in oklch,
       var(--color-popover) 95%,
       transparent
     );
+  }
+
+  .flood-gauge-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
     border-bottom-color: color-mix(
       in oklch,
       var(--color-popover) 95%,
       transparent
     );
-    border-left-color: color-mix(
+  }
+
+  .flood-gauge-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+    border-right-color: color-mix(
       in oklch,
       var(--color-popover) 95%,
       transparent
     );
-    border-right-color: color-mix(
+  }
+
+  .flood-gauge-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+    border-left-color: color-mix(
       in oklch,
       var(--color-popover) 95%,
       transparent

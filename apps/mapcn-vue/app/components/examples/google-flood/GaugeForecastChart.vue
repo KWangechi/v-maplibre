@@ -35,11 +35,6 @@
     () => props.forecast?.forecastSummary?.severity ?? 'NO_FLOODING',
   );
 
-  const hasForecastRanges = computed(() => {
-    const ranges = props.forecast?.forecastRanges ?? [];
-    return ranges.some((r) => r.value !== 'NaN');
-  });
-
   const forecastIssuedTime = computed(() => {
     if (!props.forecast?.issuedTime) return '';
     return new Date(props.forecast.issuedTime).toLocaleString([], {
@@ -48,6 +43,16 @@
       hour: 'numeric',
       minute: '2-digit',
     });
+  });
+
+  const forecastRangeLabel = computed(() => {
+    const ranges = props.forecast?.forecastRanges ?? [];
+    if (ranges.length < 2) return '';
+    const start = new Date(ranges[0].forecastStartTime);
+    const end = new Date(ranges[ranges.length - 1].forecastEndTime);
+    const fmt = (d: Date) =>
+      d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    return `${fmt(start)} – ${fmt(end)}`;
   });
 </script>
 
@@ -93,55 +98,57 @@
     </div>
 
     <template v-else>
-      <div class="mb-2 flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-muted-foreground">Status:</span>
-          <ExamplesGoogleFloodSeverityBadge
-            :severity="overallSeverity"
-            size="sm"
-          />
-        </div>
-        <span
-          v-if="forecastIssuedTime"
-          class="text-[10px] text-muted-foreground/60"
-        >
-          {{ forecastIssuedTime }}
-        </span>
-      </div>
-
-      <div v-if="intervals.length" class="flex items-end gap-0.5">
-        <div
-          v-for="(interval, i) in intervals"
-          :key="i"
-          class="group relative flex flex-1 flex-col items-center"
-        >
-          <div
-            class="w-full rounded-t-sm transition-opacity hover:opacity-80"
-            :style="{ backgroundColor: interval.color, height: '28px' }"
-          />
-          <span class="mt-1 text-[8px] text-muted-foreground">
-            {{ interval.label }}
+      <div v-if="intervals.length">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-muted-foreground">Overall:</span>
+            <ExamplesGoogleFloodSeverityBadge
+              :severity="overallSeverity"
+              size="sm"
+            />
+          </div>
+          <span
+            v-if="forecastIssuedTime"
+            class="text-[10px] text-muted-foreground/60"
+          >
+            {{ forecastIssuedTime }}
           </span>
         </div>
+        <div class="flex items-end gap-0.5">
+          <div
+            v-for="(interval, i) in intervals"
+            :key="i"
+            class="group relative flex flex-1 flex-col items-center"
+          >
+            <div
+              class="w-full rounded-t-sm transition-opacity hover:opacity-80"
+              :style="{ backgroundColor: interval.color, height: '28px' }"
+            />
+            <span class="mt-1 text-[8px] text-muted-foreground">
+              {{ interval.label }}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <div
-        v-else-if="!hasForecastRanges"
-        class="rounded-md bg-muted/50 p-2 text-center text-[11px] text-muted-foreground"
-      >
-        <Icon
-          name="lucide:check-circle"
-          class="mr-1 inline size-3.5 text-green-500"
-        />
-        No significant changes forecast
-      </div>
-
-      <div
-        v-else
-        class="rounded-md bg-muted/50 p-2 text-center text-[11px] text-muted-foreground"
-      >
-        <Icon name="lucide:activity" class="mr-1 inline size-3.5" />
-        Forecast data available
+      <div v-else class="rounded-md bg-green-500/10 p-2.5">
+        <div class="flex items-center gap-2">
+          <Icon
+            name="lucide:shield-check"
+            class="size-4 shrink-0 text-green-500"
+          />
+          <div>
+            <p class="text-xs font-medium text-foreground">
+              No flooding expected
+            </p>
+            <p class="text-[10px] text-muted-foreground">
+              {{ forecastRangeLabel }}
+              <span v-if="forecastIssuedTime">
+                · Updated {{ forecastIssuedTime }}</span
+              >
+            </p>
+          </div>
+        </div>
       </div>
     </template>
   </div>
