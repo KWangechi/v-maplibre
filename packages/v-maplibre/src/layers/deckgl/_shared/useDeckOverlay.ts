@@ -10,7 +10,7 @@ import {
   type ShallowRef,
 } from 'vue';
 import type { MapboxOverlay } from '@deck.gl/mapbox';
-import type { Map } from 'maplibre-gl';
+import type { Map, MapMouseEvent } from 'maplibre-gl';
 
 export const DeckOverlayKey: InjectionKey<ShallowRef<MapboxOverlay | null>> =
   Symbol('DeckOverlay');
@@ -60,6 +60,41 @@ export function useDeckOverlay(
   const layers = ref<unknown[]>([]);
   const isInitialized = ref(false);
   let initPromise: Promise<void> | null = null;
+  let clickHandler: ((e: MapMouseEvent) => void) | null = null;
+
+  /**
+   * Workaround for deck.gl MapboxOverlay click events not reaching layer onClick
+   * callbacks. The built-in path (_onPointerDown → _onEvent → getLastPickedObject)
+   * fails to dispatch clicks. We register our own MapLibre click handler that uses
+   * overlay.pickObject() for a fresh GPU pick and dispatches to the layer's onClick.
+   */
+  function registerClickHandler(mapInstance: Map): void {
+    clickHandler = (e: MapMouseEvent) => {
+      if (!overlay.value) return;
+      const info = overlay.value.pickObject({
+        x: e.point.x,
+        y: e.point.y,
+        radius: 5,
+      });
+      if (!info?.layer) return;
+
+      const layerProps = info.layer.props as Record<string, unknown>;
+      const onClick = layerProps.onClick as
+        | ((i: unknown, ev: unknown) => boolean | void)
+        | undefined;
+      if (onClick) {
+        onClick(info, e);
+      }
+    };
+    mapInstance.on('click', clickHandler);
+  }
+
+  function removeClickHandler(mapInstance: Map | null): void {
+    if (clickHandler && mapInstance) {
+      mapInstance.off('click', clickHandler);
+    }
+    clickHandler = null;
+  }
 
   const initOverlay = (): Promise<void> => {
     const mapInstance = map.value;
@@ -77,6 +112,7 @@ export function useDeckOverlay(
         });
 
         mapInstance.addControl(overlay.value);
+        registerClickHandler(mapInstance);
         isInitialized.value = true;
       })
       .catch((error) => {
@@ -168,6 +204,7 @@ export function useDeckOverlay(
   });
 
   onUnmounted(() => {
+    removeClickHandler(map.value);
     if (overlay.value && map.value) {
       try {
         map.value.removeControl(overlay.value);
