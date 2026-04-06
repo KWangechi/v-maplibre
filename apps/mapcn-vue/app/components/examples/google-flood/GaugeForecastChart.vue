@@ -32,8 +32,23 @@
   });
 
   const overallSeverity = computed(
-    () => props.forecast?.forecastSummary?.severity ?? 'UNKNOWN',
+    () => props.forecast?.forecastSummary?.severity ?? 'NO_FLOODING',
   );
+
+  const hasForecastRanges = computed(() => {
+    const ranges = props.forecast?.forecastRanges ?? [];
+    return ranges.some((r) => r.value !== 'NaN');
+  });
+
+  const forecastIssuedTime = computed(() => {
+    if (!props.forecast?.issuedTime) return '';
+    return new Date(props.forecast.issuedTime).toLocaleString([], {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  });
 </script>
 
 <template>
@@ -78,12 +93,20 @@
     </div>
 
     <template v-else>
-      <div class="mb-2 flex items-center gap-2">
-        <span class="text-xs text-muted-foreground">Overall:</span>
-        <ExamplesGoogleFloodSeverityBadge
-          :severity="overallSeverity"
-          size="sm"
-        />
+      <div class="mb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-muted-foreground">Status:</span>
+          <ExamplesGoogleFloodSeverityBadge
+            :severity="overallSeverity"
+            size="sm"
+          />
+        </div>
+        <span
+          v-if="forecastIssuedTime"
+          class="text-[10px] text-muted-foreground/60"
+        >
+          {{ forecastIssuedTime }}
+        </span>
       </div>
 
       <div v-if="intervals.length" class="flex items-end gap-0.5">
@@ -96,10 +119,29 @@
             class="w-full rounded-t-sm transition-opacity hover:opacity-80"
             :style="{ backgroundColor: interval.color, height: '28px' }"
           />
-          <span class="mt-1 text-[8px] text-muted-foreground">{{
-            interval.label
-          }}</span>
+          <span class="mt-1 text-[8px] text-muted-foreground">
+            {{ interval.label }}
+          </span>
         </div>
+      </div>
+
+      <div
+        v-else-if="!hasForecastRanges"
+        class="rounded-md bg-muted/50 p-2 text-center text-[11px] text-muted-foreground"
+      >
+        <Icon
+          name="lucide:check-circle"
+          class="mr-1 inline size-3.5 text-green-500"
+        />
+        No significant changes forecast
+      </div>
+
+      <div
+        v-else
+        class="rounded-md bg-muted/50 p-2 text-center text-[11px] text-muted-foreground"
+      >
+        <Icon name="lucide:activity" class="mr-1 inline size-3.5" />
+        Forecast data available
       </div>
     </template>
   </div>

@@ -121,14 +121,20 @@ export interface GoogleForecastSummary {
   forecastTimeIntervalSummaries: GoogleForecastIntervalSummary[];
 }
 
+export interface GoogleForecastRange {
+  value: string;
+  forecastStartTime: string;
+  forecastEndTime: string;
+}
+
 export interface GoogleGaugeForecast {
-  gaugeId: string;
   issuedTime: string;
-  forecastSummary: GoogleForecastSummary;
+  forecastRanges?: GoogleForecastRange[];
+  forecastSummary?: GoogleForecastSummary;
 }
 
 export interface GoogleGaugeForecastsResponse {
-  gaugeForecasts: GoogleGaugeForecast[];
+  forecasts: Record<string, { forecasts: GoogleGaugeForecast[] }>;
 }
 
 export interface GoogleSignificantEvent {

@@ -337,7 +337,7 @@ export function useGoogleFlood() {
         },
       },
     );
-    return response.gaugeForecasts?.[0] ?? null;
+    return response.forecasts?.[gaugeId]?.forecasts?.[0] ?? null;
   }
 
   async function selectGauge(marker: FloodMarker): Promise<void> {
