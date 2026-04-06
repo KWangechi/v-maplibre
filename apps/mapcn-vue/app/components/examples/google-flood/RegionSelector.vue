@@ -33,9 +33,9 @@
 </script>
 
 <template>
-  <div class="relative px-4 py-3">
+  <div class="relative px-3 py-2.5">
     <p
-      class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+      class="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
     >
       Region
     </p>
@@ -64,7 +64,7 @@
     >
       <div
         v-if="open"
-        class="absolute left-4 right-4 top-full z-20 mt-1 max-h-56 overflow-auto rounded-lg border border-border bg-popover shadow-xl"
+        class="absolute left-3 right-3 top-full z-20 mt-1 max-h-56 overflow-auto rounded-lg border border-border bg-popover shadow-xl"
       >
         <button
           v-for="region in FLOOD_REGIONS"

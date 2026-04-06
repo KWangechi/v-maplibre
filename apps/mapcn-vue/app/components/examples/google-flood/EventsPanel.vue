@@ -40,18 +40,18 @@
 </script>
 
 <template>
-  <div class="px-4 pb-4">
+  <div class="p-3">
     <p
-      class="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+      class="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground"
     >
       Significant Events
     </p>
 
-    <div v-if="loading && events.length === 0" class="space-y-2">
+    <div v-if="loading && events.length === 0" class="space-y-1.5">
       <div
         v-for="i in 3"
         :key="i"
-        class="h-14 animate-pulse rounded bg-muted"
+        class="h-12 animate-pulse rounded bg-muted"
       />
     </div>
 
@@ -62,13 +62,13 @@
       No significant events
     </div>
 
-    <div v-else class="space-y-2">
+    <div v-else class="space-y-1.5">
       <div
         v-for="(event, i) in visibleEvents"
         :key="i"
-        class="rounded-lg border border-border bg-card/50 p-2.5"
+        class="rounded-lg border border-border bg-card/50 p-2"
       >
-        <div class="mb-1.5 flex items-start justify-between gap-2">
+        <div class="mb-1 flex items-start justify-between gap-2">
           <div class="flex flex-wrap gap-1">
             <span
               v-for="code in event.affectedCountryCodes.slice(0, 3)"
