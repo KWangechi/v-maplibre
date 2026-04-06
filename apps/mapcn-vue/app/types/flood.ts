@@ -60,18 +60,14 @@ export interface GoogleGaugeLocation {
   longitude: number;
 }
 
-export interface GoogleGaugeQualityInfo {
-  qualityVerified: boolean;
-}
-
 export interface GoogleGauge {
   gaugeId: string;
   location: GoogleGaugeLocation;
-  gaugeQualityInfo: GoogleGaugeQualityInfo;
-  riverId?: string;
-  riverName?: string;
-  stationName?: string;
-  countryCode?: string;
+  siteName?: string;
+  source?: string;
+  river?: string;
+  qualityVerified?: boolean;
+  hasModel?: boolean;
 }
 
 export interface GoogleGaugesSearchResponse {
@@ -98,9 +94,14 @@ export interface GoogleNotificationPolygonSet {
 
 export interface GoogleFloodStatus {
   gaugeId: string;
-  gauge: GoogleGauge;
+  gaugeLocation: GoogleGaugeLocation;
   issuedTime: string;
   severity: GoogleFloodSeverity;
+  source?: string;
+  qualityVerified?: boolean;
+  forecastTimeRange?: GoogleFloodEventInterval;
+  forecastChange?: string;
+  forecastTrend?: string;
   inundationMapSet?: GoogleInundationMapSet;
   notificationPolygonSet?: GoogleNotificationPolygonSet;
 }

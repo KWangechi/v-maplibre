@@ -4,8 +4,10 @@ import type {
   GoogleFloodSeverity,
   GoogleFloodStatus,
   GoogleFloodStatusResponse,
+  GoogleGauge,
   GoogleGaugeForecast,
   GoogleGaugeForecastsResponse,
+  GoogleGaugesSearchResponse,
   GoogleSignificantEvent,
   GoogleSignificantEventsResponse,
   ParsedFloodPolygon,
@@ -57,36 +59,37 @@ const SEVERITY_RADII: Record<GoogleFloodSeverity, number> = {
   EXTREME: 30000,
 };
 
-function toFloodMarker(status: GoogleFloodStatus): FloodMarker {
-  return {
-    gaugeId: status.gaugeId,
-    coordinates: [
-      status.gauge.location.longitude,
-      status.gauge.location.latitude,
-    ],
-    severity: status.severity,
-    stationName: status.gauge.stationName ?? status.gaugeId,
-    riverId: status.gauge.riverId,
-    riverName: status.gauge.riverName,
-    issuedTime: status.issuedTime,
-    hasInundationMap:
-      (status.inundationMapSet?.inundationMaps?.length ?? 0) > 0,
-  };
-}
-
 export function useGoogleFlood() {
   const regionCode = ref<string>('IN');
   const loading = ref(false);
   const error = ref<string | null>(null);
   const floodStatuses = shallowRef<GoogleFloodStatus[]>([]);
+  const gaugeMetadata = shallowRef<Map<string, GoogleGauge>>(new Map());
   const significantEvents = shallowRef<GoogleSignificantEvent[]>([]);
   const polygons = shallowRef<ParsedFloodPolygon[]>([]);
   const selectedGauge = ref<SelectedGauge | null>(null);
   const lastFetch = ref<Date | null>(null);
 
-  const floodMarkers = computed<FloodMarker[]>(() =>
-    floodStatuses.value.map(toFloodMarker),
-  );
+  const floodMarkers = computed<FloodMarker[]>(() => {
+    const metadata = gaugeMetadata.value;
+    return floodStatuses.value.map((status) => {
+      const gauge = metadata.get(status.gaugeId);
+      return {
+        gaugeId: status.gaugeId,
+        coordinates: [
+          status.gaugeLocation.longitude,
+          status.gaugeLocation.latitude,
+        ],
+        severity: status.severity,
+        stationName: gauge?.siteName || status.gaugeId,
+        riverId: undefined,
+        riverName: gauge?.river || undefined,
+        issuedTime: status.issuedTime,
+        hasInundationMap:
+          (status.inundationMapSet?.inundationMaps?.length ?? 0) > 0,
+      };
+    });
+  });
 
   function getSeverityColor(
     severity: GoogleFloodSeverity,
@@ -112,6 +115,26 @@ export function useGoogleFlood() {
       },
     );
     floodStatuses.value = markRaw(response.floodStatuses ?? []);
+  }
+
+  async function fetchGauges(code: string): Promise<void> {
+    const response = await $fetch<GoogleGaugesSearchResponse>(
+      '/api/flood-forecasting',
+      {
+        method: 'POST',
+        query: { endpoint: 'gauges:searchGaugesByArea' },
+        body: {
+          regionCode: code,
+          pageSize: 500,
+          includeNonQualityVerified: true,
+        },
+      },
+    );
+    const map = new Map<string, GoogleGauge>();
+    for (const gauge of response.gauges ?? []) {
+      map.set(gauge.gaugeId, gauge);
+    }
+    gaugeMetadata.value = map;
   }
 
   async function fetchSignificantEvents(): Promise<void> {
@@ -194,8 +217,13 @@ export function useGoogleFlood() {
       (s) => s.gaugeId === marker.gaugeId,
     );
 
+    const gauge = gaugeMetadata.value.get(marker.gaugeId);
+    const hasModel = gauge?.hasModel !== false;
+
     const [forecast] = await Promise.all([
-      fetchGaugeForecast(marker.gaugeId).catch(() => null),
+      hasModel
+        ? fetchGaugeForecast(marker.gaugeId).catch(() => null)
+        : Promise.resolve(null),
       status && marker.hasInundationMap
         ? loadPolygonsForGauge(status).catch(() => undefined)
         : Promise.resolve(),
@@ -221,6 +249,7 @@ export function useGoogleFlood() {
     try {
       await Promise.all([
         fetchFloodStatuses(regionCode.value),
+        fetchGauges(regionCode.value).catch(() => undefined),
         fetchSignificantEvents(),
       ]);
       lastFetch.value = new Date();

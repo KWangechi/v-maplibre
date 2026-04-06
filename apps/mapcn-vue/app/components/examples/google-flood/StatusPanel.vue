@@ -56,8 +56,8 @@
 </script>
 
 <template>
-  <div class="p-4">
-    <div class="mb-3 flex items-center justify-between">
+  <div class="p-3">
+    <div class="mb-2 flex items-center justify-between">
       <span
         class="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
       >
@@ -78,7 +78,7 @@
 
     <div
       v-else-if="error"
-      class="rounded-md bg-destructive/10 p-3 text-xs text-destructive"
+      class="break-all rounded-md bg-destructive/10 p-3 text-xs text-destructive"
     >
       <Icon name="lucide:alert-circle" class="mr-1 inline size-3.5" />
       {{ error }}

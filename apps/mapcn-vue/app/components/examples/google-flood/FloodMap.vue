@@ -73,9 +73,29 @@
     return props.getSeverityRadius((d as FloodMarker).severity);
   }
 
+  function handleMapClick(evt: unknown): void {
+    console.log('[FloodMap] VMap click (MapLibre):', evt);
+  }
+
   function handleLayerClick(info: PickingInfo): void {
+    console.log('[FloodMap] Scatterplot click:', {
+      object: !!info.object,
+      coordinate: info.coordinate,
+      layer: info.layer?.id,
+      index: info.index,
+      picked: info.picked,
+    });
     if (info.object) {
       emit('select-gauge', info.object as FloodMarker);
+    }
+  }
+
+  function handleLayerHover(info: PickingInfo): void {
+    if (info.object) {
+      console.log(
+        '[FloodMap] hover hit:',
+        (info.object as FloodMarker).gaugeId,
+      );
     }
   }
 
@@ -95,7 +115,12 @@
 
 <template>
   <ClientOnly>
-    <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+    <VMap
+      :key="mapStyle"
+      :options="mapOptions"
+      class="size-full"
+      @click="handleMapClick"
+    >
       <VControlNavigation position="top-right" />
       <VControlScale position="bottom-left" />
       <VControlLegend
@@ -124,7 +149,10 @@
         :get-line-color="[255, 255, 255, 80]"
         :line-width-min-pixels="1"
         :antialiasing="true"
+        :auto-highlight="true"
+        :highlight-color="[255, 255, 255, 100]"
         @click="handleLayerClick"
+        @hover="handleLayerHover"
       />
 
       <VPopup
@@ -133,15 +161,18 @@
         :options="popupOptions"
         @close="handlePopupClose"
       >
-        <div class="space-y-2 p-1">
-          <div class="flex items-start gap-2">
-            <ExamplesGoogleFloodSeverityBadge
-              :severity="selectedGauge.severity"
-              size="md"
-            />
-          </div>
+        <div class="space-y-1 p-1">
+          <ExamplesGoogleFloodSeverityBadge
+            :severity="selectedGauge.severity"
+            size="md"
+          />
           <p class="text-sm font-semibold text-popover-foreground">
             {{ selectedGauge.stationName }}
+            <span
+              v-if="selectedGauge.hasInundationMap"
+              class="ml-1 inline-block size-1.5 rounded-full bg-primary align-middle"
+              title="Inundation map loaded"
+            />
           </p>
           <p
             v-if="selectedGauge.riverName"
@@ -150,18 +181,17 @@
             <Icon name="lucide:waves" class="mr-1 inline size-3" />
             {{ selectedGauge.riverName }}
           </p>
+          <p
+            v-if="selectedGauge.stationName !== selectedGauge.gaugeId"
+            class="text-[10px] font-mono text-muted-foreground/60"
+          >
+            {{ selectedGauge.gaugeId }}
+          </p>
           <div
-            class="border-t border-border pt-1.5 text-[11px] text-muted-foreground"
+            class="border-t border-border pt-1 text-[11px] text-muted-foreground"
           >
             <Icon name="lucide:clock" class="mr-1 inline size-3" />
             {{ formatTime(selectedGauge.issuedTime) }}
-          </div>
-          <div
-            v-if="selectedGauge.hasInundationMap"
-            class="text-[11px] text-primary"
-          >
-            <Icon name="lucide:map" class="mr-1 inline size-3" />
-            Inundation map loaded
           </div>
         </div>
       </VPopup>
@@ -172,8 +202,12 @@
   </ClientOnly>
 </template>
 
-<style scoped>
-  :deep(.flood-gauge-popup .maplibregl-popup-content) {
+<style>
+  .flood-gauge-popup {
+    z-index: 100 !important;
+  }
+
+  .flood-gauge-popup .maplibregl-popup-content {
     background: color-mix(in oklch, var(--color-popover) 95%, transparent);
     border: 1px solid var(--color-border);
     border-radius: 8px;
@@ -182,14 +216,45 @@
     backdrop-filter: blur(12px);
   }
 
-  :deep(.flood-gauge-popup .maplibregl-popup-close-button) {
-    color: var(--color-muted-foreground);
-    font-size: 16px;
-    padding: 2px 6px;
+  .flood-gauge-popup .maplibregl-popup-tip {
+    border-top-color: color-mix(
+      in oklch,
+      var(--color-popover) 95%,
+      transparent
+    );
+    border-bottom-color: color-mix(
+      in oklch,
+      var(--color-popover) 95%,
+      transparent
+    );
+    border-left-color: color-mix(
+      in oklch,
+      var(--color-popover) 95%,
+      transparent
+    );
+    border-right-color: color-mix(
+      in oklch,
+      var(--color-popover) 95%,
+      transparent
+    );
   }
 
-  :deep(.flood-gauge-popup .maplibregl-popup-close-button:hover) {
+  .flood-gauge-popup .maplibregl-popup-close-button {
+    color: var(--color-muted-foreground);
+    font-size: 18px;
+    top: 4px;
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    line-height: 1;
+  }
+
+  .flood-gauge-popup .maplibregl-popup-close-button:hover {
     color: var(--color-foreground);
-    background: transparent;
+    background: var(--color-muted);
   }
 </style>
