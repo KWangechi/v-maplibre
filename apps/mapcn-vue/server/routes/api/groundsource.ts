@@ -1,16 +1,7 @@
-interface GroundsourceRow {
-  id: number;
-  lon: number;
-  lat: number;
-  area_km2: number;
-  start_year: number;
-}
-
-interface GroundsourceApiResponse {
-  total: number;
-  nextCursor: number | null;
-  data: [number, number, number, number][];
-}
+import type {
+  GroundsourceRow,
+  GroundsourceApiResponse,
+} from '../../types/groundsource';
 
 const MAX_LIMIT = 500_000;
 const DEFAULT_LIMIT = 500_000;

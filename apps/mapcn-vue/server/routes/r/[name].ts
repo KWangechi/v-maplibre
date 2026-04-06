@@ -7,23 +7,7 @@ const REGISTRY_PATH = resolve(
   '../../packages/mapcn-vue/src/registry/ui',
 );
 
-interface RegistryFile {
-  path: string;
-  type: string;
-  content?: string;
-  target?: string;
-}
-
-interface RegistryItem {
-  $schema: string;
-  name: string;
-  type: string;
-  title?: string;
-  description?: string;
-  dependencies?: string[];
-  registryDependencies?: string[];
-  files: RegistryFile[];
-}
+import type { RegistryFile, RegistryItem } from '../../types/registry';
 
 const registry: Record<string, RegistryItem> = {
   map: {

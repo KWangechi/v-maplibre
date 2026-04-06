@@ -1,28 +1,8 @@
-interface ValhallaLocation {
-  lat: number;
-  lon: number;
-  type: 'break';
-}
-
-interface ConvoyDef {
-  id: string;
-  start: [number, number];
-  end: [number, number];
-  checkpointLabels: string[];
-}
-
-interface ConvoyRouteResult {
-  convoyId: string;
-  path: [number, number][];
-  timestamps: number[];
-  distanceKm: number;
-  durationSeconds: number;
-  checkpoints: {
-    label: string;
-    position: [number, number];
-    pathIndex: number;
-  }[];
-}
+import type {
+  ValhallaLocation,
+  ConvoyDef,
+  ConvoyRouteResult,
+} from '../../types/convoy';
 
 const CONVOYS: ConvoyDef[] = [
   {

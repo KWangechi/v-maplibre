@@ -1,53 +1,11 @@
-interface OverpassElement {
-  type: string;
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: {
-    name?: string;
-    tourism?: string;
-    amenity?: string;
-    cuisine?: string;
-    stars?: string;
-    opening_hours?: string;
-    website?: string;
-    [key: string]: string | undefined;
-  };
-}
-
-interface OverpassResponse {
-  elements: OverpassElement[];
-}
-
-interface Activity {
-  name: string;
-  type: 'Attraction' | 'Dining';
-  time: string;
-  coordinates: [number, number];
-}
-
-interface DayPlan {
-  day: number;
-  title: string;
-  activities: Activity[];
-  stay: { name: string; price: string; coordinates: [number, number] };
-}
-
-interface TripResponse {
-  title: string;
-  duration: string;
-  budget: string;
-  highlights: { name: string; coordinates: [number, number] }[];
-  days: DayPlan[];
-  routeWaypoints: [number, number][];
-}
-
-interface Waypoint {
-  name: string;
-  lat: number;
-  lon: number;
-}
+import type {
+  OverpassElement,
+  OverpassResponse,
+  Activity,
+  DayPlan,
+  TripResponse,
+  Waypoint,
+} from '../../types/trip-planner';
 
 const ACTIVITY_TIMES = ['9:00 AM', '12:00 PM', '3:00 PM', '7:00 PM'];
 const HOTEL_PRICES = ['$150', '$180', '$220', '$250', '$280', '$320', '$350'];
