@@ -51,12 +51,12 @@
         "maplibre-gl-wind": "^0.2.0",
         "pmtiles": "^4.4.0",
         "three": "^0.183.2",
-        "vite": "^8.0.3",
+        "vite": "^8.0.5",
         "vitest": "^4.1.2",
         "vue-tsc": "^3.2.6"
       },
       "pkg:mapcn-vue": {
-        "shadcn-vue": "^2.5.1"
+        "shadcn-vue": "^2.5.2"
       },
       "app:mapcn-vue": {
         "@deck.gl/aggregation-layers": "^9.2.11",
@@ -109,10 +109,10 @@
         "motion-v": "^2.2.0",
         "nuxt": "^4.4.2",
         "nuxt-og-image": "^6.3.2",
-        "proj4": "^2.20.6",
-        "reka-ui": "^2.9.3",
+        "proj4": "^2.20.8",
+        "reka-ui": "^2.9.4",
         "satori": "^0.26.0",
-        "shadcn-nuxt": "^2.5.1",
+        "shadcn-nuxt": "^2.5.2",
         "shiki": "^4.0.2",
         "tailwind-merge": "^3.5.0",
         "tailwindcss": "^4.2.2",
