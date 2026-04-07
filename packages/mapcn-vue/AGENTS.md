@@ -108,7 +108,7 @@ const mapStyle =
 Follow the pattern: `Map{Feature}.vue`
 
 ```
-src/registry/ui/
+registry/new-york/
 ├── map/
 │   ├── Map.vue           # Base map
 │   ├── MapMarker.vue     # Marker
@@ -164,13 +164,14 @@ All dependency versions are managed centrally via Bun workspace catalogs in the 
 
 ## Tech Stack
 
-| Component      | Technology              |
-| -------------- | ----------------------- |
-| **Framework**  | Vue 3 (Composition API) |
-| **Styling**    | Tailwind CSS 4          |
-| **Maps**       | @geoql/v-maplibre       |
-| **Color Mode** | @vueuse/core            |
-| **Registry**   | shadcn-vue compatible   |
+| Component      | Technology                         |
+| -------------- | ---------------------------------- |
+| **Framework**  | Vue 3 (Composition API)            |
+| **Styling**    | Tailwind CSS 4                     |
+| **Maps**       | @geoql/v-maplibre                  |
+| **Color Mode** | @vueuse/core                       |
+| **Registry**   | shadcn-vue compatible              |
+| **Build**      | Custom `scripts/build-registry.ts` |
 
 ---
 
@@ -178,86 +179,171 @@ All dependency versions are managed centrally via Bun workspace catalogs in the 
 
 ```
 packages/mapcn-vue/
-├── src/
-│   └── registry/
-│       └── ui/
-│           ├── map/
-│           │   ├── Map.vue
-│           │   ├── MapMarker.vue
-│           │   ├── MapPopup.vue
-│           │   ├── MapControls.vue
-│           │   └── index.ts
-│           ├── map-layers/
-│           │   ├── MapLayerGeojson.vue
-│           │   ├── MapLayerVector.vue
-│           │   ├── MapLayerRaster.vue
-│           │   ├── MapLayerCluster.vue
-│           │   ├── MapLayerPmtiles.vue
-│           │   ├── MapLayerImage.vue
-│           │   ├── MapLayerVideo.vue
-│           │   ├── MapLayerCanvas.vue
-│           │   ├── MapLayerRoute.vue
-│           │   └── index.ts
-│           ├── map-deckgl-core/
-│           │   ├── MapLayerScatterplot.vue
-│           │   ├── MapLayerArc.vue
-│           │   ├── MapLayerLine.vue
-│           │   ├── MapLayerPath.vue
-│           │   ├── MapLayerPolygon.vue
-│           │   ├── MapLayerGeojson.vue
-│           │   ├── MapLayerIcon.vue
-│           │   ├── MapLayerText.vue
-│           │   ├── MapLayerColumn.vue
-│           │   ├── MapLayerBitmap.vue
-│           │   ├── MapLayerPointCloud.vue
-│           │   ├── MapLayerGridCell.vue
-│           │   ├── MapLayerSolidPolygon.vue
-│           │   └── index.ts
-│           ├── map-deckgl-aggregation/
-│           │   ├── MapLayerHeatmap.vue
-│           │   ├── MapLayerHexagon.vue
-│           │   ├── MapLayerGrid.vue
-│           │   ├── MapLayerContour.vue
-│           │   ├── MapLayerScreenGrid.vue
-│           │   └── index.ts
-│           ├── map-deckgl-geo/
-│           │   ├── MapLayerTrips.vue
-│           │   ├── MapLayerMVT.vue
-│           │   ├── MapLayerTile.vue
-│           │   ├── MapLayerTile3D.vue
-│           │   ├── MapLayerTerrain.vue
-│           │   ├── MapLayerH3Hexagon.vue
-│           │   ├── MapLayerH3Cluster.vue
-│           │   ├── MapLayerGreatCircle.vue
-│           │   ├── MapLayerWMS.vue
-│           │   ├── MapLayerS2.vue
-│           │   ├── MapLayerGeohash.vue
-│           │   ├── MapLayerQuadkey.vue
-│           │   └── index.ts
-│           ├── map-deckgl-mesh/
-│           │   ├── MapLayerSimpleMesh.vue
-│           │   ├── MapLayerScenegraph.vue
-│           │   └── index.ts
-│           ├── map-deckgl-raster/
-│           │   ├── MapLayerCOG.vue
-│           │   └── index.ts
-│           ├── map-deckgl-wind/
-│           │   ├── MapLayerWindParticle.vue
-│           │   └── index.ts
-│           └── map-control-lidar/
-│               ├── MapControlLidar.vue
-│               └── index.ts
+├── components.json                # shadcn-vue standard config
+├── scripts/
+│   └── build-registry.ts         # Custom registry build script
+│
+├── registry/
+│   └── new-york/
+│       ├── map/
+│       │   ├── Map.vue
+│       │   ├── MapMarker.vue
+│       │   ├── MapPopup.vue
+│       │   ├── MapControls.vue
+│       │   └── index.ts
+│       ├── map-layers/
+│       │   ├── MapLayerGeojson.vue
+│       │   ├── MapLayerVector.vue
+│       │   ├── MapLayerRaster.vue
+│       │   ├── MapLayerCluster.vue
+│       │   ├── MapLayerPmtiles.vue
+│       │   ├── MapLayerImage.vue
+│       │   ├── MapLayerVideo.vue
+│       │   ├── MapLayerCanvas.vue
+│       │   ├── MapLayerRoute.vue
+│       │   └── index.ts
+│       ├── map-deckgl-core/
+│       │   ├── MapLayerScatterplot.vue
+│       │   ├── MapLayerArc.vue
+│       │   ├── MapLayerLine.vue
+│       │   ├── MapLayerPath.vue
+│       │   ├── MapLayerPolygon.vue
+│       │   ├── MapLayerGeojson.vue
+│       │   ├── MapLayerIcon.vue
+│       │   ├── MapLayerText.vue
+│       │   ├── MapLayerColumn.vue
+│       │   ├── MapLayerBitmap.vue
+│       │   ├── MapLayerPointCloud.vue
+│       │   ├── MapLayerGridCell.vue
+│       │   ├── MapLayerSolidPolygon.vue
+│       │   └── index.ts
+│       ├── map-deckgl-aggregation/
+│       │   ├── MapLayerHeatmap.vue
+│       │   ├── MapLayerHexagon.vue
+│       │   ├── MapLayerGrid.vue
+│       │   ├── MapLayerContour.vue
+│       │   ├── MapLayerScreenGrid.vue
+│       │   └── index.ts
+│       ├── map-deckgl-geo/
+│       │   ├── MapLayerTrips.vue
+│       │   ├── MapLayerMVT.vue
+│       │   ├── MapLayerTile.vue
+│       │   ├── MapLayerTile3D.vue
+│       │   ├── MapLayerTerrain.vue
+│       │   ├── MapLayerH3Hexagon.vue
+│       │   ├── MapLayerH3Cluster.vue
+│       │   ├── MapLayerGreatCircle.vue
+│       │   ├── MapLayerWMS.vue
+│       │   ├── MapLayerS2.vue
+│       │   ├── MapLayerGeohash.vue
+│       │   ├── MapLayerQuadkey.vue
+│       │   └── index.ts
+│       ├── map-deckgl-mesh/
+│       │   ├── MapLayerSimpleMesh.vue
+│       │   ├── MapLayerScenegraph.vue
+│       │   └── index.ts
+│       ├── map-deckgl-raster/
+│       │   ├── MapLayerCOG.vue
+│       │   └── index.ts
+│       ├── map-deckgl-wind/
+│       │   ├── MapLayerWindParticle.vue
+│       │   └── index.ts
+│       └── map-control-lidar/
+│           ├── MapControlLidar.vue
+│           └── index.ts
 │
 ├── public/
-│   └── r/
-│       ├── registry.json          # Registry index
-│       ├── map.json               # map component registry
-│       ├── map-layers.json        # map-layers registry
-│       └── ...
+│   └── r/                         # Generated by build-registry.ts
+│       ├── registry.json          # Registry index (9 items)
+│       ├── map.json
+│       ├── map-layers.json
+│       ├── map-deckgl-core.json
+│       ├── map-deckgl-aggregation.json
+│       ├── map-deckgl-geo.json
+│       ├── map-deckgl-mesh.json
+│       ├── map-deckgl-raster.json
+│       ├── map-deckgl-wind.json
+│       └── map-control-lidar.json
 │
-├── registry.json                  # shadcn-vue registry config
-└── package.json
+├── package.json
+├── tsconfig.json
+├── AGENTS.md
+└── README.md
 ```
+
+---
+
+## Build System
+
+The registry JSON files in `public/r/` are generated by a custom build script, following the same pattern as nxui.
+
+### How It Works
+
+1. **Source of truth:** `scripts/build-registry.ts` contains hardcoded metadata (title, description, dependencies, registryDependencies) for each component group.
+2. **Source files:** `registry/new-york/{slug}/` contains the actual `.vue` and `.ts` files.
+3. **Build process:** The script reads all files from each component folder, embeds their full content into registry JSON, and writes to `public/r/`.
+4. **Output:** Individual `{slug}.json` files + a master `registry.json` index.
+
+### Build Command
+
+```bash
+bun run build  # Runs scripts/build-registry.ts
+```
+
+### Registry JSON Format
+
+**`public/r/registry.json` (Index):**
+
+```json
+{
+  "$schema": "https://shadcn-vue.com/schema/registry.json",
+  "name": "mapcn-vue",
+  "homepage": "https://mapcn-vue.geoql.in",
+  "items": [
+    {
+      "name": "map",
+      "type": "registry:ui",
+      "title": "Map",
+      "description": "..."
+    }
+  ]
+}
+```
+
+**`public/r/map.json` (Component):**
+
+```json
+{
+  "$schema": "https://shadcn-vue.com/schema/registry-item.json",
+  "name": "map",
+  "type": "registry:ui",
+  "title": "Map",
+  "description": "A theme-aware MapLibre map component...",
+  "dependencies": ["@geoql/v-maplibre", "maplibre-gl", "@vueuse/core"],
+  "files": [
+    {
+      "path": "registry/new-york/map/Map.vue",
+      "content": "<script setup lang=\"ts\">...",
+      "type": "registry:ui",
+      "target": "components/ui/map/Map.vue"
+    }
+  ]
+}
+```
+
+### Target Path Convention
+
+All components use a consistent target path pattern:
+
+```
+components/ui/{slug}/{FileName}.vue
+```
+
+For example:
+
+- `map/Map.vue` → `components/ui/map/Map.vue`
+- `map-layers/MapLayerGeojson.vue` → `components/ui/map-layers/MapLayerGeojson.vue`
+- `map-deckgl-core/MapLayerScatterplot.vue` → `components/ui/map-deckgl-core/MapLayerScatterplot.vue`
 
 ---
 
@@ -354,56 +440,11 @@ packages/mapcn-vue/
 
 ---
 
-## Registry JSON Format
-
-The `public/r/` directory contains pre-built registry JSON files served by the showcase app.
-
-### registry.json (Index)
-
-```json
-{
-  "$schema": "https://shadcn-vue.com/schema/registry.json",
-  "name": "mapcn-vue",
-  "baseUrl": "https://mapcn-vue.geoql.in/r",
-  "items": [
-    {
-      "name": "map",
-      "type": "registry:ui",
-      "title": "Map",
-      "description": "Theme-aware MapLibre map with controls"
-    }
-  ]
-}
-```
-
-### Component Registry (map.json)
-
-```json
-{
-  "$schema": "https://shadcn-vue.com/schema/registry-item.json",
-  "name": "map",
-  "type": "registry:ui",
-  "title": "Map",
-  "description": "Theme-aware MapLibre map component",
-  "dependencies": ["@geoql/v-maplibre", "maplibre-gl", "@vueuse/core"],
-  "files": [
-    {
-      "path": "map/Map.vue",
-      "type": "registry:ui",
-      "target": "components/ui/map/Map.vue",
-      "content": "..."
-    }
-  ]
-}
-```
-
----
-
 ## Development Commands
 
 ```bash
-# Build registry
-bun run build            # Build with shadcn-vue
+# Build registry (generates public/r/*.json)
+bun run build
 
 # Linting
 bun run lint             # Run oxlint
@@ -416,27 +457,39 @@ bun run build            # Builds all packages including this
 
 ## Adding a New Component
 
-### 1. Create Component
+### 1. Create Component Folder
 
 ```bash
-mkdir -p src/registry/ui/map-new
-# Create MapNewFeature.vue
+mkdir -p registry/new-york/map-new-feature
 ```
 
-### 2. Create index.ts
+### 2. Create Component File(s)
+
+```bash
+# Create MapNewFeature.vue in the folder
+# Create index.ts with named exports
+```
+
+### 3. Add Metadata to Build Script
+
+Edit `scripts/build-registry.ts` and add an entry to the `COMPONENTS` map:
 
 ```typescript
-// src/registry/ui/map-new/index.ts
-export { default as MapNewFeature } from './MapNewFeature.vue';
+'map-new-feature': {
+  title: 'New Feature',
+  description: 'Description of the new feature component.',
+  deps: ['@geoql/v-maplibre', 'maplibre-gl'],
+  registryDeps: ['https://mapcn-vue.geoql.in/r/map.json'],
+},
 ```
 
-### 3. Add to Registry
+### 4. Rebuild Registry
 
-Update `public/r/map-new.json` with component metadata and files.
+```bash
+bun run build
+```
 
-### 4. Update Registry Index
-
-Add entry to `public/r/registry.json`.
+This regenerates `public/r/map-new-feature.json` and updates `public/r/registry.json`.
 
 ---
 
@@ -453,7 +506,7 @@ Before every code change:
    - [ ] Light/dark styles configurable via props?
 
 3. **Is styling Tailwind-only?**
-   - [ ] No `<style>` blocks?
+   - [ ] No `<style>` blocks (except MapPopup exception)?
    - [ ] All styling via class attributes?
 
 4. **Are props customizable?**
@@ -463,6 +516,10 @@ Before every code change:
 5. **Is export correct?**
    - [ ] Named export in index.ts?
    - [ ] Follows `Map{Feature}.vue` naming?
+
+6. **Is the build script updated?**
+   - [ ] New component added to `COMPONENTS` map in `scripts/build-registry.ts`?
+   - [ ] `bun run build` regenerated `public/r/` successfully?
 
 ### Preferred Patterns
 
@@ -475,5 +532,5 @@ Before every code change:
 
 ---
 
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-04-07
 **Maintainer:** GeoQL Team

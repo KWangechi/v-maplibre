@@ -96,6 +96,10 @@ v-maplibre/
 ├── packages/
 │   ├── v-maplibre/        # Main library (npm: @geoql/v-maplibre)
 │   └── mapcn-vue/         # shadcn-vue registry components
+│       ├── components.json           # shadcn-vue standard config
+│       ├── scripts/build-registry.ts # Custom registry builder
+│       ├── registry/new-york/        # Source components (one folder per component)
+│       └── public/r/                 # Generated registry JSONs
 ├── apps/
 │   ├── docs/              # Docus documentation (excluded from workspace)
 │   └── mapcn-vue/         # Nuxt 4 showcase site

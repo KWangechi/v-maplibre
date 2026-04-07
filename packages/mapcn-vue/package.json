@@ -23,7 +23,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "npx shadcn-vue build",
+    "build": "bun run scripts/build-registry.ts",
     "lint": "oxlint"
   },
   "dependencies": {
