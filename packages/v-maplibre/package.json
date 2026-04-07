@@ -71,8 +71,8 @@
     "prepublishOnly": "bun run lint && bun run format:check && bun run test:coverage && bun run build"
   },
   "dependencies": {
-    "maplibre-gl": "catalog:pkg:v-maplibre",
-    "pmtiles": "catalog:pkg:v-maplibre"
+    "maplibre-gl": "^5.22.0",
+    "pmtiles": "^4.4.0"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "catalog:pkg:v-maplibre",
