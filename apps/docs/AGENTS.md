@@ -67,7 +67,7 @@ This is an info alert.
 
 ```vue [With Marker]
 <VMap :options="mapOptions">
-  <VMarker :lng-lat="[0, 0]" />
+  <VMarker :coordinates="[0, 0]" />
 </VMap>
 ```
 ::
@@ -111,7 +111,7 @@ Brief description of what the component does.
 ::code-group
 ```vue [Template]
 <VMap :options="mapOptions" @load="onMapLoad">
-  <VMarker :lng-lat="[-74.5, 40]" />
+  <VMarker :coordinates="[-74.5, 40]" />
 </VMap>
 ```
 
