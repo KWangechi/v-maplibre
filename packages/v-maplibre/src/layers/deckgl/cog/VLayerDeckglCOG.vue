@@ -112,7 +112,7 @@
     typeof import('@developmentseed/deck.gl-geotiff').COGLayer | null
   >(null);
   const epsgResolverFn = shallowRef<
-    typeof import('@developmentseed/deck.gl-geotiff').epsgResolver | null
+    typeof import('@developmentseed/proj').epsgResolver | null
   >(null);
 
   const createLayer = () => {
@@ -167,10 +167,13 @@
 
   const initializeLayer = async () => {
     try {
-      const geotiffModule = await import('@developmentseed/deck.gl-geotiff');
+      const [geotiffModule, projModule] = await Promise.all([
+        import('@developmentseed/deck.gl-geotiff'),
+        import('@developmentseed/proj'),
+      ]);
 
       COGLayerClass.value = markRaw(geotiffModule.COGLayer);
-      epsgResolverFn.value = geotiffModule.epsgResolver;
+      epsgResolverFn.value = projModule.epsgResolver;
 
       const layer = createLayer();
       if (layer) {

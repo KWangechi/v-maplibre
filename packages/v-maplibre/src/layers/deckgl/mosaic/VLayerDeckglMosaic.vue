@@ -22,11 +22,11 @@
   import type { ShaderModule } from '@luma.gl/shadertools';
   import type {
     COGLayerProps,
-    EpsgResolver,
     GetTileDataOptions,
     MosaicLayerProps,
     MosaicSource as BaseMosaicSource,
   } from '@developmentseed/deck.gl-geotiff';
+  import type { EpsgResolver } from '@developmentseed/proj';
   import { injectStrict, MapKey } from '../../../utils';
   import { useDeckOverlay } from '../_shared/useDeckOverlay';
 
@@ -342,14 +342,16 @@ uniform ndviFilterUniforms {
               height: array.height,
             };
           },
-          renderTile: (tileData: TextureData) =>
-            getRenderModules(
+          renderTile: (tileData: TextureData) => ({
+            image: tileData.texture,
+            renderPipeline: getRenderModules(
               renderMode,
               tileData.texture,
               { CreateTexture },
               ndviRange,
               customRenderModules,
             ),
+          }),
           signal,
         } as COGLayerProps<TextureData>);
       },
@@ -360,18 +362,20 @@ uniform ndviFilterUniforms {
 
   async function initializeLayer() {
     try {
-      const [geotiffModule, rasterModule, devGeotiff] = await Promise.all([
-        import('@developmentseed/deck.gl-geotiff'),
-        import('@developmentseed/deck.gl-raster/gpu-modules'),
-        import('@developmentseed/geotiff'),
-      ]);
+      const [geotiffModule, rasterModule, devGeotiff, projModule] =
+        await Promise.all([
+          import('@developmentseed/deck.gl-geotiff'),
+          import('@developmentseed/deck.gl-raster/gpu-modules'),
+          import('@developmentseed/geotiff'),
+          import('@developmentseed/proj'),
+        ]);
 
       modules.value = markRaw({
         MosaicLayer: geotiffModule.MosaicLayer,
         COGLayer: geotiffModule.COGLayer,
         CreateTexture: rasterModule.CreateTexture,
         fromUrl: devGeotiff.GeoTIFF.fromUrl,
-        resolveEpsg: geotiffModule.epsgResolver,
+        resolveEpsg: projModule.epsgResolver,
       });
 
       const layer = createLayer();
