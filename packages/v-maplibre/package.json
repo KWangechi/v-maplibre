@@ -58,21 +58,20 @@
     "access": "public"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && vue-tsc --project tsconfig.build.json",
-    "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "oxfmt --write .",
-    "format:check": "oxfmt --check .",
-    "prepublishOnly": "bun run lint && bun run format:check && bun run test:coverage && bun run build"
+    "dev": "vp pack --watch",
+    "build": "vp pack",
+    "test": "vp test",
+    "test:ui": "vp test --ui",
+    "test:coverage": "vp test --coverage",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "format": "vp fmt --write .",
+    "format:check": "vp fmt --check .",
+    "prepublishOnly": "pnpm run lint && pnpm run format:check && pnpm run test:coverage && pnpm run build"
   },
   "dependencies": {
-    "maplibre-gl": "^5.22.0",
-    "pmtiles": "^4.4.0"
+    "maplibre-gl": "^5.24.0",
+    "pmtiles": "^4.4.1"
   },
   "devDependencies": {
     "@deck.gl/aggregation-layers": "catalog:pkg:v-maplibre",
@@ -83,39 +82,44 @@
     "@deck.gl/mesh-layers": "catalog:pkg:v-maplibre",
     "@developmentseed/deck.gl-geotiff": "catalog:pkg:v-maplibre",
     "@developmentseed/deck.gl-raster": "catalog:pkg:v-maplibre",
+    "@developmentseed/deck.gl-zarr": "catalog:pkg:v-maplibre",
     "@developmentseed/geotiff": "catalog:pkg:v-maplibre",
+    "@developmentseed/proj": "catalog:pkg:v-maplibre",
     "@geoql/maplibre-gl-starfield": "catalog:pkg:v-maplibre",
     "@luma.gl/core": "catalog:pkg:v-maplibre",
     "@luma.gl/engine": "catalog:pkg:v-maplibre",
     "@luma.gl/shadertools": "catalog:pkg:v-maplibre",
+    "@tsdown/css": "catalog:pkg:v-maplibre",
     "@types/node": "catalog:pkg:v-maplibre",
     "@vitejs/plugin-vue": "catalog:pkg:v-maplibre",
     "@vitest/coverage-v8": "catalog:pkg:v-maplibre",
-    "@vitest/ui": "catalog:pkg:v-maplibre",
     "@vue/test-utils": "catalog:pkg:v-maplibre",
     "happy-dom": "catalog:pkg:v-maplibre",
     "maplibre-gl-lidar": "catalog:pkg:v-maplibre",
     "maplibre-gl-wind": "catalog:pkg:v-maplibre",
-    "oxfmt": "catalog:default",
-    "oxlint": "catalog:default",
     "three": "catalog:pkg:v-maplibre",
     "typescript": "catalog:default",
-    "vite": "catalog:pkg:v-maplibre",
-    "vitest": "catalog:pkg:v-maplibre",
+    "unplugin-vue": "catalog:pkg:v-maplibre",
+    "vite-plus": "catalog:pkg:v-maplibre",
     "vue": "catalog:default",
-    "vue-tsc": "catalog:pkg:v-maplibre"
+    "vue-tsc": "catalog:pkg:v-maplibre",
+    "zarrita": "catalog:pkg:v-maplibre"
   },
   "peerDependencies": {
-    "@deck.gl/aggregation-layers": "^9.2.6",
-    "@deck.gl/core": "^9.2.6",
-    "@deck.gl/geo-layers": "^9.2.6",
-    "@deck.gl/layers": "^9.2.6",
-    "@deck.gl/mapbox": "^9.2.6",
-    "@deck.gl/mesh-layers": "^9.2.6",
-    "@developmentseed/deck.gl-geotiff": "^0.3.0",
-    "@developmentseed/deck.gl-raster": "^0.3.0",
+    "@deck.gl/aggregation-layers": "^9.3.0",
+    "@deck.gl/core": "^9.3.0",
+    "@deck.gl/geo-layers": "^9.3.0",
+    "@deck.gl/layers": "^9.3.0",
+    "@deck.gl/mapbox": "^9.3.0",
+    "@deck.gl/mesh-layers": "^9.3.0",
+    "@developmentseed/deck.gl-geotiff": "^0.6.0",
+    "@developmentseed/deck.gl-raster": "^0.6.0",
+    "@developmentseed/deck.gl-zarr": "^0.6.0",
+    "@developmentseed/geotiff": "^0.6.0",
+    "@developmentseed/proj": "^0.6.0",
+    "zarrita": "^0.7.0",
     "@geoql/maplibre-gl-starfield": "^0.1.0",
-    "maplibre-gl-lidar": "^0.11.1",
+    "maplibre-gl-lidar": "^0.13.0",
     "maplibre-gl-wind": "^0.2.0",
     "three": ">=0.176.0",
     "vue": "^3.5.0"
@@ -145,6 +149,18 @@
     "@developmentseed/deck.gl-raster": {
       "optional": true
     },
+    "@developmentseed/deck.gl-zarr": {
+      "optional": true
+    },
+    "@developmentseed/geotiff": {
+      "optional": true
+    },
+    "@developmentseed/proj": {
+      "optional": true
+    },
+    "zarrita": {
+      "optional": true
+    },
     "@geoql/maplibre-gl-starfield": {
       "optional": true
     },
@@ -158,5 +174,5 @@
       "optional": true
     }
   },
-  "packageManager": "bun@1.3.11"
+  "packageManager": "pnpm@11.1.1"
 }
