@@ -1,7 +1,16 @@
 /**
- * Build-time script to prepare ProMap data from Zillow ZHVI + Census centroids + SimpleMaps population.
+ * Maintainer-only script to regenerate ProMap data from Zillow ZHVI + Census centroids + SimpleMaps population.
  *
- * Run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
+ * **NOT run in CI.** SimpleMaps.com sits behind Cloudflare Bot Fight Mode and returns 403
+ * to all non-browser clients (Node fetch, curl, GitHub Actions runners). The output JSON is
+ * vendored at apps/mapcn-vue/public/data/promap-data.json and committed to the repo.
+ *
+ * Regeneration workflow (run locally, ~once per quarter as data refreshes):
+ *   1. Download simplemaps_uszips_basicv1.94.zip manually via a real browser
+ *      (Cloudflare challenge can only be solved by a JS runtime)
+ *   2. Adjust SIMPLEMAPS_URL below to a local file:// path
+ *   3. node apps/mapcn-vue/scripts/prepare-promap-data.ts
+ *   4. Commit the regenerated apps/mapcn-vue/public/data/promap-data.json
  *
  * Runs directly under Node 24 (strip-types is stable; no `tsx` runner needed).
  *

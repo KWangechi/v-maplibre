@@ -52,9 +52,7 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=8192
 
-      - name: Generate ProMap data
-        if: inputs.skip-build != true
-        run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
+      # ProMap data is VENDORED — see comment in ci.yml + prepare-promap-data.ts header.
 
       - name: Build mapcn-vue
         if: inputs.skip-build != true

@@ -157,8 +157,10 @@ jobs:
           name: lib-dist
           path: packages/v-maplibre/dist/
 
-      - name: Generate ProMap data
-        run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
+      # ProMap data (apps/mapcn-vue/public/data/promap-data.json) is VENDORED.
+      # SimpleMaps.com is behind Cloudflare Bot Fight Mode and 403s any non-browser
+      # client, so CI cannot regenerate it. Maintainers regenerate locally — see
+      # apps/mapcn-vue/scripts/prepare-promap-data.ts for the workflow.
 
       - name: Build mapcn-vue
         run: pnpm run build:mapcn
