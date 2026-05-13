@@ -5,46 +5,48 @@
 </script>
 
 <template>
-  <div class="mb-16 pt-4 text-center md:mb-20">
+  <div class="mb-16 pt-4 md:mb-20">
     <div
-      class="mb-4 inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-4 py-1.5 text-xs font-medium tracking-wider text-muted-foreground"
+      class="mb-6 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] text-primary uppercase"
     >
-      <Icon name="lucide:sparkles" class="size-3.5 text-primary" />
-      <span class="font-mono">{{ totalExamples }} Interactive Examples</span>
+      <Icon name="lucide:sparkles" class="size-3" />
+      <span class="tabular-nums">{{ totalExamples }} interactive examples</span>
     </div>
 
     <h1
-      class="gradient-text font-display text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl"
+      class="max-w-[14ch] text-4xl font-extrabold tracking-[-0.04em] text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
     >
       Explore Examples
     </h1>
 
     <p
-      class="mx-auto mt-5 max-w-2xl text-base/relaxed text-muted-foreground md:text-lg"
+      class="mt-6 max-w-[55ch] text-base/relaxed text-muted-foreground md:text-lg"
     >
-      Discover what's possible with mapcn-vue. From basic maps to advanced
+      What's possible with mapcn-vue. From basic markers to advanced
       <span class="font-medium text-foreground">WebGL visualizations</span>
       — each example is interactive and ready to use.
     </p>
 
     <div
-      class="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground"
+      class="mt-8 flex flex-wrap items-center gap-6 font-mono text-[11px] tracking-[0.15em] text-muted-foreground uppercase"
     >
       <div class="flex items-center gap-2">
-        <div class="relative size-2">
-          <div
-            class="absolute inset-0 animate-ping rounded-full bg-emerald-500"
-          ></div>
-          <div class="absolute inset-0 rounded-full bg-emerald-500"></div>
-        </div>
+        <span class="relative flex size-1.5">
+          <span
+            class="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-70"
+          ></span>
+          <span
+            class="relative inline-flex size-1.5 rounded-full bg-success"
+          ></span>
+        </span>
         <span>All interactive</span>
       </div>
       <div class="flex items-center gap-2">
-        <Icon name="lucide:moon" class="size-3.5" />
+        <Icon name="lucide:moon" class="size-3" />
         <span>Dark mode ready</span>
       </div>
       <div class="flex items-center gap-2">
-        <Icon name="lucide:zap" class="size-3.5" />
+        <Icon name="lucide:zap" class="size-3" />
         <span>WebGL accelerated</span>
       </div>
     </div>

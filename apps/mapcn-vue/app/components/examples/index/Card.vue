@@ -9,44 +9,33 @@
 <template>
   <NuxtLink
     :to="example.href"
-    class="group relative flex h-full flex-col rounded-xl border border-border/50 bg-muted/20 p-5 transition-colors hover:border-primary/30 hover:bg-muted/40"
+    class="group relative flex h-full flex-col rounded-md border border-border bg-card p-5 transition-colors hover:bg-muted/40"
   >
-    <!-- Badge -->
     <div
       v-if="example.badge"
-      class="absolute right-3 top-3 rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-primary"
+      class="absolute top-3 right-3 rounded-sm border border-border bg-background/70 px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase backdrop-blur-sm"
     >
       {{ example.badge }}
     </div>
 
-    <!-- Icon -->
-    <div
-      class="flex size-10 items-center justify-center rounded-lg border border-border/50 bg-background transition-colors group-hover:border-primary/30 group-hover:bg-primary/10"
-    >
-      <Icon
-        :name="example.icon"
-        class="size-5 text-muted-foreground transition-colors group-hover:text-primary"
-      />
-    </div>
+    <Icon
+      :name="example.icon"
+      class="size-5 text-primary transition-transform group-hover:scale-110"
+    />
 
-    <!-- Title -->
-    <h3
-      class="mt-3 text-base font-semibold transition-colors group-hover:text-primary"
-    >
+    <h3 class="mt-5 text-base font-medium tracking-tight text-foreground">
       {{ example.title }}
     </h3>
 
-    <!-- Description -->
-    <p class="mt-1.5 flex-1 text-sm/relaxed text-muted-foreground">
+    <p class="mt-2 flex-1 text-sm/relaxed text-muted-foreground">
       {{ example.description }}
     </p>
 
-    <!-- Arrow -->
     <div
-      class="mt-3 flex items-center gap-1 text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+      class="mt-4 inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.15em] text-muted-foreground uppercase opacity-0 transition-opacity group-hover:opacity-100"
     >
-      <span class="text-primary">Explore</span>
-      <Icon name="lucide:arrow-right" class="size-3.5 text-primary" />
+      <span class="text-primary">Open</span>
+      <Icon name="lucide:arrow-right" class="size-3 text-primary" />
     </div>
   </NuxtLink>
 </template>

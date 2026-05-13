@@ -8,15 +8,16 @@
 
 <template>
   <div
-    class="rounded-xl border border-border/50 bg-muted/20 p-5 transition-colors hover:border-primary/30 hover:bg-muted/40"
+    class="group flex flex-col rounded-md border border-border bg-card p-6 transition-colors hover:bg-muted/40"
   >
-    <div
-      class="flex size-10 items-center justify-center rounded-lg border border-border/50 bg-background"
-    >
-      <Icon :name="icon" class="size-5 text-primary" />
-    </div>
-    <h3 class="mt-3 text-base font-semibold">{{ title }}</h3>
-    <p class="mt-1.5 text-sm/relaxed text-muted-foreground">
+    <Icon
+      :name="icon"
+      class="size-5 text-primary transition-transform group-hover:scale-110"
+    />
+    <h3 class="mt-5 text-base font-medium tracking-tight text-foreground">
+      {{ title }}
+    </h3>
+    <p class="mt-2 text-sm/relaxed text-muted-foreground">
       {{ description }}
     </p>
   </div>

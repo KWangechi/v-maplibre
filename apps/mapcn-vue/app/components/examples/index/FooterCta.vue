@@ -1,48 +1,73 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="mt-20 border-t border-border/40 pt-16 text-center">
-    <div class="mx-auto max-w-md space-y-4">
-      <div
-        class="mx-auto flex size-12 items-center justify-center rounded-xl border border-border/50 bg-muted/30"
-      >
-        <Icon name="lucide:code-2" class="size-6 text-primary" />
+  <div class="mt-20 border-t border-border pt-16">
+    <div class="grid grid-cols-1 items-end gap-8 md:grid-cols-[5fr_7fr]">
+      <div>
+        <div
+          class="mb-4 inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] text-primary uppercase"
+        >
+          <Icon name="lucide:code-2" class="size-3" />
+          Ready to build
+        </div>
+        <h3
+          class="text-2xl font-extrabold tracking-[-0.03em] text-foreground md:text-3xl"
+        >
+          One command.<br />Zero config.
+        </h3>
+        <p class="mt-4 text-base text-muted-foreground">
+          Add any component to your project via shadcn-vue CLI. Components land
+          in your repo, typed end-to-end, owned by you.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <NuxtLink
+            to="/docs/introduction"
+            class="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground transition-[filter] hover:brightness-110"
+          >
+            Get started
+            <Icon name="lucide:arrow-right" class="size-4" />
+          </NuxtLink>
+          <a
+            href="https://github.com/geoql/v-maplibre"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex h-10 items-center gap-2 rounded-md border border-border px-5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+          >
+            <Icon name="lucide:github" class="size-4" />
+            View source
+          </a>
+        </div>
       </div>
 
-      <h3
-        class="gradient-text font-display text-2xl font-bold tracking-tighter"
-      >
-        Ready to build?
-      </h3>
-      <p class="text-sm text-muted-foreground">
-        Add any component to your project with a single CLI command. Start
-        building beautiful maps in minutes.
-      </p>
-
-      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-        <NuxtLink
-          to="/docs/introduction"
-          class="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
-        >
-          Get Started
-          <Icon name="lucide:arrow-right" class="size-4" />
-        </NuxtLink>
-        <a
-          href="https://github.com/geoql/v-maplibre"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex h-10 items-center gap-2 rounded-lg border border-border/50 px-5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          <Icon name="lucide:github" class="size-4" />
-          View Source
-        </a>
-      </div>
-
       <div
-        class="mx-auto mt-4 w-fit rounded-lg border border-border/50 bg-muted/30 px-4 py-2 font-mono text-xs text-muted-foreground"
+        class="overflow-hidden rounded-md border border-border bg-card text-left"
       >
-        <span class="text-primary">npx</span> shadcn-vue add
-        <span class="text-emerald-500">https://mapcn-vue.geoql.in/r/map</span>
+        <div
+          class="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2.5"
+        >
+          <div
+            class="size-2.5 rounded-full bg-destructive/70"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="size-2.5 rounded-full bg-warning/70"
+            aria-hidden="true"
+          ></div>
+          <div
+            class="size-2.5 rounded-full bg-success/70"
+            aria-hidden="true"
+          ></div>
+          <span
+            class="ml-2 font-mono text-[10px] tracking-[0.15em] text-muted-foreground uppercase"
+            >Terminal</span
+          >
+        </div>
+        <div class="overflow-x-auto p-5">
+          <code class="font-mono text-sm whitespace-nowrap text-foreground">
+            <span class="text-primary">$</span> npx shadcn-vue@latest add
+            https://mapcn-vue.geoql.in/r/map
+          </code>
+        </div>
       </div>
     </div>
   </div>

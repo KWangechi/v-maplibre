@@ -88,16 +88,16 @@
     return minRadius + normalized * (maxRadius - minRadius);
   };
 
-  // Emerald green color with slight variation based on weight
+  // Tech Utility primary accent: oklch(0.70 0.16 254) ≈ rgb(64, 168, 247)
+  // Weight ↑ → alpha ↑ for subtle data emphasis without color drift
   const getFillColor = (d: unknown): [number, number, number, number] => {
     const weight = (d as UserData).weight;
-    const intensity = Math.min(255, 150 + (weight / 847) * 105);
-    return [16, intensity, 129, 200];
+    const alpha = Math.min(220, 140 + (weight / 847) * 80);
+    return [64, 168, 247, alpha];
   };
 
-  // Pulse ring color - lighter emerald
   const getPulseColor = (): [number, number, number, number] => {
-    return [16, 185, 129, 100];
+    return [64, 168, 247, 90];
   };
 </script>
 
@@ -133,7 +133,7 @@
         :opacity="0.9"
         :pickable="true"
         :stroked="true"
-        :get-line-color="[16, 185, 129, 255]"
+        :get-line-color="[64, 168, 247, 255]"
         :line-width-min-pixels="1"
         :filled="true"
         :antialiasing="true"
@@ -155,7 +155,9 @@
           >
             {{ hoveredCity.city }}
           </div>
-          <div class="text-2xl/tight font-semibold text-emerald-500">
+          <div
+            class="font-mono text-2xl/tight font-medium tabular-nums text-primary"
+          >
             {{ hoveredCity.weight.toLocaleString() }}
           </div>
           <div class="text-[10px] tracking-wider text-muted-foreground">
