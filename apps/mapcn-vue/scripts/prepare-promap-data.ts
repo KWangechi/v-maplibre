@@ -1,7 +1,9 @@
 /**
  * Build-time script to prepare ProMap data from Zillow ZHVI + Census centroids + SimpleMaps population.
  *
- * Run: pnpm --filter @geoql/mapcn-vue-app exec tsx scripts/prepare-promap-data.ts
+ * Run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
+ *
+ * Runs directly under Node 24 (strip-types is stable; no `tsx` runner needed).
  *
  * Downloads:
  *   1. Zillow ZHVI CSV (~120MB, 26,300 ZIPs × 322 columns)

@@ -158,7 +158,7 @@ jobs:
           path: packages/v-maplibre/dist/
 
       - name: Generate ProMap data
-        run: pnpm --filter @geoql/mapcn-vue-app exec tsx scripts/prepare-promap-data.ts
+        run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
 
       - name: Build mapcn-vue
         run: pnpm run build:mapcn

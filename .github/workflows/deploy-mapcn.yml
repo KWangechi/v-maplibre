@@ -54,7 +54,7 @@ jobs:
 
       - name: Generate ProMap data
         if: inputs.skip-build != true
-        run: pnpm --filter @geoql/mapcn-vue-app exec tsx scripts/prepare-promap-data.ts
+        run: node apps/mapcn-vue/scripts/prepare-promap-data.ts
 
       - name: Build mapcn-vue
         if: inputs.skip-build != true

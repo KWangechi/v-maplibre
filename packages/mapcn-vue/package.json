@@ -23,7 +23,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsx scripts/build-registry.ts",
+    "build": "node scripts/build-registry.ts",
     "lint": "oxlint"
   },
   "dependencies": {
@@ -32,7 +32,6 @@
   "devDependencies": {
     "oxlint": "catalog:default",
     "shadcn-vue": "catalog:pkg:mapcn-vue",
-    "tsx": "^4.21.0",
     "typescript": "catalog:default",
     "vue": "catalog:default"
   },
