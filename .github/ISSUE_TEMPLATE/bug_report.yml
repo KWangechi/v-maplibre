@@ -124,7 +124,7 @@ body:
       placeholder: |
         - OS: macOS 14.0
         - Node: 20.10.0
-        - Bun/npm/yarn/pnpm: bun 1.0.0
+        - pnpm/npm/yarn version: pnpm 11.1.0
         - Nuxt (if applicable): 4.0.0
       render: shell
     validations:
