@@ -145,9 +145,6 @@ catalogs:
     flatbush:
       specifier: ^4.5.1
       version: 4.5.1
-    idb:
-      specifier: ^8.0.3
-      version: 8.0.3
     jszip:
       specifier: ^3.10.1
       version: 3.10.1
@@ -393,9 +390,6 @@ importers:
       flatbush:
         specifier: catalog:app:mapcn-vue
         version: 4.5.1
-      idb:
-        specifier: catalog:app:mapcn-vue
-        version: 8.0.3
       lerc:
         specifier: catalog:app:mapcn-vue
         version: 4.1.1
@@ -7245,9 +7239,6 @@ packages:
   iconv-lite@0.7.2:
     resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
     engines: {node: '>=0.10.0'}
-
-  idb@8.0.3:
-    resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
 
   identifier-regex@1.0.1:
     resolution: {integrity: sha512-ZrYyM0sozNPZlvBvE7Oq9Bn44n0qKGrYu5sQ0JzMUnjIhpgWYE2JB6aBoFwEYdPjqj7jPyxXTMJiHDOxDfd8yw==}
@@ -17338,8 +17329,6 @@ snapshots:
   iconv-lite@0.7.2:
     dependencies:
       safer-buffer: 2.1.2
-
-  idb@8.0.3: {}
 
   identifier-regex@1.0.1:
     dependencies:

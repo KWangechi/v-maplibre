@@ -43,10 +43,7 @@ tmp/
 # Local notes
 TODO.local.md
 
-# Generated data (regenerate with: bun run apps/mapcn-vue/scripts/prepare-promap-data.ts)
-# promap-data.json is VENDORED — committed to the repo. SimpleMaps
-# (one of the three upstream sources) sits behind Cloudflare Bot Fight Mode,
-# so CI cannot regenerate it. Maintainer-only regeneration:
-#   node apps/mapcn-vue/scripts/prepare-promap-data.ts
-# (run locally; bypass SimpleMaps 403 by downloading the ZIP via browser first)
 .design-explorations
+
+# Cloudflare Pages / Workers local state (D1, KV, etc.)
+.wrangler
