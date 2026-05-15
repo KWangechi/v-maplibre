@@ -22,36 +22,62 @@
 
 ## Installation
 
+The library has **two required dependencies**. Everything else is opt-in per feature.
+
 ```bash
 # pnpm (recommended)
-pnpm add @geoql/v-maplibre maplibre-gl @deck.gl/core @deck.gl/layers @deck.gl/mapbox @deck.gl/aggregation-layers @deck.gl/geo-layers @deck.gl/mesh-layers maplibre-gl-wind
+pnpm add @geoql/v-maplibre maplibre-gl
 
 # npm
-npm install @geoql/v-maplibre maplibre-gl @deck.gl/core @deck.gl/layers @deck.gl/mapbox @deck.gl/aggregation-layers @deck.gl/geo-layers @deck.gl/mesh-layers maplibre-gl-wind
+npm install @geoql/v-maplibre maplibre-gl
 
 # yarn
-yarn add @geoql/v-maplibre maplibre-gl @deck.gl/core @deck.gl/layers @deck.gl/mapbox @deck.gl/aggregation-layers @deck.gl/geo-layers @deck.gl/mesh-layers maplibre-gl-wind
+yarn add @geoql/v-maplibre maplibre-gl
 ```
 
-> **Note:** All packages listed above are required peer dependencies. Without them, your build will fail with missing export errors.
+That covers `VMap`, `VMarker`, `VPopup`, all controls (`VControl*`), and every MapLibre-native layer (`VLayerMaplibre*`).
 
-### Additional Optional Dependencies
+### Optional peer dependencies
 
-Install these packages based on the features you need:
+Add these **only** for the layers you actually use — picking what you need keeps your bundle lean:
 
 ```bash
-# Raster/COG layers (Cloud-Optimized GeoTIFF) — requires deck.gl-raster ^0.6.0
-pnpm add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff @developmentseed/geotiff
+# deck.gl base — VLayerDeckgl, VLayerDeckglScatterplot, VLayerDeckglArc,
+# VLayerDeckglLine, VLayerDeckglPath, VLayerDeckglPolygon, VLayerDeckglSolidPolygon,
+# VLayerDeckglGeojson, VLayerDeckglIcon, VLayerDeckglText, VLayerDeckglColumn,
+# VLayerDeckglBitmap, VLayerDeckglPointCloud
+pnpm add @deck.gl/core @deck.gl/layers @deck.gl/mapbox
 
-# COG Mosaic layers (client-side mosaicking of multiple COGs)
-pnpm add @developmentseed/deck.gl-raster @developmentseed/deck.gl-geotiff @developmentseed/geotiff
+# Aggregation — VLayerDeckglHeatmap, VLayerDeckglHexagon, VLayerDeckglGrid,
+# VLayerDeckglGridCell, VLayerDeckglContour, VLayerDeckglScreenGrid
+pnpm add @deck.gl/aggregation-layers
 
-# LiDAR viewer control
+# Geo / tiles — VLayerDeckglTrips, VLayerDeckglMVT, VLayerDeckglTile,
+# VLayerDeckglTile3D, VLayerDeckglTerrain, VLayerDeckglH3Hexagon,
+# VLayerDeckglH3Cluster, VLayerDeckglS2, VLayerDeckglGeohash,
+# VLayerDeckglQuadkey, VLayerDeckglGreatCircle, VLayerDeckglWMS
+pnpm add @deck.gl/geo-layers
+
+# 3D mesh — VLayerDeckglSimpleMesh, VLayerDeckglScenegraph
+pnpm add @deck.gl/mesh-layers
+
+# Cloud-Optimized GeoTIFF — VLayerDeckglCOG, VLayerDeckglMultiCOG, VLayerDeckglMosaic
+pnpm add @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj
+
+# Zarr — VLayerDeckglZarr
+pnpm add @developmentseed/deck.gl-zarr zarrita
+
+# Wind particles — VLayerDeckglWindParticle
+pnpm add maplibre-gl-wind
+
+# LiDAR point cloud viewer — VControlLidar
 pnpm add maplibre-gl-lidar
 
-# Wind particle visualization
-pnpm add maplibre-gl-wind
+# Three.js starfield skybox for globe projections — VLayerMaplibreStarfield
+pnpm add @geoql/maplibre-gl-starfield three
 ```
+
+If you import a layer without its peer deps installed, your bundler will surface a `Cannot find module '...'` error — install the missing package(s) from the table above to resolve it.
 
 ## Quick Start
 
