@@ -449,13 +449,10 @@ ${SCRIPT_END}
             >
             <NumberField
               id="aef-r"
-              :model-value="rBandIdx"
+              v-model="rBandIdx"
               :min="0"
               :max="NUM_BANDS - 1"
               :step="1"
-              @update:model-value="
-                (v) => (rBandIdx = clampBand(Number(v ?? 0)))
-              "
             >
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -472,13 +469,10 @@ ${SCRIPT_END}
             >
             <NumberField
               id="aef-g"
-              :model-value="gBandIdx"
+              v-model="gBandIdx"
               :min="0"
               :max="NUM_BANDS - 1"
               :step="1"
-              @update:model-value="
-                (v) => (gBandIdx = clampBand(Number(v ?? 0)))
-              "
             >
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -495,13 +489,10 @@ ${SCRIPT_END}
             >
             <NumberField
               id="aef-b"
-              :model-value="bBandIdx"
+              v-model="bBandIdx"
               :min="0"
               :max="NUM_BANDS - 1"
               :step="1"
-              @update:model-value="
-                (v) => (bBandIdx = clampBand(Number(v ?? 0)))
-              "
             >
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -521,13 +512,12 @@ ${SCRIPT_END}
             >
             <NumberField
               id="aef-rmin"
-              :model-value="rescaleMin"
+              v-model="rescaleMin"
               :step="0.1"
               :format-options="{
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 3,
               }"
-              @update:model-value="(v) => (rescaleMin = Number(v ?? 0) || 0)"
             >
               <NumberFieldContent>
                 <NumberFieldDecrement />
@@ -544,13 +534,12 @@ ${SCRIPT_END}
             >
             <NumberField
               id="aef-rmax"
-              :model-value="rescaleMax"
+              v-model="rescaleMax"
               :step="0.1"
               :format-options="{
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 3,
               }"
-              @update:model-value="(v) => (rescaleMax = Number(v ?? 0) || 0)"
             >
               <NumberFieldContent>
                 <NumberFieldDecrement />
