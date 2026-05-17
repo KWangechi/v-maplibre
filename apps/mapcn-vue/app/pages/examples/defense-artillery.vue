@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Artillery Range Planner - mapcn-vue Examples',
     description:
       'Interactive artillery range planning demo with range fan polygons, weapon types, and bearing control on a MapLibre map.',

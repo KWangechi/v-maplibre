@@ -5,7 +5,7 @@
     Orientation,
   } from '~/types/defense-spectral';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Multi-Spectral Compare - mapcn-vue Examples',
     description:
       'Defense multi-spectral imagery comparison with swipe slider between thermal, IR, and optical sensor views.',

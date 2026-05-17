@@ -8,7 +8,7 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'COPC Streaming - LiDAR Examples - mapcn-vue',
     description:
       'Cloud-Optimized Point Cloud with dynamic viewport-based loading for large LiDAR datasets.',

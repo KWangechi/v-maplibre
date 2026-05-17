@@ -2,7 +2,7 @@
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import { VControlNavigation, VControlScale, VMap } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Pitch & Bearing Control - mapcn-vue Examples',
     description:
       'Interactive sliders for adjusting map pitch (tilt) and bearing (rotation).',

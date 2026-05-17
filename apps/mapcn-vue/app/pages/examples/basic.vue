@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Basic Map - mapcn-vue Examples',
     description: 'A simple map with navigation controls.',
   });

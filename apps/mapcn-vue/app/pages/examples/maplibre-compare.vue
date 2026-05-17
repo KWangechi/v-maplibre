@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { Orientation } from '~/types/compare';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Map Compare - mapcn-vue Examples',
     description:
       'Swipe-style map comparison control with vertical and horizontal orientation.',

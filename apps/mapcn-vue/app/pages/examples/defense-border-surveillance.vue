@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { BorderLayerName } from '~/types/defense-border';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Border Surveillance Dashboard - mapcn-vue Examples',
     description:
       'Defense border surveillance demo showing the India-China LAC with camera positions, patrol routes, and intrusion detection zones.',

@@ -9,7 +9,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { Map } from 'maplibre-gl';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'COG Layer (deck.gl-raster) - mapcn-vue Examples',
     description:
       'GPU-accelerated Cloud-Optimized GeoTIFF visualization with automatic reprojection.',

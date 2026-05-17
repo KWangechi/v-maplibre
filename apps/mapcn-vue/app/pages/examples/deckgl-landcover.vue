@@ -9,7 +9,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { Map } from 'maplibre-gl';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Land Cover COG - mapcn-vue Examples',
     description:
       'Render NLCD Land Cover classification data with automatic colormap visualization.',

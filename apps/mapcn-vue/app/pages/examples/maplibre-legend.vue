@@ -19,7 +19,7 @@
     SizeLegendItem,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Interactive Legend - mapcn-vue Examples',
     description:
       'Interactive legend with click-to-filter functionality for MapLibre layers.',

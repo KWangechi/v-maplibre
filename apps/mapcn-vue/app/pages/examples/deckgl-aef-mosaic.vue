@@ -33,7 +33,7 @@
   import { Slider } from '~/components/ui/slider';
   import { SampleAefRgb } from '~/utils/gpu/sample-aef-rgb';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'AEF Mosaic - mapcn-vue Examples',
     description:
       'AlphaEarth Foundations embedding mosaic via VLayerDeckglZarr. Int8 Texture2DArray + GPU dequant + RGB band tuning across 9 annual snapshots (2017–2025).',

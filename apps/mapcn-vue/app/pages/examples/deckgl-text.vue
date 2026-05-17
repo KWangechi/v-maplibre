@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Text Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render text labels at geographic locations.',
   });

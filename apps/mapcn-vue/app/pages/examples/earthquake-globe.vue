@@ -11,7 +11,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { EarthquakeData } from '~/types/earthquake';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Earthquake Globe - mapcn-vue Examples',
     description: 'Live 3D globe showing worldwide seismic activity from USGS.',
   });

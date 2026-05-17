@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Logistics Convoy Tracker - mapcn-vue Examples',
     description:
       'Military supply convoy tracking with animated routes, checkpoints, and ETA across the Rajasthan corridor.',

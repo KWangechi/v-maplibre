@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Heatmap (deck.gl) - mapcn-vue Examples',
     description: 'Density heatmap visualization.',
   });

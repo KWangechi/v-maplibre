@@ -11,7 +11,7 @@
   // Register GLTFLoader globally so deck.gl can find it
   registerLoaders([GLTFLoader]);
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Scenegraph Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render 3D glTF/GLB models on the map.',
   });

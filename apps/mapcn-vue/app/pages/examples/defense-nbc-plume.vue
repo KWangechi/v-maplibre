@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'NBC Plume Dispersion - mapcn-vue Examples',
     description:
       'NBC hazard plume dispersion modeling with wind-driven Gaussian dispersion zones on a MapLibre map.',

@@ -7,7 +7,7 @@
   } from '@geoql/v-maplibre';
   import { BitmapLayer } from '@deck.gl/layers';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Tile Layer (deck.gl) - mapcn-vue Examples',
     description: 'Generic tile layer for loading raster or vector tiles.',
   });

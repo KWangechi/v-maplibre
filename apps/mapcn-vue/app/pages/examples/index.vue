@@ -1,4 +1,8 @@
 <script setup lang="ts">
+  usePageGeo({
+    title: 'Examples - mapcn-vue',
+    description: 'Interactive map examples built with mapcn-vue components.',
+  });
   useSeoMeta({
     title: 'Examples - mapcn-vue',
     description: 'Interactive map examples built with mapcn-vue components.',

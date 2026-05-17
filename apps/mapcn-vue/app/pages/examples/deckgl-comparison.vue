@@ -8,7 +8,7 @@
   import type { Map } from 'maplibre-gl';
   import { Slider } from '~/components/ui/slider';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Before / After Comparison - mapcn-vue Examples',
     description:
       'Compare two COG layers side by side with a draggable swipe slider. Useful for change detection, time-series and A/B raster comparison.',

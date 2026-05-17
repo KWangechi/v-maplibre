@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Hexagon Layer (deck.gl) - mapcn-vue Examples',
     description: '3D hexagonal binning aggregation visualization.',
   });

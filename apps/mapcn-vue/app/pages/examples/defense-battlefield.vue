@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: '3D Battlefield Terrain - mapcn-vue Examples',
     description:
       'Interactive tactical map with animated troop movement replay over the Ladakh region.',

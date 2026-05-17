@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Icon Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render icons/sprites at geographic locations.',
   });

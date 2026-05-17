@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Delivery Tracking - mapcn-vue Examples',
     description:
       'Live delivery simulation with ETA updates using Valhalla routing API.',

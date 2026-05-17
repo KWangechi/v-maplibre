@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Quadkey Layer (deck.gl) - mapcn-vue Examples',
     description: 'Visualize data using Bing Maps Quadkey tiles.',
   });

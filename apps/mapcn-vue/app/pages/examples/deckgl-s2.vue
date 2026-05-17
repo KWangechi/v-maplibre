@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'S2 Layer (deck.gl) - mapcn-vue Examples',
     description: 'Visualize data using Google S2 geometry cells.',
   });

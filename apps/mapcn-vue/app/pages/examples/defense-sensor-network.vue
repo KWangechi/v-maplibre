@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { SensorType } from '~/types/defense-sensor';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Sensor Network & EW Coverage - mapcn-vue Examples',
     description:
       'Distributed sensor network with electronic warfare coverage zones and simulated threat detection along the Arunachal Pradesh border.',

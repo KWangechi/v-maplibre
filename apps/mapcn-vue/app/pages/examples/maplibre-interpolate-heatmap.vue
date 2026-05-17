@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Interpolate Heatmap - mapcn-vue Examples',
     description:
       'IDW interpolated heatmap showing real-time temperature data from OpenWeatherMap.',

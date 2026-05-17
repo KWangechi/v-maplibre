@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'H3 Hexagon Layer (deck.gl) - mapcn-vue Examples',
     description: 'H3 hexagonal grid visualization.',
   });

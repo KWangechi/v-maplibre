@@ -20,7 +20,7 @@
   } from '@developmentseed/deck.gl-raster';
   import type { Slider } from '~/components/ui/slider';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'ECMWF GeoZarr - mapcn-vue Examples',
     description:
       'Render ECMWF Open Data GeoZarr temperature with deck.gl-raster ZarrLayer + zarrita. Single time slice, GPU-rendered.',

@@ -14,7 +14,7 @@
   import type { BusFeature, BusTrail, StopFeature } from '~/types/actransit';
   import { motion, AnimatePresence } from 'motion-v';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'AC Transit Live (deck.gl) - mapcn-vue Examples',
     description: 'Real-time AC Transit bus tracking with deck.gl layers.',
   });

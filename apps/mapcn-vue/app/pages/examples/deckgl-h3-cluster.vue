@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'H3 Cluster Layer (deck.gl) - mapcn-vue Examples',
     description: 'Visualize clustered H3 hexagon regions.',
   });

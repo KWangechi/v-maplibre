@@ -9,7 +9,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { GreatCircleData } from '~/types/great-circle';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Great Circle Layer (deck.gl) - mapcn-vue Examples',
     description: 'Great circle arcs for global flight paths.',
   });

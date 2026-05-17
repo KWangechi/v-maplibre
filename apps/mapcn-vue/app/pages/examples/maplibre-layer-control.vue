@@ -10,7 +10,7 @@
     VLayerDeckglScatterplot,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Layer Control - mapcn-vue Examples',
     description:
       'Toggle layer visibility and opacity with VControlLayer for both MapLibre and deck.gl layers.',

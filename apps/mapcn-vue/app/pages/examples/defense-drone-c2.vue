@@ -2,7 +2,7 @@
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import type { GeofenceDrawMode } from '~/types/defense-drone-c2';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Multi-Drone C2 Dashboard - mapcn-vue Examples',
     description:
       'Command & Control dashboard with multiple drones and UGVs tracked on a 3D map in real-time.',

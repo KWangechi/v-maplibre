@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'WMS Layer (deck.gl) - mapcn-vue Examples',
     description: 'Web Map Service (WMS) integration with deck.gl.',
   });

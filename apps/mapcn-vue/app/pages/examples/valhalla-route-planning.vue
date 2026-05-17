@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Route Planning - mapcn-vue Examples',
     description:
       'A to B routing with turn-by-turn directions using Valhalla routing API.',

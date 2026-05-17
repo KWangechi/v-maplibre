@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Bitmap Layer (deck.gl) - mapcn-vue Examples',
     description: 'Georeferenced image overlay on the map.',
   });

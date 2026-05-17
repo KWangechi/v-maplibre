@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { Map } from 'maplibre-gl';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Wind Animation - mapcn-vue Examples',
     description:
       'Real-time wind particle visualization using live data from OpenWeatherMap.',

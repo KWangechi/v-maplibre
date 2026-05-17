@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Weather Dashboard - mapcn-vue Examples',
     description:
       'Global weather explorer with real-time data from Open-Meteo. Temperature markers, air quality index, city search, and 7-day forecasts.',

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Trip Playback - mapcn-vue Examples',
     description:
       'Animated route replay with timeline scrubbing using Valhalla routing API.',

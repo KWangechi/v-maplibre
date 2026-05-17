@@ -8,7 +8,7 @@
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import type { SkyMode } from '~/types/globe';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Globe Atmosphere - mapcn-vue Examples',
     description:
       'Interactive dawn, day, dusk, and night atmosphere modes on a 3D globe.',

@@ -16,7 +16,7 @@
     ValhallaMatrixResponse,
   } from '~/types/proximity';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Proximity Map - mapcn-vue Examples',
     description:
       'Visualize distances and connections between multiple locations.',

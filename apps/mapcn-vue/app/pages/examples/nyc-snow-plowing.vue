@@ -11,7 +11,7 @@
   import type { NYCBorough } from '~/types/nyc-snow';
   import { PLOW_STATUS_LEGEND, SNOW_PRIORITY_LEGEND } from '~/types/nyc-snow';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'NYC Snow Plowing - mapcn-vue Examples',
     description:
       '3D visualization of snow accumulation on NYC streets using DSNY data.',

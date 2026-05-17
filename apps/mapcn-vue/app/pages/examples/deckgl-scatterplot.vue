@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Scatterplot (deck.gl) - mapcn-vue Examples',
     description: 'High-performance scatterplot visualization.',
   });

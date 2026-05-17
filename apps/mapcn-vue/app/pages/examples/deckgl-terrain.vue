@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Terrain Layer (deck.gl) - mapcn-vue Examples',
     description: '3D terrain visualization with elevation data.',
   });

@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Polygon Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render filled and stroked polygons.',
   });

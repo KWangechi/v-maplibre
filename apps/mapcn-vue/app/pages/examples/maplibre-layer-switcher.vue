@@ -4,7 +4,7 @@
   import { onClickOutside } from '@vueuse/core';
   import type { MapStyle } from '~/types/layer-switcher';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Layer Switcher - mapcn-vue Examples',
     description:
       'Dynamic basemap/style switching between satellite, terrain, streets, and more.',

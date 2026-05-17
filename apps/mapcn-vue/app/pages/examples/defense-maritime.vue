@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { ShipType } from '~/types/defense-maritime';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Maritime Domain Awareness - mapcn-vue Examples',
     description:
       'Indian Navy coastal surveillance with ship tracking, EEZ boundary, and coastal radar coverage.',

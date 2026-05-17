@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Grid Cell Layer (deck.gl) - mapcn-vue Examples',
     description: '3D grid cell visualization for aggregated data.',
   });

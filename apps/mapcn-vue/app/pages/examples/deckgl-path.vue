@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Path Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render continuous paths with multiple vertices.',
   });

@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'GeoJSON Layer - mapcn-vue Examples',
     description: 'Render GeoJSON data on the map.',
   });

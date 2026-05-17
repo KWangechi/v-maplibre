@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Markers & Popups - mapcn-vue Examples',
     description: 'Interactive markers with popup information.',
   });

@@ -1,4 +1,9 @@
 <script setup lang="ts">
+  usePageGeo({
+    title: 'mapcn-vue - Beautiful maps for Vue',
+    description:
+      'Beautiful map components for Vue. Built on @geoql/v-maplibre, styled with Tailwind CSS, works with shadcn-vue.',
+  });
   useSeoMeta({
     title: 'mapcn-vue - Beautiful maps for Vue',
     description:

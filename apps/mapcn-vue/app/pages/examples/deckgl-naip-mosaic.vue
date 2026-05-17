@@ -21,7 +21,7 @@
   } from '~/components/ui/select';
   import { Slider } from '~/components/ui/slider';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'NAIP Mosaic - mapcn-vue Examples',
     description:
       'Client-side COG mosaic of NAIP imagery from Microsoft Planetary Computer with multiple render modes.',

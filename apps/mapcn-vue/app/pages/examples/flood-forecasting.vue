@@ -16,7 +16,7 @@
   import type { Map } from 'maplibre-gl';
   import type { FloodPoint } from '~/types/flood';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Flood Forecasting - mapcn-vue Examples',
     description:
       'Global flood visualization powered by Google Groundsource — 2.6M+ historical flash flood events from 2000 to 2026.',

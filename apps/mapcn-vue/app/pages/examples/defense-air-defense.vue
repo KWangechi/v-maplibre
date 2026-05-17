@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Air Defense Radar - mapcn-vue Examples',
     description:
       'Layered air defense radar coverage demo with SHORAD, MRSAM, and LRSAM tiers, altitude filtering, and animated radar sweep.',

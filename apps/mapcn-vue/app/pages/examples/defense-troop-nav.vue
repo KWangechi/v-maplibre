@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Ground Troop Navigation - mapcn-vue Examples',
     description:
       'Multi-waypoint route planning for infantry patrols in Ladakh with real Valhalla pedestrian routing and elevation profile.',

@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Video Layer - mapcn-vue Examples',
     description: 'Overlay video on specific map coordinates.',
   });

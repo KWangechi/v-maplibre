@@ -8,7 +8,7 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'EPT Streaming - LiDAR Examples - mapcn-vue',
     description:
       'Entwine Point Tile (EPT) streaming for large point cloud datasets with viewport-based loading.',

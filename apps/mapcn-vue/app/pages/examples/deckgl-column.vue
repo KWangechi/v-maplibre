@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Column Layer (deck.gl) - mapcn-vue Examples',
     description: '3D column/bar chart visualization on the map.',
   });

@@ -9,7 +9,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import { CubeGeometry } from '@luma.gl/engine';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Simple Mesh Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render instanced 3D meshes on the map.',
   });

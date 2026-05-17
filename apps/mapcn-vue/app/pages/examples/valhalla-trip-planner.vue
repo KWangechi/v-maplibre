@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Trip Planner - mapcn-vue Examples',
     description:
       'Multi-day itinerary generator with POI suggestions using Valhalla routing.',

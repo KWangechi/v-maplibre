@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Search & Rescue Grid - mapcn-vue Examples',
     description:
       'SAR grid overlay with probability heat mapping, helicopter sweep paths, and sector tracking for disaster response.',

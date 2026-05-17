@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Terrain Viewshed Analysis - mapcn-vue Examples',
     description:
       'Interactive terrain viewshed analysis demo. Place observer points and visualize visible terrain areas with adjustable observer height.',

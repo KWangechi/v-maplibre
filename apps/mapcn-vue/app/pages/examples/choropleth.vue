@@ -19,7 +19,7 @@
   import type { ChoroplethTabType, ColorThreshold } from '~/types/choropleth';
   import { TAB_TO_QUERY, QUERY_TO_TAB } from '~/types/choropleth';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Choropleth Map - mapcn-vue Examples',
     description:
       'Color-coded region map showing data values by geographic area. Compare MapLibre GL and deck.gl implementations.',

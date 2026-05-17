@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Clustered Points - mapcn-vue Examples',
     description: 'Cluster large datasets of points.',
   });

@@ -2,7 +2,7 @@
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import type { DrawMode, ZoneType } from '~/types/defense-zone-planner';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Defense Zone Planner - mapcn-vue Examples',
     description:
       'Draw danger zones (minefields, restricted areas) on the map and visualize safe corridors between them.',

@@ -2,7 +2,7 @@
   import type { ViewportBounds, PromapSearchResult } from '~/types/promap';
   import type MapContainer from '~/components/examples/promap/MapContainer.vue';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Home Price Explorer - mapcn-vue Examples',
     description:
       'Interactive US home price bubble map at the ZIP code level with LocalView — viewport-based quintile re-bucketing that reveals local variation.',

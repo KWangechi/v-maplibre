@@ -6,7 +6,7 @@
     VMap,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Globe Day/Night - mapcn-vue Examples',
     description:
       'Real-time sun tracking based on your location and current time.',

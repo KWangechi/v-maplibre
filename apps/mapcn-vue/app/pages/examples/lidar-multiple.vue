@@ -8,7 +8,7 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Multiple Point Clouds - LiDAR Examples - mapcn-vue',
     description:
       'Load and manage multiple LiDAR point cloud datasets simultaneously.',

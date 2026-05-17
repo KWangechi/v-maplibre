@@ -19,7 +19,7 @@
   import type { HhiConfig } from '~/types/hhi';
 
   // SEO & OG Image
-  useSeoMeta({
+  usePageGeo({
     title: 'HHI Map - mapcn-vue Examples',
     description:
       'US Vehicle Market Concentration (Herfindahl-Hirschman Index) interactive census tract map with dynamic filtering by group, level, and year.',

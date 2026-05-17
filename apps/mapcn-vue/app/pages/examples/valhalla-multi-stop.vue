@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  useSeoMeta({
+  usePageGeo({
     title: 'Multi-Stop Routes - mapcn-vue Examples',
     description:
       'Traveling salesman route optimization with draggable waypoints using Valhalla.',

@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Geohash Layer (deck.gl) - mapcn-vue Examples',
     description: 'Visualize data using Geohash spatial indexing.',
   });

@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Solid Polygon Layer (deck.gl) - mapcn-vue Examples',
     description: '3D extruded solid polygons visualization.',
   });

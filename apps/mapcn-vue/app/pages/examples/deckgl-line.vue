@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Line Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render line segments between points.',
   });

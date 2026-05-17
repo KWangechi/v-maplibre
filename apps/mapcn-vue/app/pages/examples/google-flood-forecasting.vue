@@ -2,7 +2,7 @@
   import { FLOOD_REGIONS } from '~/composables/use-google-flood';
   import type { FloodMarker } from '~/types/flood';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Real-Time Flood Monitoring - mapcn-vue Examples',
     description:
       'Live flood severity, inundation maps, and gauge forecasts powered by Google Flood Forecasting API across 20+ countries.',

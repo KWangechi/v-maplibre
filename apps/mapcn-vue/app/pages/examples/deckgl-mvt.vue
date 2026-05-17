@@ -9,7 +9,7 @@
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { MVTFeature } from '~/types/mvt';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'MVT Layer (deck.gl) - mapcn-vue Examples',
     description: 'Mapbox Vector Tiles visualization with deck.gl.',
   });

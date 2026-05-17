@@ -8,7 +8,7 @@
   } from '@geoql/v-maplibre';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Point Cloud Layer (deck.gl) - mapcn-vue Examples',
     description: 'Render point cloud data on the map.',
   });

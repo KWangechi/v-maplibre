@@ -7,7 +7,7 @@
     VMarker,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'FlyTo Animation - mapcn-vue Examples',
     description:
       'Smooth camera animations with flyTo, easeTo, and jumpTo methods.',

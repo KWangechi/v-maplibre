@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Raster Layer - mapcn-vue Examples',
     description: 'Display raster tile layers on the map.',
   });

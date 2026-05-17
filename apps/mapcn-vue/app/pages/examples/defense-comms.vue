@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import type { NodeType } from '~/types/defense-comms';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Tactical Comms Network - mapcn-vue Examples',
     description:
       'Tactical communications network with HQ, relay, and field unit nodes connected by signal-strength links along the Arunachal Pradesh border.',

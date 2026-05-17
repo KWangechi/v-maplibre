@@ -9,7 +9,7 @@
   } from '@geoql/v-maplibre';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Trips Animation (deck.gl) - mapcn-vue Examples',
     description: 'Animated path visualization.',
   });

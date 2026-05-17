@@ -6,7 +6,7 @@
     VControlScale,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Image Layer - mapcn-vue Examples',
     description: 'Overlay images on specific map coordinates.',
   });

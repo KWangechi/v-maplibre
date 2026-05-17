@@ -16,7 +16,7 @@
     TransportModeOption,
   } from '~/types/isochrone';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Isochrone Map - mapcn-vue Examples',
     description:
       'Visualize travel time or distance zones showing areas reachable from a point.',

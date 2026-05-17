@@ -8,7 +8,7 @@
     VControlLegend,
   } from '@geoql/v-maplibre';
 
-  useSeoMeta({
+  usePageGeo({
     title: 'Classification Filter - LiDAR Examples - mapcn-vue',
     description:
       'Filter LiDAR point clouds by ASPRS classification types like ground, buildings, and vegetation.',
