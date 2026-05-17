@@ -1,7 +1,7 @@
 import libraryPkg from '../../packages/v-maplibre/package.json' with { type: 'json' };
 
 // Bump alongside packages/v-maplibre version. Source: GitHub release date for the matching tag.
-const LIBRARY_RELEASED_AT = '2026-05-15T22:49:10Z';
+const LIBRARY_RELEASED_AT = '2026-05-17T09:30:41Z';
 
 export default defineNuxtConfig({
   modules: [
