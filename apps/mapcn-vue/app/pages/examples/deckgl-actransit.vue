@@ -386,7 +386,7 @@
             </div>
           </motion.div>
         </AnimatePresence>
-        <MapPanel title="AC Transit" panel-width="w-auto">
+        <MapPanel title="AC Transit">
           <ExamplesActransitControlPanel
             :bus-count="buses.length"
             :total-buses="totalBuses"

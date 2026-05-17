@@ -26,9 +26,7 @@
 </script>
 
 <template>
-  <div
-    class="absolute top-4 left-4 z-10 w-72 rounded-lg bg-background/95 p-4 shadow-lg backdrop-blur-sm"
-  >
+  <div>
     <h3 class="mb-3 flex items-center gap-2 text-lg font-semibold">
       <Icon name="lucide:bus" class="size-5" />
       AC Transit Live
