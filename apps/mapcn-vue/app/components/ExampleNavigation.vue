@@ -25,19 +25,27 @@
     return flat.filter((ex, i) => lastSeen.get(ex.href) === i);
   });
 
-  const currentIndex = computed(() =>
-    allExamples.value.findIndex((ex) => ex.href === route.path),
-  );
+  // Cloudflare Pages canonicalises example URLs with a trailing slash
+  // (`/examples/foo/`) but example hrefs in useExamplesData are stored
+  // without one (`/examples/foo`). Normalise both sides before matching
+  // so prev/next isn't off-by-one after SSR -> client hydration on prod.
+  const normalisePath = (p: string) => p.replace(/\/$/, '');
+  const currentIndex = computed(() => {
+    const here = normalisePath(route.path);
+    return allExamples.value.findIndex((ex) => normalisePath(ex.href) === here);
+  });
 
+  // When currentIndex is -1 (route not found in list), return null for both
+  // — never fall back to index 0 ("Next: AC Transit Live" was the previous bug).
   const prevExample = computed(() =>
     currentIndex.value > 0 ? allExamples.value[currentIndex.value - 1] : null,
   );
 
-  const nextExample = computed(() =>
-    currentIndex.value < allExamples.value.length - 1
-      ? allExamples.value[currentIndex.value + 1]
-      : null,
-  );
+  const nextExample = computed(() => {
+    const i = currentIndex.value;
+    if (i < 0 || i >= allExamples.value.length - 1) return null;
+    return allExamples.value[i + 1];
+  });
 
   const editUrl = computed(() => {
     const filename = route.path.split('/').pop();
