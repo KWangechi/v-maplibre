@@ -138,28 +138,64 @@
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const w = window as any;
+  w.__GAP = w.__GAP || {};
+  const tag = `[GAP:${props.id}]`;
+
   onMounted(() => {
+    console.log(
+      tag,
+      'onMounted, styleLoaded=',
+      map.value?.isStyleLoaded(),
+      'mapVal=',
+      !!map.value,
+    );
+    w.__GAP[props.id] = { mounted: true };
     if (map.value?.isStyleLoaded()) {
       initializeLayer();
     } else {
       map.value?.once('style.load', () => {
+        console.log(tag, 'style.load fired');
         initializeLayer();
       });
     }
   });
 
-  // Create layer when LayerClass becomes available (handles async module load race condition).
   watch(LayerClass, (cls) => {
+    console.log(
+      tag,
+      'LayerClass watcher: cls=',
+      !!cls,
+      'data=',
+      !!props.data,
+      'dataType=',
+      props.data?.constructor?.name,
+    );
+    w.__GAP[props.id] = {
+      ...w.__GAP[props.id],
+      layerClass: !!cls,
+      dataAtClassWatch: !!props.data,
+    };
     if (!cls || !props.data) return;
     const layer = createLayer();
+    console.log(tag, 'addLayer, layer=', !!layer);
+    w.__GAP[props.id] = { ...w.__GAP[props.id], addedAtClassWatch: !!layer };
     if (layer) addLayer(layer);
   });
 
   watch(
     () => props.data,
     () => {
+      console.log(
+        tag,
+        'data watcher fired, dataType=',
+        props.data?.constructor?.name,
+      );
+      w.__GAP[props.id] = { ...w.__GAP[props.id], dataWatchFired: true };
       if (!LayerClass.value || !props.data) return;
       const layer = createLayer();
+      console.log(tag, 'updateLayer, layer=', !!layer);
       if (layer) updateLayer(props.id, layer);
     },
   );
