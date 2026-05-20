@@ -2,6 +2,7 @@
   import {
     VMap,
     VLayerDeckglGeoArrowPolygon,
+    VLayerDeckglGeoArrowSolidPolygon,
     VControlNavigation,
     VControlScale,
     VControlLegend,
@@ -62,92 +63,177 @@
     }
   });
 
-  const legend: CategoryLegendItem[] = [
-    { color: '#4ecdc4', label: 'NYC boroughs (3 polygons)' },
+  const fillColor = computed<[number, number, number, number]>(() => [
+    78,
+    205,
+    196,
+    opacity.value[0] ?? 180,
+  ]);
+
+  const legendItems: CategoryLegendItem[] = [
+    { value: 'boroughs', label: 'NYC boroughs (3 polygons)', color: '#4ecdc4' },
   ];
+
+  const SCRIPT_END = '</' + 'script>';
+  const SCRIPT_START = '<' + 'script setup lang="ts">';
+
+  const codeExample = `${SCRIPT_START}
+    import { VMap, VLayerDeckglGeoArrowPolygon } from '@geoql/v-maplibre';
+    import { tableFromIPC } from 'apache-arrow';
+
+    const table = shallowRef(null);
+    onMounted(async () => {
+      const url = '/geoarrow/nyc-boroughs.arrows';
+      const buffer = await (await fetch(url)).arrayBuffer();
+      table.value = tableFromIPC(new Uint8Array(buffer));
+    });
+  ${SCRIPT_END}
+
+  <template>
+    <VMap :options="mapOptions" class="size-full">
+      <VLayerDeckglGeoArrowPolygon
+        v-if="table"
+        :data="table"
+        :get-fill-color="[78, 205, 196, 180]"
+      />
+    </VMap>
+  </template>`;
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-3">
-    <div class="min-w-0 flex flex-col gap-3 flex-1">
-      <div class="relative flex-1">
-        <ClientOnly>
-          <VMap :options="mapOptions" class="h-[500px]">
-            <VLayerDeckglGeoArrowPolygon
-              v-if="table && !extruded"
-              :data="table"
-              :visible="true"
-              :getFillColor="[72, 209, 204, opacity[0]]"
+  <ComponentDemo
+    title="GeoArrow NYC Polygons (deck.gl-geoarrow)"
+    description="NYC borough outlines from a synthetic GeoArrow IPC file. Demonstrates MultiPolygon geometry with multiple disjoint shapes, and the flat/extruded mode toggle."
+    :code="codeExample"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerDeckglGeoArrowPolygon
+            v-if="!extruded"
+            id="geoarrow-nyc-flat"
+            :data="table"
+            :get-fill-color="fillColor"
+            :get-line-color="[200, 220, 255, 255]"
+            :line-width-min-pixels="1"
+            stroked
+            filled
+            pickable
+          />
+
+          <VLayerDeckglGeoArrowSolidPolygon
+            v-if="extruded"
+            id="geoarrow-nyc-extruded"
+            :data="table"
+            :get-fill-color="fillColor"
+            :get-elevation="() => elevationScale[0] ?? 5000"
+            extruded
+            pickable
+          />
+
+          <VControlLegend
+            :layer-ids="['geoarrow-nyc-flat', 'geoarrow-nyc-extruded']"
+            position="bottom-right"
+            type="category"
+            title="NYC Boroughs"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <MapPanel title="GeoArrow MultiPolygon" panel-width="w-72">
+        <p class="mb-3 text-xs text-muted-foreground">
+          NYC boroughs from a synthetic
+          <a
+            href="https://geoarrow.org"
+            target="_blank"
+            class="font-mono text-primary hover:underline"
+            >GeoArrow</a
+          >
+          MultiPolygon — three disjoint shapes in a single row.
+        </p>
+
+        <div class="mb-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Rows
+            </div>
+            <div class="tabular-nums text-foreground">
+              <span v-if="loading">—</span>
+              <span v-else-if="error" class="text-destructive">err</span>
+              <span v-else-if="table">{{ table.numRows }}</span>
+              <span v-else>—</span>
+            </div>
+          </div>
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Format
+            </div>
+            <div class="tabular-nums text-foreground">MultiPolygon</div>
+          </div>
+        </div>
+
+        <div v-if="error" class="mb-3 text-xs text-destructive">
+          {{ error }}
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div
+              class="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Mode
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              class="w-full"
+              @click="extruded = !extruded"
+            >
+              {{ extruded ? '3D extruded' : 'Flat polygons' }}
+            </Button>
+          </div>
+
+          <div v-if="extruded">
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Elevation</span>
+              <span class="tabular-nums">{{ elevationScale[0] }}m</span>
+            </div>
+            <Slider
+              v-model="elevationScale"
+              :min="100"
+              :max="20000"
+              :step="100"
             />
-            <VLayerDeckglGeoArrowPolygon
-              v-if="table && extruded"
-              :data="table"
-              :visible="true"
-              :extruded="true"
-              :getElevation="elevationScale[0]"
-              :getFillColor="[72, 209, 204, opacity[0]]"
-            />
-            <template #layers>
-              <VControlNavigation />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                v-if="legend.length"
-                :items="legend"
-                title="NYC Boroughs"
-                position="top-left"
-              />
-            </template>
-          </VMap>
-          <template #fallback>
-            <div class="h-[500px] skeleton" />
-          </template>
-        </ClientOnly>
-      </div>
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Fill opacity</span>
+              <span class="tabular-nums">{{ opacity[0] }}</span>
+            </div>
+            <Slider v-model="opacity" :min="50" :max="255" :step="1" />
+          </div>
+        </div>
+      </MapPanel>
     </div>
-
-    <div
-      class="w-full lg:w-72 flex flex-col gap-4 p-4 bg-background border rounded-lg"
-    >
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-foreground">GEOARROW NYC</h2>
-        <span class="text-xs text-muted-foreground">PolygonLayer</span>
-      </div>
-
-      <div v-if="loading" class="text-xs text-muted-foreground">
-        Loading Arrow data…
-      </div>
-      <div v-else-if="error" class="text-xs text-destructive">{{ error }}</div>
-      <div v-else class="text-xs text-muted-foreground">
-        {{ table?.numRows }} polygons · GeoArrow IPC · MultiPolygon
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <Button
-          :variant="extruded ? 'default' : 'outline'"
-          size="sm"
-          @click="extruded = !extruded"
-        >
-          {{ extruded ? '3D extruded' : 'Flat polygons' }}
-        </Button>
-      </div>
-
-      <div v-if="extruded" class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground"
-          >Elevation scale</label
-        >
-        <Slider v-model="elevationScale" :min="100" :max="50000" :step="100" />
-        <span class="text-xs text-muted-foreground text-right">{{
-          elevationScale[0].toLocaleString()
-        }}</span>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Fill opacity</label>
-        <Slider v-model="opacity" :min="50" :max="255" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ Math.round((opacity[0] / 255) * 100) }}%</span
-        >
-      </div>
-    </div>
-  </div>
+  </ComponentDemo>
 </template>

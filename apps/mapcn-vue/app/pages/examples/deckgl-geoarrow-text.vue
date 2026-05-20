@@ -56,58 +56,120 @@
       loading.value = false;
     }
   });
+
+  const SCRIPT_END = '</' + 'script>';
+  const SCRIPT_START = '<' + 'script setup lang="ts">';
+
+  const codeExample = `${SCRIPT_START}
+    import { VMap, VLayerDeckglGeoArrowText } from '@geoql/v-maplibre';
+    import { tableFromIPC } from 'apache-arrow';
+
+    const table = shallowRef(null);
+    onMounted(async () => {
+      const url = '/geoarrow/city-labels.arrows';
+      const buffer = await (await fetch(url)).arrayBuffer();
+      table.value = tableFromIPC(new Uint8Array(buffer));
+    });
+  ${SCRIPT_END}
+
+  <template>
+    <VMap :options="mapOptions" class="size-full">
+      <VLayerDeckglGeoArrowText
+        v-if="table"
+        :data="table"
+        :get-text="(d) => String(d.name ?? '')"
+        :get-position="([x, y]) => [x, y]"
+        :get-size="14"
+        :get-color="[180, 220, 255, 255]"
+      />
+    </VMap>
+  </template>`;
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-3">
-    <div class="min-w-0 flex flex-col gap-3 flex-1">
-      <div class="relative flex-1">
-        <ClientOnly>
-          <VMap :options="mapOptions" class="h-[500px]">
-            <VLayerDeckglGeoArrowText
-              v-if="table"
-              :data="table"
-              :visible="true"
-              :getText="(d: Record<string, unknown>) => String(d['name'] ?? '')"
-              :getPosition="([x, y]) => [x, y] as [number, number]"
-              :getSize="fontSize[0]"
-              :getColor="[72, 209, 204, 255]"
-            />
-            <template #layers>
-              <VControlNavigation />
-              <VControlScale position="bottom-left" />
-            </template>
-          </VMap>
-          <template #fallback>
-            <div class="h-[500px] skeleton" />
-          </template>
-        </ClientOnly>
-      </div>
+  <ComponentDemo
+    title="GeoArrow Text Labels (deck.gl-geoarrow)"
+    description="City name labels rendered from a GeoArrow IPC file. The geometry column is a Point (struct x/y) and the name column provides label text."
+    :code="codeExample"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerDeckglGeoArrowText
+            v-if="table"
+            id="geoarrow-text"
+            :data="table"
+            :get-text="(d: Record<string, unknown>) => String(d['name'] ?? '')"
+            :get-position="
+              ([x, y]: [number, number]) => [x, y] as [number, number]
+            "
+            :get-size="fontSize[0]"
+            :get-color="[200, 220, 255, 255]"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <MapPanel title="GeoArrow Text" panel-width="w-72">
+        <p class="mb-3 text-xs text-muted-foreground">
+          Text labels driven by a
+          <a
+            href="https://geoarrow.org"
+            target="_blank"
+            class="font-mono text-primary hover:underline"
+            >GeoArrow</a
+          >
+          Point geometry plus a separate
+          <span class="font-mono text-foreground">name</span>
+          column.
+        </p>
+
+        <div class="mb-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Labels
+            </div>
+            <div class="tabular-nums text-foreground">
+              <span v-if="loading">—</span>
+              <span v-else-if="error" class="text-destructive">err</span>
+              <span v-else-if="table">{{ table.numRows }}</span>
+              <span v-else>—</span>
+            </div>
+          </div>
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Format
+            </div>
+            <div class="tabular-nums text-foreground">Point + name</div>
+          </div>
+        </div>
+
+        <div v-if="error" class="mb-3 text-xs text-destructive">
+          {{ error }}
+        </div>
+
+        <div>
+          <div
+            class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+          >
+            <span>Font size</span>
+            <span class="tabular-nums">{{ fontSize[0] }}px</span>
+          </div>
+          <Slider v-model="fontSize" :min="8" :max="48" :step="1" />
+        </div>
+      </MapPanel>
     </div>
-
-    <div
-      class="w-full lg:w-72 flex flex-col gap-4 p-4 bg-background border rounded-lg"
-    >
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-foreground">GEOARROW TEXT</h2>
-        <span class="text-xs text-muted-foreground">TextLayer</span>
-      </div>
-
-      <div v-if="loading" class="text-xs text-muted-foreground">
-        Loading Arrow data…
-      </div>
-      <div v-else-if="error" class="text-xs text-destructive">{{ error }}</div>
-      <div v-else class="text-xs text-muted-foreground">
-        {{ table?.numRows }} labels · GeoArrow IPC · Point + text column
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Font size</label>
-        <Slider v-model="fontSize" :min="8" :max="36" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ fontSize[0] }}px</span
-        >
-      </div>
-    </div>
-  </div>
+  </ComponentDemo>
 </template>

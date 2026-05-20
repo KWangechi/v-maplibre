@@ -61,82 +61,152 @@
 
   // timestamps are in ms; max time = 240000ms
   const maxTime = 240000;
+
+  const SCRIPT_END = '</' + 'script>';
+  const SCRIPT_START = '<' + 'script setup lang="ts">';
+
+  const codeExample = `${SCRIPT_START}
+    import { VMap, VLayerDeckglGeoArrowTrips } from '@geoql/v-maplibre';
+    import { tableFromIPC } from 'apache-arrow';
+
+    const table = shallowRef(null);
+    const currentTime = ref(0);
+    onMounted(async () => {
+      const url = '/geoarrow/city-trips.arrows';
+      const buffer = await (await fetch(url)).arrayBuffer();
+      table.value = tableFromIPC(new Uint8Array(buffer));
+    });
+  ${SCRIPT_END}
+
+  <template>
+    <VMap :options="mapOptions" class="size-full">
+      <VLayerDeckglGeoArrowTrips
+        v-if="table"
+        :data="table"
+        :current-time="currentTime"
+        :trail-length="80"
+        :get-timestamp="(d) => d.timestamps"
+        :get-color="[180, 220, 255, 255]"
+      />
+    </VMap>
+  </template>`;
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-3">
-    <div class="min-w-0 flex flex-col gap-3 flex-1">
-      <div class="relative flex-1">
-        <ClientOnly>
-          <VMap :options="mapOptions" class="h-[500px]">
-            <VLayerDeckglGeoArrowTrips
-              v-if="table"
-              :data="table"
-              :visible="true"
-              :currentTime="currentTime[0]"
-              :speed="speed[0]"
-              :trailLength="trailLength[0]"
-              :getTimestamp="
-                (d: Record<string, unknown>) => {
-                  const ts = d['timestamps'];
-                  return Array.isArray(ts) ? (ts[ts.length - 1] as number) : 0;
-                }
-              "
-              :getColor="[72, 209, 204, 200]"
+  <ComponentDemo
+    title="GeoArrow Trips (deck.gl-geoarrow)"
+    description="Animated travel paths from a GeoArrow IPC file. Each trip has a timestamp column that drives the animation along the path."
+    :code="codeExample"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerDeckglGeoArrowTrips
+            v-if="table"
+            id="geoarrow-trips"
+            :data="table"
+            :current-time="currentTime[0]"
+            :speed="speed[0]"
+            :trail-length="trailLength[0]"
+            :get-timestamp="
+              (d: Record<string, unknown>) => {
+                const ts = d['timestamps'];
+                if (Array.isArray(ts)) return ts;
+                return [];
+              }
+            "
+            :get-color="[180, 220, 255, 220]"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <MapPanel title="GeoArrow Trips" panel-width="w-72">
+        <p class="mb-3 text-xs text-muted-foreground">
+          Animated trips from a
+          <a
+            href="https://geoarrow.org"
+            target="_blank"
+            class="font-mono text-primary hover:underline"
+            >GeoArrow</a
+          >
+          LineString + parallel timestamps column — the animation head walks
+          each path.
+        </p>
+
+        <div class="mb-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Trips
+            </div>
+            <div class="tabular-nums text-foreground">
+              <span v-if="loading">—</span>
+              <span v-else-if="error" class="text-destructive">err</span>
+              <span v-else-if="table">{{ table.numRows }}</span>
+              <span v-else>—</span>
+            </div>
+          </div>
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Format
+            </div>
+            <div class="tabular-nums text-foreground">Trips</div>
+          </div>
+        </div>
+
+        <div v-if="error" class="mb-3 text-xs text-destructive">
+          {{ error }}
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Time</span>
+              <span class="tabular-nums">{{ currentTime[0] }}ms</span>
+            </div>
+            <Slider
+              v-model="currentTime"
+              :min="0"
+              :max="maxTime"
+              :step="1000"
             />
-            <template #layers>
-              <VControlNavigation />
-              <VControlScale position="bottom-left" />
-            </template>
-          </VMap>
-          <template #fallback>
-            <div class="h-[500px] skeleton" />
-          </template>
-        </ClientOnly>
-      </div>
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Trail length</span>
+              <span class="tabular-nums">{{ trailLength[0] }}</span>
+            </div>
+            <Slider v-model="trailLength" :min="10" :max="200" :step="1" />
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Speed</span>
+              <span class="tabular-nums">{{ speed[0] }}</span>
+            </div>
+            <Slider v-model="speed" :min="10" :max="500" :step="10" />
+          </div>
+        </div>
+      </MapPanel>
     </div>
-
-    <div
-      class="w-full lg:w-72 flex flex-col gap-4 p-4 bg-background border rounded-lg"
-    >
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-foreground">GEOARROW TRIPS</h2>
-        <span class="text-xs text-muted-foreground">TripsLayer</span>
-      </div>
-
-      <div v-if="loading" class="text-xs text-muted-foreground">
-        Loading Arrow data…
-      </div>
-      <div v-else-if="error" class="text-xs text-destructive">{{ error }}</div>
-      <div v-else class="text-xs text-muted-foreground">
-        {{ table?.numRows }} trips · GeoArrow IPC · LineString + timestamps
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground"
-          >Current time (ms)</label
-        >
-        <Slider v-model="currentTime" :min="0" :max="maxTime" :step="1000" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ currentTime[0].toLocaleString() }}ms</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Speed</label>
-        <Slider v-model="speed" :min="1" :max="500" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ speed[0] }}x</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Trail length</label>
-        <Slider v-model="trailLength" :min="10" :max="200" :step="5" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ trailLength[0] }} frames</span
-        >
-      </div>
-    </div>
-  </div>
+  </ComponentDemo>
 </template>

@@ -88,104 +88,152 @@
     }
   });
 
-  const legend: CategoryLegendItem[] = [
-    { color: '#48d1cc', label: 'Cities (MultiPoint)' },
-    { color: '#ffd700', label: 'Routes (LineString)' },
-    { color: '#ff6b6b', label: 'NYC boroughs (MultiPolygon)' },
+  const polyFillColor = computed<[number, number, number, number]>(() => [
+    255,
+    107,
+    107,
+    polyOpacity.value[0] ?? 150,
+  ]);
+
+  const legendItems: CategoryLegendItem[] = [
+    { value: 'pts', label: 'Cities (MultiPoint)', color: '#48d1cc' },
+    { value: 'lines', label: 'Routes (LineString)', color: '#ffd700' },
+    { value: 'polys', label: 'NYC boroughs (MultiPolygon)', color: '#ff6b6b' },
   ];
+
+  const SCRIPT_END = '</' + 'script>';
+  const SCRIPT_START = '<' + 'script setup lang="ts">';
+
+  const codeExample = `${SCRIPT_START}
+    import {
+      VMap,
+      VLayerDeckglGeoArrowScatterplot,
+      VLayerDeckglGeoArrowPath,
+      VLayerDeckglGeoArrowPolygon,
+    } from '@geoql/v-maplibre';
+    import { tableFromIPC } from 'apache-arrow';
+
+    const pointsTable = shallowRef(null);
+    const linesTable = shallowRef(null);
+    const polygonsTable = shallowRef(null);
+  ${SCRIPT_END}
+
+  <template>
+    <VMap :options="mapOptions" class="size-full">
+      <VLayerDeckglGeoArrowPolygon v-if="polygonsTable" :data="polygonsTable" />
+      <VLayerDeckglGeoArrowPath v-if="linesTable" :data="linesTable" />
+      <VLayerDeckglGeoArrowScatterplot v-if="pointsTable" :data="pointsTable" />
+    </VMap>
+  </template>`;
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-3">
-    <div class="min-w-0 flex flex-col gap-3 flex-1">
-      <div class="relative flex-1">
-        <ClientOnly>
-          <VMap :options="mapOptions" class="h-[500px]">
-            <!-- NYC boroughs: MultiPolygon -->
-            <VLayerDeckglGeoArrowPolygon
-              v-if="polygonsTable"
-              :data="polygonsTable"
-              :visible="true"
-              :getFillColor="[255, 107, 107, polyOpacity[0]]"
-            />
-            <!-- Famous routes: LineString -->
-            <VLayerDeckglGeoArrowPath
-              v-if="linesTable"
-              :data="linesTable"
-              :visible="true"
-              :widthScale="lineWidth[0]"
-              :getColor="[255, 215, 0, 220]"
-            />
-            <!-- City clusters: MultiPoint -->
-            <VLayerDeckglGeoArrowScatterplot
-              v-if="pointsTable"
-              :data="pointsTable"
-              :visible="true"
-              :getPosition="([x, y]) => [x, y] as [number, number]"
-              :getColor="[72, 209, 204, 220]"
-              :pointSize="pointSize[0]"
-            />
-            <template #layers>
-              <VControlNavigation />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                v-if="legend.length"
-                :items="legend"
-                title="Geometry Types"
-                position="top-left"
-              />
-            </template>
-          </VMap>
-          <template #fallback>
-            <div class="h-[500px] skeleton" />
-          </template>
-        </ClientOnly>
-      </div>
+  <ComponentDemo
+    title="GeoArrow All Geometries (deck.gl-geoarrow)"
+    description="Point, LineString, and Polygon geometries in one view — each layer reads its own GeoArrow IPC file and renders to a shared MapboxOverlay canvas."
+    :code="codeExample"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerDeckglGeoArrowPolygon
+            v-if="polygonsTable"
+            id="geoarrow-mixed-polys"
+            :data="polygonsTable"
+            :get-fill-color="polyFillColor"
+          />
+
+          <VLayerDeckglGeoArrowPath
+            v-if="linesTable"
+            id="geoarrow-mixed-lines"
+            :data="linesTable"
+            :width-scale="lineWidth[0]"
+            :get-color="[255, 215, 0, 220]"
+          />
+
+          <VLayerDeckglGeoArrowScatterplot
+            v-if="pointsTable"
+            id="geoarrow-mixed-points"
+            :data="pointsTable"
+            :get-position="
+              ([x, y]: [number, number]) => [x, y] as [number, number]
+            "
+            :get-color="[72, 209, 204, 220]"
+            :point-size="pointSize[0]"
+          />
+
+          <VControlLegend
+            :layer-ids="[
+              'geoarrow-mixed-polys',
+              'geoarrow-mixed-lines',
+              'geoarrow-mixed-points',
+            ]"
+            position="bottom-right"
+            type="category"
+            title="Geometry Types"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <MapPanel title="All Geometry Types" panel-width="w-72">
+        <p class="mb-3 text-xs text-muted-foreground">
+          Three
+          <a
+            href="https://geoarrow.org"
+            target="_blank"
+            class="font-mono text-primary hover:underline"
+            >GeoArrow</a
+          >
+          IPC files — points, lines, polygons — rendered through one
+          MapboxOverlay.
+        </p>
+
+        <div v-if="error" class="mb-3 text-xs text-destructive">
+          {{ error }}
+        </div>
+        <div v-else-if="loading" class="mb-3 text-xs text-muted-foreground">
+          Loading Arrow files…
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Point size</span>
+              <span class="tabular-nums">{{ pointSize[0] }}px</span>
+            </div>
+            <Slider v-model="pointSize" :min="2" :max="40" :step="1" />
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Line width</span>
+              <span class="tabular-nums">{{ lineWidth[0] }}×</span>
+            </div>
+            <Slider v-model="lineWidth" :min="1" :max="20" :step="1" />
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Polygon opacity</span>
+              <span class="tabular-nums">{{ polyOpacity[0] }}</span>
+            </div>
+            <Slider v-model="polyOpacity" :min="50" :max="255" :step="1" />
+          </div>
+        </div>
+      </MapPanel>
     </div>
-
-    <div
-      class="w-full lg:w-72 flex flex-col gap-4 p-4 bg-background border rounded-lg"
-    >
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-foreground">GEOARROW MIXED</h2>
-        <span class="text-xs text-muted-foreground">3 geometry types</span>
-      </div>
-
-      <div v-if="loading" class="text-xs text-muted-foreground">
-        Loading Arrow data…
-      </div>
-      <div v-else-if="error" class="text-xs text-destructive">{{ error }}</div>
-      <div v-else class="flex flex-col gap-1 text-xs text-muted-foreground">
-        <span>{{ pointsTable?.numRows ?? 0 }} points</span>
-        <span>{{ linesTable?.numRows ?? 0 }} lines</span>
-        <span>{{ polygonsTable?.numRows ?? 0 }} polygons</span>
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Point size</label>
-        <Slider v-model="pointSize" :min="3" :max="30" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ pointSize[0] }}px</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Line width</label>
-        <Slider v-model="lineWidth" :min="1" :max="20" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ lineWidth[0] }}px</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground"
-          >Polygon opacity</label
-        >
-        <Slider v-model="polyOpacity" :min="50" :max="255" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ Math.round((polyOpacity[0] / 255) * 100) }}%</span
-        >
-      </div>
-    </div>
-  </div>
+  </ComponentDemo>
 </template>

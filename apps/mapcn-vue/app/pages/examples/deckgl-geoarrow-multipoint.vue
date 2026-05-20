@@ -27,7 +27,6 @@
   const { mapStyle } = useMapStyle();
   const mapId = useId();
 
-  // Individual city points from the clusters file
   const GEOARROW_URL = '/geoarrow/natural-earth_cities-clusters.arrows';
 
   const table = shallowRef<Table | null>(null);
@@ -61,80 +60,146 @@
     }
   });
 
-  // Dark teal dots
-  const pointColor: [number, number, number, number] = [32, 64, 64, 255];
+  const pointColor: [number, number, number, number] = [180, 220, 255, 255];
 
-  const legend: CategoryLegendItem[] = [
-    { color: '#204040', label: '21 individual cities' },
+  const legendItems: CategoryLegendItem[] = [
+    { value: 'cities', label: '21 individual cities', color: '#b4dcff' },
   ];
+
+  const SCRIPT_END = '</' + 'script>';
+  const SCRIPT_START = '<' + 'script setup lang="ts">';
+
+  const codeExample = `${SCRIPT_START}
+    import { VMap, VLayerDeckglGeoArrowScatterplot } from '@geoql/v-maplibre';
+    import { tableFromIPC } from 'apache-arrow';
+
+    const table = shallowRef(null);
+    onMounted(async () => {
+      const url = '/geoarrow/natural-earth_cities-clusters.arrows';
+      const buffer = await (await fetch(url)).arrayBuffer();
+      table.value = tableFromIPC(new Uint8Array(buffer));
+    });
+  ${SCRIPT_END}
+
+  <template>
+    <VMap :options="mapOptions" class="size-full">
+      <VLayerDeckglGeoArrowScatterplot
+        v-if="table"
+        :data="table"
+        :get-position="([x, y]) => [x, y]"
+        :get-color="[180, 220, 255, 255]"
+        :point-size="8"
+      />
+    </VMap>
+  </template>`;
 </script>
 
 <template>
-  <div class="flex flex-col lg:flex-row gap-3">
-    <div class="min-w-0 flex flex-col gap-3 flex-1">
-      <div class="relative flex-1">
-        <ClientOnly>
-          <VMap :options="mapOptions" class="h-[500px]">
-            <VLayerDeckglGeoArrowScatterplot
-              v-if="table"
-              :data="table"
-              :visible="true"
-              :getPosition="([x, y]) => [x, y] as [number, number]"
-              :getColor="pointColor"
-              :pointSize="pointSize[0]"
-              :opacity="opacity[0] / 255"
-            />
-            <template #layers>
-              <VControlNavigation />
-              <VControlScale position="bottom-left" />
-              <VControlLegend
-                v-if="legend.length"
-                :items="legend"
-                title="Cities"
-                position="top-left"
-              />
-            </template>
-          </VMap>
-          <template #fallback>
-            <div class="h-[500px] skeleton" />
-          </template>
-        </ClientOnly>
-      </div>
+  <ComponentDemo
+    title="GeoArrow Multipoint (deck.gl-geoarrow)"
+    description="Individual city locations from a GeoArrow IPC file. Same dataset as the Points example, rendered as small individual dots instead of clustered halos."
+    :code="codeExample"
+    full-width
+    class="h-full"
+  >
+    <div class="relative size-full min-w-0 overflow-hidden">
+      <ClientOnly>
+        <VMap :key="mapStyle" :options="mapOptions" class="size-full">
+          <VControlNavigation position="top-right" />
+          <VControlScale position="bottom-left" />
+
+          <VLayerDeckglGeoArrowScatterplot
+            v-if="table"
+            id="geoarrow-multipoint"
+            :data="table"
+            :get-position="
+              ([x, y]: [number, number]) => [x, y] as [number, number]
+            "
+            :get-color="pointColor"
+            :point-size="pointSize[0]"
+            :opacity="(opacity[0] ?? 255) / 255"
+          />
+
+          <VControlLegend
+            :layer-ids="['geoarrow-multipoint']"
+            position="bottom-right"
+            type="category"
+            title="Cities"
+            :items="legendItems"
+            :interactive="false"
+          />
+        </VMap>
+      </ClientOnly>
+
+      <MapPanel title="GeoArrow Multipoint" panel-width="w-72">
+        <p class="mb-3 text-xs text-muted-foreground">
+          Individual points from a
+          <a
+            href="https://geoarrow.org"
+            target="_blank"
+            class="font-mono text-primary hover:underline"
+            >GeoArrow</a
+          >
+          MultiPoint encoding — each city is a discrete dot rather than a
+          cluster halo.
+        </p>
+
+        <div class="mb-4 grid grid-cols-2 gap-2 font-mono text-[11px]">
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Cities
+            </div>
+            <div class="tabular-nums text-foreground">
+              <span v-if="loading">—</span>
+              <span v-else-if="error" class="text-destructive">err</span>
+              <span v-else-if="table">{{ table.numRows }}</span>
+              <span v-else>—</span>
+            </div>
+          </div>
+          <div
+            class="rounded-sm border border-border bg-background/40 px-2 py-1.5"
+          >
+            <div
+              class="text-[9px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              Format
+            </div>
+            <div class="tabular-nums text-foreground">MultiPoint</div>
+          </div>
+        </div>
+
+        <div v-if="error" class="mb-3 text-xs text-destructive">
+          {{ error }}
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Dot size</span>
+              <span class="tabular-nums">{{ pointSize[0] }}px</span>
+            </div>
+            <Slider v-model="pointSize" :min="2" :max="40" :step="1" />
+          </div>
+
+          <div>
+            <div
+              class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
+            >
+              <span>Opacity</span>
+              <span class="tabular-nums"
+                >{{ Math.round(((opacity[0] ?? 255) / 255) * 100) }}%</span
+              >
+            </div>
+            <Slider v-model="opacity" :min="50" :max="255" :step="1" />
+          </div>
+        </div>
+      </MapPanel>
     </div>
-
-    <div
-      class="w-full lg:w-72 flex flex-col gap-4 p-4 bg-background border rounded-lg"
-    >
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-foreground">
-          GEOARROW MULTIPOINT
-        </h2>
-        <span class="text-xs text-muted-foreground">ScatterplotLayer</span>
-      </div>
-
-      <div v-if="loading" class="text-xs text-muted-foreground">
-        Loading Arrow data…
-      </div>
-      <div v-else-if="error" class="text-xs text-destructive">{{ error }}</div>
-      <div v-else class="text-xs text-muted-foreground">
-        {{ table?.numRows }} points · GeoArrow IPC · MultiPoint
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Point size</label>
-        <Slider v-model="pointSize" :min="3" :max="30" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ pointSize[0] }}px</span
-        >
-      </div>
-
-      <div class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-foreground">Opacity</label>
-        <Slider v-model="opacity" :min="50" :max="255" :step="1" />
-        <span class="text-xs text-muted-foreground text-right"
-          >{{ Math.round((opacity[0] / 255) * 100) }}%</span
-        >
-      </div>
-    </div>
-  </div>
+  </ComponentDemo>
 </template>
