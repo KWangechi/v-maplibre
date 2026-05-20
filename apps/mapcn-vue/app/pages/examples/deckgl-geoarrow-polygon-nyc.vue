@@ -2,7 +2,6 @@
   import {
     VMap,
     VLayerDeckglGeoArrowPolygon,
-    VLayerDeckglGeoArrowSolidPolygon,
     VControlNavigation,
     VControlScale,
     VControlLegend,
@@ -115,8 +114,8 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPolygon
-            v-if="!extruded"
-            id="geoarrow-nyc-flat"
+            v-if="table"
+            id="geoarrow-nyc"
             :data="table"
             :get-fill-color="fillColor"
             :get-line-color="[200, 220, 255, 255]"
@@ -124,20 +123,13 @@
             stroked
             filled
             pickable
-          />
-
-          <VLayerDeckglGeoArrowSolidPolygon
-            v-if="extruded"
-            id="geoarrow-nyc-extruded"
-            :data="table"
-            :get-fill-color="fillColor"
-            :get-elevation="() => elevationScale[0] ?? 5000"
-            extruded
-            pickable
+            :extruded="extruded"
+            :get-elevation="elevationScale[0] ?? 5000"
+            :elevation-scale="1"
           />
 
           <VControlLegend
-            :layer-ids="['geoarrow-nyc-flat', 'geoarrow-nyc-extruded']"
+            :layer-ids="['geoarrow-nyc']"
             position="bottom-right"
             type="category"
             title="NYC Boroughs"
