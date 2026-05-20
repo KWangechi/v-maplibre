@@ -114,6 +114,7 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPolygon
+            v-if="table"
             id="geoarrow-nyc"
             :data="table"
             :get-fill-color="fillColor"

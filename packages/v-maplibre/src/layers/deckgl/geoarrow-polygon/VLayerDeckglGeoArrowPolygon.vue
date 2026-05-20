@@ -160,6 +160,34 @@
     },
   );
 
+  // Reactive props that should rebuild the layer when changed (extruded toggle,
+  // elevation slider, opacity slider, etc.). deck.gl Layer instances are
+  // immutable — we have to recreate the layer on any reactive change.
+  watch(
+    () => [
+      props.extruded,
+      props.getElevation,
+      props.elevationScale,
+      props.opacity,
+      props.stroked,
+      props.filled,
+      props.wireframe,
+      props.getFillColor,
+      props.getLineColor,
+      props.getLineWidth,
+      props.lineWidthMinPixels,
+      props.lineWidthMaxPixels,
+      props.lineWidthScale,
+      props.visible,
+      props.pickable,
+    ],
+    () => {
+      if (!LayerClass.value || !props.data) return;
+      const layer = createLayer();
+      if (layer) updateLayer(props.id, layer);
+    },
+  );
+
   onBeforeUnmount(() => {
     removeLayer(props.id);
   });
