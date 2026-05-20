@@ -114,7 +114,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPolygon
-            v-if="table"
             id="geoarrow-nyc"
             :data="table"
             :get-fill-color="fillColor"
@@ -124,8 +123,7 @@
             filled
             pickable
             :extruded="extruded"
-            :get-elevation="elevationScale[0] ?? 5000"
-            :elevation-scale="1"
+            :get-elevation="extruded ? elevationScale[0] : 0"
           />
 
           <VControlLegend
