@@ -223,6 +223,8 @@ export default defineNuxtConfig({
         '@luma.gl/core',
         '@luma.gl/engine',
         '@luma.gl/shadertools',
+        '@geoarrow/deck.gl-geoarrow',
+        'apache-arrow',
       ],
     },
     worker: {
@@ -231,6 +233,9 @@ export default defineNuxtConfig({
     optimizeDeps: {
       exclude: ['@geoql/v-maplibre'],
       include: [
+        '@deck.gl/mapbox',
+        '@geoarrow/deck.gl-geoarrow',
+        'apache-arrow',
         'class-variance-authority',
         'clsx',
         'reka-ui',
