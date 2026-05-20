@@ -114,7 +114,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPolygon
-            v-if="table"
             id="geoarrow-nyc"
             :data="table"
             :get-fill-color="fillColor"
@@ -200,7 +199,7 @@
             </Button>
           </div>
 
-          <div v-if="extruded">
+          <div v-show="extruded">
             <div
               class="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground"
             >
