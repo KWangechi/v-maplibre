@@ -29,7 +29,7 @@
 
   type Props = {
     id: string;
-    data: import('apache-arrow').RecordBatch;
+    data: import('apache-arrow').RecordBatch | null | undefined;
     getPosition?: unknown;
     getRadius?: unknown;
     getFillColor?: unknown;
@@ -77,14 +77,22 @@
   >(null);
 
   const createLayer = () => {
-    if (!LayerClass.value) return null;
-    const layer = new LayerClass.value({
-      ...(props as object),
-      id: props.id,
-      onClick: (info: PickingInfo) => emit('click', info),
-      onHover: (info: PickingInfo) => emit('hover', info),
-    });
-    return markRaw(layer);
+    if (!LayerClass.value || !props.data) return null;
+    try {
+      const layer = new LayerClass.value({
+        ...(props as object),
+        id: props.id,
+        onClick: (info: PickingInfo) => emit('click', info),
+        onHover: (info: PickingInfo) => emit('hover', info),
+      });
+      return markRaw(layer);
+    } catch (err) {
+      console.error(
+        '[VLayerDeckglGeoArrowScatterplot] failed to construct layer:',
+        err,
+      );
+      return null;
+    }
   };
 
   const initializeLayer = async () => {

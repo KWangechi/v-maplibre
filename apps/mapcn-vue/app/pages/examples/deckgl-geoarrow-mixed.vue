@@ -158,14 +158,12 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPolygon
-            v-if="polygonsTable"
             id="geoarrow-mixed-polys"
             :data="polygonsTable"
             :get-fill-color="polyFillColor"
           />
 
           <VLayerDeckglGeoArrowPath
-            v-if="linesTable"
             id="geoarrow-mixed-lines"
             :data="linesTable"
             :get-color="[255, 215, 0, 220]"
@@ -176,7 +174,6 @@
           />
 
           <VLayerDeckglGeoArrowScatterplot
-            v-if="pointsTable"
             id="geoarrow-mixed-points"
             :data="pointsTable"
             :get-fill-color="[72, 209, 204, 220]"

@@ -109,7 +109,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowScatterplot
-            v-if="table"
             id="geoarrow-multipoint"
             :data="table"
             :get-fill-color="pointColor"

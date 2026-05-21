@@ -100,7 +100,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPath
-            v-if="table"
             id="geoarrow-routes"
             :data="table"
             :get-color="[72, 209, 204, 220]"

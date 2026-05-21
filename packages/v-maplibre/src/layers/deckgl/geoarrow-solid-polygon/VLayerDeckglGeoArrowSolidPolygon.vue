@@ -25,7 +25,7 @@
 
   type Props = {
     id: string;
-    data: import('apache-arrow').RecordBatch;
+    data: import('apache-arrow').RecordBatch | null | undefined;
     getPolygon?: unknown;
     getFillColor?: unknown;
     getLineColor?: unknown;

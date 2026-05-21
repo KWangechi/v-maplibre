@@ -100,7 +100,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowPath
-            v-if="table"
             id="geoarrow-bounds"
             :data="table"
             :get-color="[200, 220, 255, 255]"

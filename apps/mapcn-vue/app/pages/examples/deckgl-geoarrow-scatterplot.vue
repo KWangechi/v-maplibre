@@ -113,7 +113,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowScatterplot
-            v-if="table"
             id="geoarrow-cities"
             :data="table"
             :get-fill-color="pointColor"

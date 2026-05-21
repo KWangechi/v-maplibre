@@ -115,7 +115,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowTrips
-            v-if="table && getTimestamps"
             id="geoarrow-trips"
             :data="table"
             :get-timestamps="getTimestamps"

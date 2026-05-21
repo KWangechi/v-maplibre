@@ -107,7 +107,6 @@
           <VControlScale position="bottom-left" />
 
           <VLayerDeckglGeoArrowText
-            v-if="table && getText"
             id="geoarrow-text"
             :data="table"
             :get-text="getText"
