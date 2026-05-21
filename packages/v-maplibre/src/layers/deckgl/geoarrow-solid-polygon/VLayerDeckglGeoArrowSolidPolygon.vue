@@ -91,7 +91,6 @@
         id: props.id,
         data: rings,
         getPolygon: (ring: number[][]) => ring,
-        _normalize: false,
         onClick: (info: PickingInfo) => emit('click', info),
         onHover: (info: PickingInfo) => emit('hover', info),
       });
