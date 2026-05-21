@@ -68,8 +68,11 @@ pnpm add @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @devel
 pnpm add @developmentseed/deck.gl-zarr zarrita
 
 # GeoArrow — VLayerDeckglGeoArrowScatterplot, VLayerDeckglGeoArrowPath,
-# VLayerDeckglGeoArrowPolygon, VLayerDeckglGeoArrowSolidPolygon
-pnpm add @geoarrow/deck.gl-geoarrow apache-arrow @math.gl/polygon
+# VLayerDeckglGeoArrowPolygon, VLayerDeckglGeoArrowSolidPolygon,
+# VLayerDeckglGeoArrowText, VLayerDeckglGeoArrowTrips
+# (Trips additionally needs @deck.gl/geo-layers — already covered by the
+#  deck.gl tile/route line above.)
+pnpm add apache-arrow
 
 # Wind particles — VLayerDeckglWindParticle
 # (Wind-data helpers — createWindDataFromOpenWeatherMap, generateWindTexture,
@@ -187,14 +190,16 @@ High-performance WebGL visualization layers powered by deck.gl:
 - `VLayerDeckglCOG` - Cloud-Optimized GeoTIFF visualization (GPU-accelerated, auto-reprojection)
 - `VLayerDeckglMosaic` - Client-side COG mosaic from STAC items (requires `flatbush`, `proj4`)
 
-**GeoArrow Layers** (requires `@geoarrow/deck.gl-geoarrow`, `apache-arrow`, `@math.gl/polygon`)
+**GeoArrow Layers** (requires `@deck.gl/layers` + `apache-arrow`; trips also needs `@deck.gl/geo-layers`)
 
-Render Apache Arrow `RecordBatch` data with GeoArrow extension types directly — no GeoJSON parsing. Ideal for GeoParquet / Arrow IPC sources and very large point/polygon datasets.
+Render Apache Arrow `Table` / `RecordBatch` data with GeoArrow extension types directly — no GeoJSON parsing. Ideal for GeoParquet / Arrow IPC sources and very large point/polygon datasets. The wrappers extract GeoArrow geometry columns inside the Vue wrapper and feed flat-buffer attributes to stock deck.gl layers — no `@geoarrow/deck.gl-geoarrow` runtime dependency.
 
 - `VLayerDeckglGeoArrowScatterplot` - Points from a GeoArrow point / multipoint column
 - `VLayerDeckglGeoArrowPath` - Polylines from a GeoArrow linestring / multilinestring column
 - `VLayerDeckglGeoArrowPolygon` - Filled + stroked polygons from a GeoArrow polygon / multipolygon column
 - `VLayerDeckglGeoArrowSolidPolygon` - 3D extruded polygons (height-mapped choropleths, building footprints)
+- `VLayerDeckglGeoArrowText` - Text labels at GeoArrow point positions
+- `VLayerDeckglGeoArrowTrips` - Animated trips along GeoArrow linestrings with per-vertex timestamps
 
 **Wind Visualization** (requires `maplibre-gl-wind`)
 

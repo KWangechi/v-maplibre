@@ -1,17 +1,20 @@
 <script setup lang="ts">
   /**
-   * Render polylines from an Apache Arrow `RecordBatch` containing GeoArrow
-   * line geometries (extension type `geoarrow.linestring` or
+   * Render polylines from an Apache Arrow `Table` or `RecordBatch` containing
+   * GeoArrow line geometries (extension type `geoarrow.linestring` or
    * `geoarrow.multilinestring`).
+   *
+   * Wraps deck.gl's stock `PathLayer`. The wrapper extracts vertex offsets
+   * directly from the Arrow column — no GeoJSON parse pass, no
+   * `@geoarrow/deck.gl-geoarrow` runtime dependency.
    *
    * @requires `@deck.gl/core`
    * @requires `@deck.gl/layers`
    * @requires `@deck.gl/mapbox`
-   * @requires `@geoarrow/deck.gl-geoarrow`
    * @requires `apache-arrow`
    *
    * Install with:
-   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @geoarrow/deck.gl-geoarrow apache-arrow`
+   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow`
    */
   import { onBeforeUnmount, watch, shallowRef, markRaw } from 'vue';
   import type { PickingInfo } from '@deck.gl/core';

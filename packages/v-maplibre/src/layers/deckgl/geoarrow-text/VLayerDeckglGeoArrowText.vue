@@ -1,13 +1,20 @@
 <script setup lang="ts">
   /**
-   * Render text labels from an Apache Arrow `RecordBatch` containing GeoArrow
-   * point geometries.
+   * Render text labels at point positions from an Apache Arrow `Table` or
+   * `RecordBatch` containing GeoArrow point geometries (extension type
+   * `geoarrow.point` or `geoarrow.multipoint`).
+   *
+   * Wraps deck.gl's stock `TextLayer`. The wrapper extracts XY positions plus
+   * a per-row label string from the configured `textColumn` (default `name`).
+   * No `@geoarrow/deck.gl-geoarrow` runtime dependency.
    *
    * @requires `@deck.gl/core`
    * @requires `@deck.gl/layers`
    * @requires `@deck.gl/mapbox`
-   * @requires `@geoarrow/deck.gl-geoarrow`
    * @requires `apache-arrow`
+   *
+   * Install with:
+   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow`
    */
   import { onBeforeUnmount, watch, shallowRef, markRaw } from 'vue';
   import type { PickingInfo } from '@deck.gl/core';

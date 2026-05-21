@@ -1,22 +1,21 @@
 <script setup lang="ts">
   /**
-   * Render circles at coordinate positions from an Apache Arrow `RecordBatch`
-   * containing GeoArrow point geometries (extension type `geoarrow.point` or
-   * `geoarrow.multipoint`).
+   * Render circles at coordinate positions from an Apache Arrow `Table` or
+   * `RecordBatch` containing GeoArrow point geometries (extension type
+   * `geoarrow.point` or `geoarrow.multipoint`).
    *
-   * Wraps `GeoArrowScatterplotLayer` from `@geoarrow/deck.gl-geoarrow`. Use this
-   * when your data is already in Arrow IPC / GeoParquet format — it avoids the
-   * GeoJSON-parse cost and ships hundreds of thousands of points directly to
-   * the GPU.
+   * Wraps deck.gl's stock `ScatterplotLayer`. The wrapper reads the GeoArrow
+   * geometry column directly from the Arrow Table and feeds a flat
+   * `Float64Array` of XYZ positions to the GPU — no GeoJSON parse pass, no
+   * `@geoarrow/deck.gl-geoarrow` runtime dependency.
    *
    * @requires `@deck.gl/core`
    * @requires `@deck.gl/layers`
    * @requires `@deck.gl/mapbox`
-   * @requires `@geoarrow/deck.gl-geoarrow`
    * @requires `apache-arrow`
    *
    * Install with:
-   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @geoarrow/deck.gl-geoarrow apache-arrow`
+   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow`
    */
   import { onBeforeUnmount, watch, shallowRef, markRaw } from 'vue';
   import type { PickingInfo } from '@deck.gl/core';

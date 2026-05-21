@@ -85,12 +85,10 @@
     "@developmentseed/deck.gl-zarr": "^0.7.0",
     "@developmentseed/geotiff": "^0.7.0",
     "@developmentseed/proj": "^0.7.0",
-    "@geoarrow/deck.gl-geoarrow": "^0.4.1",
     "@geoql/maplibre-gl-starfield": "^0.1.1",
     "@luma.gl/core": "^9.3.3",
     "@luma.gl/engine": "^9.3.3",
     "@luma.gl/shadertools": "^9.3.3",
-    "@math.gl/polygon": "^4.1.0",
     "@tsdown/css": "^0.22.0",
     "@types/node": "^25.9.0",
     "@vitejs/plugin-vue": "^6.0.7",
@@ -120,9 +118,7 @@
     "@developmentseed/deck.gl-zarr": "^0.6.0",
     "@developmentseed/geotiff": "^0.6.0",
     "@developmentseed/proj": "^0.6.0",
-    "@geoarrow/deck.gl-geoarrow": "^0.4.0",
     "@geoql/maplibre-gl-starfield": "^0.1.0",
-    "@math.gl/polygon": "^4.1.0",
     "apache-arrow": "^17.0.0",
     "maplibre-gl-lidar": "^0.13.0",
     "maplibre-gl-wind": "^0.2.0",
@@ -162,12 +158,6 @@
       "optional": true
     },
     "@developmentseed/proj": {
-      "optional": true
-    },
-    "@geoarrow/deck.gl-geoarrow": {
-      "optional": true
-    },
-    "@math.gl/polygon": {
       "optional": true
     },
     "apache-arrow": {

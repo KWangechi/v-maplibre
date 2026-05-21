@@ -4,9 +4,9 @@ Synthetic Apache Arrow IPC files used by the `/examples/deckgl-geoarrow-*` showc
 
 Each file's `geometry` column carries the `ARROW:extension:name` metadata
 (`geoarrow.point`, `geoarrow.linestring`, `geoarrow.multilinestring`,
-`geoarrow.multipolygon`) that lets the `@geoarrow/deck.gl-geoarrow` layers
-auto-detect geometry without an explicit `getPosition`/`getPath`/`getPolygon`
-accessor.
+`geoarrow.multipolygon`) so the v-maplibre GeoArrow wrappers can read the
+column directly off the Arrow `Table` without an explicit
+`getPosition`/`getPath`/`getPolygon` accessor.
 
 | File                                    | Geometry                | Rows | Used by                                                |
 | --------------------------------------- | ----------------------- | ---- | ------------------------------------------------------ |

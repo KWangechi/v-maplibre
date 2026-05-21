@@ -1,18 +1,21 @@
 <script setup lang="ts">
   /**
-   * Render filled polygons with optional stroke from an Apache Arrow
-   * `RecordBatch` containing GeoArrow polygon geometries (extension type
+   * Render filled polygons with optional stroke from an Apache Arrow `Table`
+   * or `RecordBatch` containing GeoArrow polygon geometries (extension type
    * `geoarrow.polygon` or `geoarrow.multipolygon`).
+   *
+   * Wraps deck.gl's stock `PolygonLayer` (composite of `SolidPolygonLayer` +
+   * `PathLayer`). The wrapper flattens multi-polygons into per-ring arrays
+   * extracted from the Arrow column — no GeoJSON parse pass, no
+   * `@geoarrow/deck.gl-geoarrow` runtime dependency.
    *
    * @requires `@deck.gl/core`
    * @requires `@deck.gl/layers`
    * @requires `@deck.gl/mapbox`
-   * @requires `@geoarrow/deck.gl-geoarrow`
    * @requires `apache-arrow`
-   * @requires `@math.gl/polygon`
    *
    * Install with:
-   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @geoarrow/deck.gl-geoarrow apache-arrow @math.gl/polygon`
+   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow`
    */
   import { onBeforeUnmount, watch, shallowRef, markRaw } from 'vue';
   import type { PickingInfo } from '@deck.gl/core';
@@ -28,7 +31,7 @@
   import type { ArrowTableLike } from '../_shared/types';
 
   const POLYGON_PEER_INSTALL =
-    'pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow @math.gl/polygon';
+    'pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers apache-arrow';
 
   type Props = {
     id: string;

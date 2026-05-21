@@ -1,14 +1,22 @@
 <script setup lang="ts">
   /**
-   * Render animated trips from an Apache Arrow `RecordBatch` containing
-   * GeoArrow linestring geometries with per-vertex timestamps.
+   * Render animated trips from an Apache Arrow `Table` or `RecordBatch`
+   * containing GeoArrow linestring geometries (extension type
+   * `geoarrow.linestring` or `geoarrow.multilinestring`) with per-vertex
+   * timestamps in a parallel `List<float64>` column (default name
+   * `timestamps`, overridable via the `timestampsColumn` prop).
+   *
+   * Wraps deck.gl's stock `TripsLayer` from `@deck.gl/geo-layers`. No
+   * `@geoarrow/deck.gl-geoarrow` runtime dependency.
    *
    * @requires `@deck.gl/core`
    * @requires `@deck.gl/layers`
    * @requires `@deck.gl/geo-layers`
    * @requires `@deck.gl/mapbox`
-   * @requires `@geoarrow/deck.gl-geoarrow`
    * @requires `apache-arrow`
+   *
+   * Install with:
+   * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @deck.gl/geo-layers apache-arrow`
    */
   import { onBeforeUnmount, watch, shallowRef, markRaw } from 'vue';
   import type { PickingInfo } from '@deck.gl/core';
