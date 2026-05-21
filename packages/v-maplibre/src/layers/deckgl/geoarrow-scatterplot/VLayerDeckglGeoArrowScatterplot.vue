@@ -85,6 +85,12 @@
         onClick: (info: PickingInfo) => emit('click', info),
         onHover: (info: PickingInfo) => emit('hover', info),
       });
+      console.log(
+        '[GAS] createLayer ok, id=',
+        props.id,
+        'dataType=',
+        props.data?.constructor?.name,
+      );
       return markRaw(layer);
     } catch (err) {
       console.error(
@@ -96,10 +102,15 @@
   };
 
   const initializeLayer = async () => {
+    console.log('[GAS] initializeLayer start, id=', props.id);
     const mod = await requirePeer(
       '@geoarrow/deck.gl-geoarrow',
       () => import('@geoarrow/deck.gl-geoarrow'),
       GEOARROW_PEER_INSTALL,
+    );
+    console.log(
+      '[GAS] requirePeer ok, hasClass=',
+      !!mod.GeoArrowScatterplotLayer,
     );
     LayerClass.value = markRaw(mod.GeoArrowScatterplotLayer);
   };
@@ -107,14 +118,24 @@
   useMapReady(map, initializeLayer);
 
   watch(LayerClass, (cls) => {
+    console.log(
+      '[GAS] LayerClass watcher, cls=',
+      !!cls,
+      'data=',
+      !!props.data,
+      'dataT=',
+      props.data?.constructor?.name,
+    );
     if (!cls || !props.data) return;
     const layer = createLayer();
+    console.log('[GAS] addLayer call, layer=', !!layer);
     if (layer) addLayer(layer);
   });
 
   watch(
     () => props.data,
     () => {
+      console.log('[GAS] data watcher, dataT=', props.data?.constructor?.name);
       if (!LayerClass.value || !props.data) return;
       const layer = createLayer();
       if (layer) updateLayer(props.id, layer);
