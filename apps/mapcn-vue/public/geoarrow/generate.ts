@@ -26,9 +26,15 @@ type MultiPolygon = readonly Polygon[];
 
 const OUT = dirname(fileURLToPath(import.meta.url));
 
+// GeoArrow point coords are nested struct<x, y[, z]>. We always emit a 3D
+// struct (z = 0 for 2D data) because deck.gl@9's instancePositions attribute
+// is hardcoded to size:3 and external 2D buffers from deck.gl-geoarrow@0.4.1
+// get read with stride 3 — scrambling every point's coordinates. Padding to
+// XYZ at the data layer ensures the converted FixedSizeList is size:3.
 const POINT_STRUCT = new Struct([
   new Field('x', new Float64()),
   new Field('y', new Float64()),
+  new Field('z', new Float64()),
 ]);
 
 function extMeta(name: string): Map<string, string> {
@@ -50,6 +56,7 @@ function pointData(coords: readonly XY[]): Data<Struct> {
   const n = coords.length;
   const xs = new Float64Array(n);
   const ys = new Float64Array(n);
+  const zs = new Float64Array(n);
   for (let i = 0; i < n; i++) {
     xs[i] = coords[i]![0];
     ys[i] = coords[i]![1];
@@ -61,6 +68,7 @@ function pointData(coords: readonly XY[]): Data<Struct> {
     children: [
       makeData({ type: new Float64(), data: xs }),
       makeData({ type: new Float64(), data: ys }),
+      makeData({ type: new Float64(), data: zs }),
     ],
   });
 }
