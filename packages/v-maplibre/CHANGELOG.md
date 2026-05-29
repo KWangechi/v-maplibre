@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.11.0](https://github.com/geoql/v-maplibre/compare/v1.10.0...v1.11.0) (2026-05-29)
+
+
+### Features
+
+* **v-maplibre:** add globe projection support to VMap ([b7c2e2e](https://github.com/geoql/v-maplibre/commit/b7c2e2edb32d5b94aa7c82cc0b1897b1ca1f9572))
+
+
+### Bug Fixes
+
+* **v-maplibre:** default HexagonLayer weight accessors ([8a94b74](https://github.com/geoql/v-maplibre/commit/8a94b74f4d8b0664307eceec11077bbe9d84e719))
+* **v-maplibre:** use race-free Map registry for shared deck layers ([6cdd2b9](https://github.com/geoql/v-maplibre/commit/6cdd2b9d789ec2f784568a23a98a24428ca151be))
+
+
+### Performance Improvements
+
+* **v-maplibre:** split TripsLayer currentTime watch from data watch ([e6117d1](https://github.com/geoql/v-maplibre/commit/e6117d17ae22b49419e2c3371f317b7308550c95))
+
 ## [1.10.0](https://github.com/geoql/v-maplibre/compare/v1.9.0...v1.10.0) (2026-05-21)
 
 
