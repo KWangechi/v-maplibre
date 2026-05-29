@@ -117,6 +117,10 @@ export function useDeckOverlay(
     clickHandler = null;
   }
 
+  // Queues syncLayers() calls made before overlay.value is set so they can be
+  // flushed after initOverlay() resolves and overlay.value is assigned.
+  const pendingSyncCalls: (() => void)[] = [];
+
   const initOverlay = (): Promise<void> => {
     const mapInstance = map.value;
     if (!mapInstance) return Promise.resolve();
@@ -153,12 +157,20 @@ export function useDeckOverlay(
         mapInstance.addControl(overlay.value);
         registerClickHandler(mapInstance);
         isInitialized.value = true;
+
         // Flush any layers that registered before the overlay existed. Child
         // layer components mount before the parent VMap assigns map.value, so
         // their addLayer() calls land in the registry while overlay is null.
         // Without this flush they are silently dropped on first load and only
         // appear after a re-navigation warms the timing.
         syncLayers();
+        mapInstance.triggerRepaint();
+
+        // Flush any syncLayers() calls that raced ahead of initOverlay()
+        // resolving (they called syncLayers() before overlay.value was set).
+        while (pendingSyncCalls.length > 0) {
+          pendingSyncCalls.shift()!();
+        }
       })
       .catch((error) => {
         console.error('[deck.gl] Error initializing overlay:', error);
@@ -182,6 +194,16 @@ export function useDeckOverlay(
     layers.value = [...layerRegistry.values()];
     if (overlay.value) {
       overlay.value.setProps({ layers: layers.value as never });
+      // With interleaved:false, deck.gl renders to a separate canvas. setProps()
+      // schedules a deck.gl redraw but does NOT tell MapLibre to composite that
+      // canvas onto the base map. Without this triggerRepaint(), the deck canvas
+      // stays blank on idle maps (no animation loop, no camera move).
+      // This fires on every syncLayers() call — including the queued ones from
+      // addLayer() made before overlay existed, and from removeLayer/updateLayer.
+      // Guarded with typeof: test-env mock maps don't implement triggerRepaint.
+      if (typeof map.value?.triggerRepaint === 'function') {
+        map.value.triggerRepaint();
+      }
     }
   };
 
@@ -192,7 +214,15 @@ export function useDeckOverlay(
     if (overlay.value) {
       syncLayers();
     } else {
-      initOverlay().then(syncLayers);
+      // Queue the call so initOverlay() can flush it after overlay.value is set.
+      // Previously this did initOverlay().then(syncLayers), but that called
+      // syncLayers() BEFORE overlay.value was assigned (race: the .then() fires
+      // immediately if the promise is already resolved, AND the syncLayers() call
+      // inside initOverlay's .then() also races ahead before overlay.value is set).
+      // The queue ensures every syncLayers() call made before overlay exists
+      // is replayed exactly once, after overlay.value is guaranteed to be set.
+      pendingSyncCalls.push(syncLayers);
+      initOverlay();
     }
   };
 

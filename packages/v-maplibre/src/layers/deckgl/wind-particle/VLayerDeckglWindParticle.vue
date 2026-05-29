@@ -179,11 +179,12 @@
     map,
     (mapInstance) => {
       if (!mapInstance) return;
-      if (mapInstance.isStyleLoaded()) {
-        initializeLayer();
-      } else {
-        mapInstance.once('style.load', initializeLayer);
-      }
+      // Register unconditionally once the map exists. addLayer() routes through
+      // useDeckOverlay's initOverlay(), which robustly waits for style.load via
+      // its own once-listener + polling. Gating here on isStyleLoaded() was racy:
+      // if style.load already fired before this watch ran, the one-shot
+      // .once('style.load') never fired and the layer was never registered.
+      initializeLayer();
     },
     { immediate: true },
   );
