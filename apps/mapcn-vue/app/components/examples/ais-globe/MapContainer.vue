@@ -22,10 +22,19 @@
   const mapOptions = computed(() => ({
     container: `ais-globe-${mapId}`,
     style: mapStyle.value,
-    center: [20, 25] as [number, number],
-    zoom: 1.6,
+    center: [30, 25] as [number, number],
+    zoom: 2,
     pitch: 0,
     bearing: 0,
+    // deck.gl billboard layers tear/detach when a MapLibre globe is tilted or
+    // rotated (unresolved upstream bug). Lock pitch AND bearing so the globe
+    // stays pan/zoom only and never enters the janky tilted-or-rotated state.
+    maxPitch: 0,
+    minPitch: 0,
+    dragRotate: false,
+    pitchWithRotate: false,
+    rotate: false,
+    touchPitch: false,
   }));
 </script>
 

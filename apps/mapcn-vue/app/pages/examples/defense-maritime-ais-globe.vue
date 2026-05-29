@@ -75,7 +75,7 @@
 <template>
   <ComponentDemo
     title="Global AIS + Dark Fleet Detection"
-    description="World-scale vessel tracking across 10 major shipping lanes. Dark fleet anomalies are identified via AIS signal gaps and rendered with a pulsing red ring overlay. Animated TripsLayer trails show recent vessel movement."
+    description="World-scale vessel tracking across 10 major shipping lanes. Dark fleet anomalies are identified via AIS signal gaps and highlighted with a red ring overlay. Animated TripsLayer trails show recent vessel movement."
     :code="codeExample"
     full-width
     class="h-full"

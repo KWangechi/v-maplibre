@@ -3,14 +3,12 @@
     Vessel,
     VesselPosition,
     VesselPositionDatum,
-    VesselLabelDatum,
     TripDatum,
   } from '~/types/maritime-ais';
   import type { Position, Color } from '@deck.gl/core';
   import {
     VLayerDeckglTrips,
     VLayerDeckglScatterplot,
-    VLayerDeckglText,
   } from '@geoql/v-maplibre';
 
   const props = defineProps<{
@@ -60,28 +58,6 @@
       .filter((d): d is VesselPositionDatum => d !== null),
   );
 
-  const labelData = computed<VesselLabelDatum[]>(() =>
-    props.vessels
-      .filter((v) => v.dark || v.type === 'naval')
-      .map((v) => {
-        const pos = props.positions[v.id];
-        return pos
-          ? { position: [pos.lng, pos.lat] as Position, text: v.mmsi }
-          : null;
-      })
-      .filter((d): d is VesselLabelDatum => d !== null),
-  );
-
-  const getDarkRadius = computed(() => {
-    const r = 14 + 6 * Math.sin(props.loopedTime * 0.4);
-    return (): number => r;
-  });
-
-  const getDarkLineColor = computed(() => {
-    const alpha = Math.round(120 + 80 * Math.sin(props.loopedTime * 0.4));
-    return (): Color => [255, 30, 30, alpha];
-  });
-
   function getTripPath(d: unknown): Position[] {
     return (d as TripDatum).path;
   }
@@ -109,14 +85,6 @@
   function getVesselRadius(d: unknown): number {
     return RADIUS_BY_TYPE[(d as VesselPositionDatum).type] ?? 7;
   }
-
-  function getLabelPosition(d: unknown): Position {
-    return (d as VesselLabelDatum).position;
-  }
-
-  function getLabelText(d: unknown): string {
-    return (d as VesselLabelDatum).text;
-  }
 </script>
 
 <template>
@@ -127,7 +95,7 @@
     :get-timestamps="getTripTimestamps"
     :get-color="getTripColor"
     :current-time="loopedTime"
-    :trail-length="35"
+    :trail-length="10"
     :fade-trail="true"
     :width-min-pixels="2"
     :cap-rounded="true"
@@ -160,30 +128,16 @@
   />
 
   <VLayerDeckglScatterplot
-    id="ais-dark-pulse"
+    id="ais-dark-ring"
     :data="darkData"
     :get-position="getVesselPosition"
     :get-fill-color="[255, 30, 30, 0]"
-    :get-radius="getDarkRadius"
+    :get-radius="16"
     radius-units="pixels"
     :stroked="true"
-    :get-line-color="getDarkLineColor"
+    :get-line-color="[255, 40, 40, 200]"
     :line-width-min-pixels="2"
+    :filled="false"
     :pickable="false"
-  />
-
-  <VLayerDeckglText
-    id="ais-labels"
-    :data="labelData"
-    :get-position="getLabelPosition"
-    :get-text="getLabelText"
-    :get-color="[255, 255, 255, 220]"
-    :get-size="10"
-    :get-pixel-offset="[0, -20]"
-    font-family="monospace"
-    :font-weight="700"
-    :outline-width="3"
-    :outline-color="[0, 0, 0, 200]"
-    :billboard="true"
   />
 </template>

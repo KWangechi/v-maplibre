@@ -301,7 +301,7 @@ function buildTrack(
     const lngDeg = latDeg / Math.cos(toRad(curLat));
 
     // Slight heading change per leg
-    curHeading = randomHeading(curHeading, 30, rng);
+    curHeading = randomHeading(curHeading, 8, rng);
     const hRad = toRad(curHeading);
 
     curLng += lngDeg * Math.sin(hRad);
@@ -460,21 +460,26 @@ function generateFleet(): Vessel[] {
 
 const ALL_VESSELS: Vessel[] = generateFleet();
 
-function buildTripData(vessels: Vessel[]): TripDatum[] {
-  return vessels.map((v) => {
-    const path = v.track;
-    const timestamps = path.map((_, i) => i);
-    return { vesselId: v.id, path, timestamps };
-  });
-}
-
-const ALL_TRIPS: TripDatum[] = buildTripData(ALL_VESSELS);
-
 // ---------------------------------------------------------------------------
 // Animation constants
 // ---------------------------------------------------------------------------
 const TRACK_POINTS = 50; // canonical track length used for time normalization
 const BASE_LOOP_SECONDS = 120;
+
+function buildTripData(vessels: Vessel[]): TripDatum[] {
+  return vessels.map((v) => {
+    const path = v.track;
+    // Normalize every vessel's timestamps onto the SAME 0..TRACK_POINTS span,
+    // regardless of its variable point count (30-60). Without this, the single
+    // shared loopedTime overshoots short tracks (trail vanishes) and undershoots
+    // long ones (partial trail) — the cause of the glitchy out-of-sync trails.
+    const lastIdx = Math.max(path.length - 1, 1);
+    const timestamps = path.map((_, i) => (i / lastIdx) * TRACK_POINTS);
+    return { vesselId: v.id, path, timestamps };
+  });
+}
+
+const ALL_TRIPS: TripDatum[] = buildTripData(ALL_VESSELS);
 
 // ---------------------------------------------------------------------------
 // Composable
@@ -526,7 +531,9 @@ export function useMaritimeAis() {
       return { lng: vessel.lng, lat: vessel.lat, heading: vessel.heading };
 
     const maxIdx = path.length - 1;
-    const t = time % maxIdx;
+    // Map the shared 0..TRACK_POINTS loop onto this vessel's variable-length
+    // path so the dot rides exactly on its trail head (both share one period).
+    const t = ((time % TRACK_POINTS) / TRACK_POINTS) * maxIdx;
     const idx = Math.floor(t);
     const frac = t - idx;
 
