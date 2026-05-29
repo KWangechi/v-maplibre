@@ -90,6 +90,8 @@
     :color-range="COLOR_RANGE"
     :coverage="0.88"
     :opacity="0.85"
+    :lower-percentile="8"
+    :elevation-lower-percentile="8"
   />
 
   <VLayerDeckglPath

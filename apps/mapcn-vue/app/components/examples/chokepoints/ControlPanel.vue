@@ -57,9 +57,9 @@
       </div>
       <Slider
         :model-value="[hexagonRadius]"
-        :min="100"
-        :max="1200"
-        :step="50"
+        :min="500"
+        :max="6000"
+        :step="250"
         class="w-full"
         @update:model-value="emit('setHexagonRadius', $event[0]!)"
       />
@@ -117,6 +117,40 @@
             class="size-4"
           />
         </button>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="space-y-2">
+      <h3 class="text-sm font-semibold">Legend</h3>
+      <div class="space-y-1.5 text-xs text-muted-foreground">
+        <div class="space-y-1">
+          <div class="flex items-center justify-between">
+            <span>Vessel density</span>
+          </div>
+          <div
+            class="h-2 w-full rounded-full"
+            style="
+              background: linear-gradient(
+                to right,
+                rgb(30, 100, 220),
+                rgb(200, 200, 80),
+                rgb(220, 80, 30),
+                rgb(180, 30, 20)
+              );
+            "
+          ></div>
+          <div class="flex justify-between text-[10px]">
+            <span>Low</span>
+            <span>High (taller bars)</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1">
+          <span
+            class="size-2.5 rounded-full border-2 border-destructive"
+          ></span>
+          <span>Ship-to-ship (STS) transfer — % = risk score</span>
+        </div>
       </div>
     </div>
 

@@ -203,8 +203,11 @@ export function useMaritimeChokepoints() {
   const stsEvents = ref<StsEvent[]>([]);
 
   const showSts = ref(true);
-  const hexagonRadius = ref(400);
-  const elevationScale = ref(80);
+  // Hexagon radius is in METERS. At the chokepoint zoom (~8) one pixel covers
+  // ~550m, so a 400m hex is sub-pixel and invisible — the density field needs
+  // ~2-3km bins to read on screen.
+  const hexagonRadius = ref(2500);
+  const elevationScale = ref(30);
   const isPlaying = ref(false);
   const loopedTime = ref(0);
 
