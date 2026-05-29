@@ -25,6 +25,13 @@ export const DeckLayersKey: InjectionKey<{
 
 interface UseDeckOverlayOptions {
   interleaved?: boolean;
+  /**
+   * Enable MapLibre globe projection. Implies `interleaved: true` (required for
+   * deck.gl layers to share depth with the globe) and auto-injects
+   * `parameters.cullMode = 'none'` on every layer so billboard-style layers
+   * (Scatterplot / Trips / Icon / Text) don't clip off the sphere on pitch.
+   */
+  globe?: boolean;
 }
 
 interface UseDeckOverlayReturn {
@@ -42,7 +49,20 @@ export function useDeckOverlay(
   map: Ref<Map | null>,
   options: UseDeckOverlayOptions = {},
 ): UseDeckOverlayReturn {
-  const { interleaved = false } = options;
+  const { interleaved = false, globe = false } = options;
+  const useInterleaved = interleaved || globe;
+
+  const applyGlobeParams = (layer: unknown): unknown => {
+    if (!globe) return layer;
+    const l = layer as {
+      clone?: (props: Record<string, unknown>) => unknown;
+      props?: { parameters?: Record<string, unknown> };
+    };
+    if (typeof l.clone !== 'function') return layer;
+    return l.clone({
+      parameters: { cullMode: 'none', ...(l.props?.parameters ?? {}) },
+    });
+  };
 
   const existingOverlay = inject(DeckOverlayKey, null);
   const existingLayersRegistry = inject(DeckLayersKey, null);
@@ -111,8 +131,20 @@ export function useDeckOverlay(
       .then(({ MapboxOverlay }) => {
         if (overlay.value) return;
 
+        if (globe && mapInstance.getProjection()?.type !== 'globe') {
+          const center = mapInstance.getCenter();
+          const zoom = mapInstance.getZoom();
+          const pitch = mapInstance.getPitch();
+          const bearing = mapInstance.getBearing();
+          mapInstance.setProjection({ type: 'globe' });
+          mapInstance.setCenter(center);
+          mapInstance.setZoom(zoom);
+          mapInstance.setPitch(pitch);
+          mapInstance.setBearing(bearing);
+        }
+
         overlay.value = new MapboxOverlay({
-          interleaved,
+          interleaved: useInterleaved,
           layers: [],
           onError: (err: unknown) =>
             console.error('[useDeckOverlay] deck onError:', err),
@@ -134,27 +166,22 @@ export function useDeckOverlay(
     return (layer as { id: string }).id;
   };
 
+  // Imperative id-keyed registry. A reactive array rebuilt via spread reads
+  // races when N child layers mount in the same tick (all read the pre-write
+  // value and clobber each other, leaving only the last layer). A Map mutated
+  // in place is insertion-ordered and race-free, so every layer survives.
+  const layerRegistry = new Map<string, unknown>();
+
   const syncLayers = () => {
+    layers.value = [...layerRegistry.values()];
     if (overlay.value) {
       overlay.value.setProps({ layers: layers.value as never });
     }
   };
 
-  const addLayer = (layer: unknown): void => {
-    const layerId = getLayerId(layer);
-    const existingIndex = layers.value.findIndex(
-      (l) => getLayerId(l) === layerId,
-    );
-
-    if (existingIndex >= 0) {
-      layers.value = [
-        ...layers.value.slice(0, existingIndex),
-        layer,
-        ...layers.value.slice(existingIndex + 1),
-      ];
-    } else {
-      layers.value = [...layers.value, layer];
-    }
+  const addLayer = (rawLayer: unknown): void => {
+    const layer = applyGlobeParams(rawLayer);
+    layerRegistry.set(getLayerId(layer), layer);
 
     if (overlay.value) {
       syncLayers();
@@ -164,26 +191,21 @@ export function useDeckOverlay(
   };
 
   const removeLayer = (layerId: string): void => {
-    layers.value = layers.value.filter((l) => getLayerId(l) !== layerId);
+    layerRegistry.delete(layerId);
     syncLayers();
   };
 
-  const updateLayer = (layerId: string, newLayer: unknown): void => {
-    const index = layers.value.findIndex((l) => getLayerId(l) === layerId);
-    if (index >= 0) {
-      layers.value = [
-        ...layers.value.slice(0, index),
-        newLayer,
-        ...layers.value.slice(index + 1),
-      ];
+  const updateLayer = (layerId: string, rawLayer: unknown): void => {
+    if (layerRegistry.has(layerId)) {
+      layerRegistry.set(layerId, applyGlobeParams(rawLayer));
       syncLayers();
     } else {
-      addLayer(newLayer);
+      addLayer(rawLayer);
     }
   };
 
   const getLayers = (): unknown[] => {
-    return [...layers.value];
+    return [...layerRegistry.values()];
   };
 
   watch(
