@@ -56,11 +56,25 @@ export function useDeckOverlay(
     if (!globe) return layer;
     const l = layer as {
       clone?: (props: Record<string, unknown>) => unknown;
-      props?: { parameters?: Record<string, unknown> };
+      props?: { billboard?: boolean; parameters?: Record<string, unknown> };
     };
     if (typeof l.clone !== 'function') return layer;
+    // On an interleaved globe, deck layers share MapLibre's depth buffer with the
+    // globe sphere. Dots sit at the sphere surface depth, so depth comparisons are
+    // ambiguous: flat disks (billboard:false) z-fight the sphere as the camera
+    // moves, producing a motion-coupled diagonal hatch inside each dot. Disabling
+    // depthTest stops the comparison and depthWrite stops dots writing conflicting
+    // depth into the shared buffer — together they eliminate the hatch. On a globe
+    // with points spread across the surface no two dots share a pixel, so losing
+    // dot-vs-dot occlusion is invisible. cullMode 'back' for camera-facing
+    // billboards, 'none' for flat fills (polygons/paths) that need both faces.
     return l.clone({
-      parameters: { cullMode: 'none', ...(l.props?.parameters ?? {}) },
+      parameters: {
+        cullMode: l.props?.billboard ? 'back' : 'none',
+        depthTest: false,
+        depthWrite: false,
+        ...(l.props?.parameters ?? {}),
+      },
     });
   };
 
