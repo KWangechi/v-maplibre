@@ -60,17 +60,18 @@ export function useDeckOverlay(
     };
     if (typeof l.clone !== 'function') return layer;
     // Interleaved globe layers share MapLibre's depth buffer with the globe
-    // sphere; deck billboards sit at the sphere-surface depth and z-fight it as
-    // the camera moves, producing a motion-coupled diagonal hatch inside each
-    // shape (deck.gl open bug visgl/deck.gl#10206). The maintainer-confirmed
-    // workaround is depthCompare:'always' (luma.gl v9 WebGPU-style key — NOT the
-    // legacy WebGL depthTest/depthWrite, which deck.gl 9 silently ignores) so
-    // fragments always pass the depth test instead of fighting the sphere.
-    // cullMode:'back' draws a single face. Both come straight from #10206.
+    // sphere; deck shapes sit at the sphere-surface depth and z-fight it as the
+    // camera moves, producing a motion-coupled diagonal hatch (deck.gl open bug
+    // visgl/deck.gl#10206). The maintainer-confirmed workaround is
+    // depthCompare:'always' (luma.gl v9 WebGPU-style key — NOT the legacy WebGL
+    // depthTest/depthWrite, which deck.gl 9 silently ignores) so fragments
+    // always pass the depth test instead of fighting the sphere. cullMode:'none'
+    // keeps both faces so billboard path ribbons (TripsLayer) aren't culled
+    // away on the globe.
     return l.clone({
       parameters: {
         depthCompare: 'always',
-        cullMode: 'back',
+        cullMode: 'none',
         ...(l.props?.parameters ?? {}),
       },
     });
