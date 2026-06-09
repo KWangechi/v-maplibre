@@ -191,6 +191,71 @@ canvas {
   border-left-color: var(--color-card);
 }
 
+/* ─── Climate Equivalents region/country popups ─── */
+
+.climate-region-popup .maplibregl-popup-content {
+  padding: 10px 12px;
+  max-width: 240px;
+}
+
+.climate-region-popup .region-tip__match,
+.climate-region-popup .country-tip__name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-card-foreground);
+}
+
+.climate-region-popup .region-tip__koppen,
+.climate-region-popup .country-tip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--color-muted-foreground);
+}
+
+.climate-region-popup .swatch {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in oklch, var(--color-border) 60%, transparent);
+}
+
+.climate-region-popup .symbol {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--color-card-foreground);
+}
+
+.climate-region-popup .name {
+  color: var(--color-muted-foreground);
+}
+
+.climate-region-popup .pct {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-card-foreground);
+}
+
+.climate-region-popup .region-tip__share,
+.climate-region-popup .region-tip__also,
+.climate-region-popup .country-tip__cta {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.climate-region-popup .country-tip__cta {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
 /* Sidebar: always overlay, never push content */
 [data-slot='sidebar'][data-state='expanded'] > div:first-child {
   width: 0 !important;
