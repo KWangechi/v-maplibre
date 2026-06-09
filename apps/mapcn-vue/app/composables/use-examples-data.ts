@@ -89,7 +89,15 @@ export function useExamplesData() {
           badge: 'HHI',
         },
         {
-          title: 'Home Price Explorer',
+          title: 'Climate Equivalents',
+          description:
+            'Click a country to see it split into 30 Köppen-Geiger climate zones, each labeled with another country that shares that same climate.',
+          href: '/examples/climate-equivalents',
+          icon: 'lucide:cloud-sun',
+          badge: 'Köppen',
+        },
+        {
+          title: 'ProMap: Home Price Explorer',
           description:
             'Interactive US home price bubble map at the ZIP code level with LocalView viewport-based re-bucketing.',
           href: '/examples/promap',
