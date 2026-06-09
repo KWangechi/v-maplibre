@@ -26,5 +26,8 @@
     // MDC syntax (::component, ---frontmatter---) parses incorrectly under
     // oxfmt's markdown rules — keep @nuxt/content collections hand-formatted.
     "apps/mapcn-vue/content/**/*.md",
+    // Browser-served map data assets (Köppen zones, boundaries) are kept
+    // minified for payload size — pretty-printing bloats them 60–80%.
+    "apps/mapcn-vue/public/data/**",
   ],
 }
