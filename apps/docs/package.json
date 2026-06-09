@@ -11,6 +11,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@comark/nuxt": "catalog:app:docs",
     "better-sqlite3": "catalog:app:docs",
     "docus": "catalog:app:docs",
     "nuxt": "catalog:app:docs",
