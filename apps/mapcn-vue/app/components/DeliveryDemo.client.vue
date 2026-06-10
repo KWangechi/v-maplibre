@@ -2,7 +2,7 @@
   import { ref, shallowRef, onUnmounted, computed } from 'vue';
   import type { Map, MapOptions } from 'maplibre-gl';
   import { VMap, VControlScale } from '@geoql/v-maplibre';
-  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
+  import { VLayerStarfield } from '@geoql/v-maplibre/starfield';
   import { MapboxOverlay } from '@deck.gl/mapbox';
   import AnimatedArcLayer from '~/utils/animated-arc-layer';
 
@@ -309,7 +309,7 @@
 
 <template>
   <VMap :options="mapOptions" class="size-full" @loaded="onMapLoaded">
-    <VLayerMaplibreStarfield
+    <VLayerStarfield
       galaxy-texture-url="/milkyway.jpg"
       :star-count="4000"
       :star-size="2.0"

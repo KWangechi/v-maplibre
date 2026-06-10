@@ -1,6 +1,6 @@
 <script setup lang="ts">
   /**
-   * Minimal ECMWF GeoZarr example using VLayerDeckglZarr.
+   * Minimal ECMWF GeoZarr example using VLayerZarr.
    *
    * Renders a single time slice of the ECMWF Open Data temperature dataset.
    * For animated time/level scrubbing + colormap controls, see the upstream
@@ -8,7 +8,7 @@
    * https://github.com/developmentseed/deck.gl-raster/blob/main/examples/dynamical-zarr-ecmwf/src/App.tsx
    */
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
-  import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
+  import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import type {
     MinimalTileData,
@@ -150,7 +150,7 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
 import { VMap } from '@geoql/v-maplibre';
-import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
+import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
 import * as zarr from 'zarrita';
 
 const ZARR_URL = 'https://.../ecmwf.zarr';
@@ -173,7 +173,7 @@ ${SCRIPT_END}
 
 <template>
   <VMap :options="mapOptions">
-    <VLayerDeckglZarr
+    <VLayerZarr
       v-if="node"
       id="ecmwf"
       :node="node"
@@ -204,7 +204,7 @@ ${SCRIPT_END}
         >
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
-          <VLayerDeckglZarr
+          <VLayerZarr
             v-if="zarrNode"
             id="ecmwf"
             :node="zarrNode"

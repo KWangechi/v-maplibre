@@ -8,7 +8,7 @@
    * — the shader samples 3 bands per fragment, dequantizes, rescales.
    */
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
-  import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
+  import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import type {
     MinimalTileData,
@@ -38,7 +38,7 @@
   usePageGeo({
     title: 'AEF Mosaic - mapcn-vue Examples',
     description:
-      'AlphaEarth Foundations embedding mosaic via VLayerDeckglZarr. Int8 Texture2DArray + GPU dequant + RGB band tuning across 9 annual snapshots (2017–2025).',
+      'AlphaEarth Foundations embedding mosaic via VLayerZarr. Int8 Texture2DArray + GPU dequant + RGB band tuning across 9 annual snapshots (2017–2025).',
   });
 
   defineOgImage('MapcnDoc', {
@@ -203,7 +203,7 @@
   }
 
   // Mirror upstream's makeRenderTile(args) factory: new closure per band/rescale
-  // change so VLayerDeckglZarr's reactive watch picks it up and rebuilds the layer.
+  // change so VLayerZarr's reactive watch picks it up and rebuilds the layer.
   const renderTile = computed(() => {
     const r = rBandIdx.value;
     const g = gBandIdx.value;
@@ -279,7 +279,7 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
 import { VMap } from '@geoql/v-maplibre';
-import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
+import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
 import { SampleAefRgb } from '~/utils/gpu/sample-aef-rgb';
 import * as zarr from 'zarrita';
 
@@ -333,7 +333,7 @@ ${SCRIPT_END}
 
 <template>
   <VMap :options="mapOptions">
-    <VLayerDeckglZarr
+    <VLayerZarr
       v-if="node"
       id="aef"
       :node="node"
@@ -364,7 +364,7 @@ ${SCRIPT_END}
         >
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
-          <VLayerDeckglZarr
+          <VLayerZarr
             v-if="zarrNode"
             id="aef-mosaic"
             :node="zarrNode"

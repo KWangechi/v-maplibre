@@ -5,7 +5,7 @@
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
-  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
+  import { VLayerCog } from '@geoql/v-maplibre/geotiff';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { Map } from 'maplibre-gl';
 
@@ -77,7 +77,7 @@
 
   const codeExample = `${SCRIPT_START}
                   import { VMap, VControlNavigation } from '@geoql/v-maplibre';
-                  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
+                  import { VLayerCog } from '@geoql/v-maplibre/geotiff';
 
                   const mapOptions = {
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',
@@ -92,7 +92,7 @@
                   <template>
                     <VMap :options="mapOptions" class="h-125 w-full">
                       <VControlNavigation position="top-right" />
-                      <VLayerDeckglCOG
+                      <VLayerCog
                         id="cog-layer"
                         :geotiff="COG_URL"
                       />
@@ -119,7 +119,7 @@
         >
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
-          <VLayerDeckglCOG
+          <VLayerCog
             id="cog-layer"
             :geotiff="COG_URL"
             @geotiff-load="handleGeotiffLoad"

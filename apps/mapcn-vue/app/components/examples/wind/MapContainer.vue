@@ -8,7 +8,7 @@
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
-  import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
+  import { VLayerWindParticle } from '@geoql/v-maplibre/wind';
 
   defineProps<{
     windData: WindDataPoint[];
@@ -113,7 +113,7 @@
         class="size-full"
         @loaded="handleMapLoad"
       >
-        <VLayerDeckglWindParticle
+        <VLayerWindParticle
           v-if="windData.length > 0"
           id="wind-particles"
           :wind-data="windData"

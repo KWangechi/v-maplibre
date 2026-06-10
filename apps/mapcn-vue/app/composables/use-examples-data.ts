@@ -564,7 +564,7 @@ export function useExamplesData() {
         {
           title: 'AEF Mosaic',
           description:
-            'Annual Earth Foundation embedding mosaic via VLayerDeckglZarr. Int8 quantized embeddings dequantized + RGB-mapped across 9 annual snapshots (2017–2025).',
+            'Annual Earth Foundation embedding mosaic via VLayerZarr. Int8 quantized embeddings dequantized + RGB-mapped across 9 annual snapshots (2017–2025).',
           href: '/examples/deckgl-aef-mosaic',
           icon: 'lucide:layers',
           badge: 'Zarr Mosaic',

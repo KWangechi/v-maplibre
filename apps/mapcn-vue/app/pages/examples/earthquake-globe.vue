@@ -6,7 +6,7 @@
     VMap,
   } from '@geoql/v-maplibre';
   import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
-  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
+  import { VLayerStarfield } from '@geoql/v-maplibre/starfield';
   import type { PickingInfo } from '@deck.gl/core';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { EarthquakeData } from '~/types/earthquake';
@@ -114,7 +114,7 @@
   const codeExample = `${SCRIPT_START}
                 import { VMap, VControlNavigation } from '@geoql/v-maplibre';
                 import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
-                import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
+                import { VLayerStarfield } from '@geoql/v-maplibre/starfield';
 
                 // Geocentric sun position + local altitude for star fading
                 const { sunAzimuth, sunAltitude, localSunAltitude } = useSunPosition();
@@ -140,7 +140,7 @@
 
               <template>
                 <VMap :options="mapOptions" class="h-125 w-full">
-                  <VLayerMaplibreStarfield
+                  <VLayerStarfield
                     galaxy-texture-url="/milkyway.jpg"
                     :star-count="5000"
                     :star-size="2.5"
@@ -178,7 +178,7 @@
     <div class="relative size-full min-w-0 overflow-hidden bg-black">
       <ClientOnly>
         <VMap :options="mapOptions" class="size-full">
-          <VLayerMaplibreStarfield
+          <VLayerStarfield
             galaxy-texture-url="/milkyway.jpg"
             :star-count="5000"
             :star-size="2.5"

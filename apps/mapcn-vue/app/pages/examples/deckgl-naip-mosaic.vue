@@ -5,7 +5,7 @@
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
-  import { VLayerDeckglMosaic } from '@geoql/v-maplibre/geotiff';
+  import { VLayerMosaic } from '@geoql/v-maplibre/geotiff';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type {
     MosaicSource,
@@ -140,7 +140,7 @@
 
   const codeExample = `${SCRIPT_START}
                   import { VMap } from '@geoql/v-maplibre';
-                  import { VLayerDeckglMosaic, type MosaicSource, type MosaicRenderMode } from '@geoql/v-maplibre/geotiff';
+                  import { VLayerMosaic, type MosaicSource, type MosaicRenderMode } from '@geoql/v-maplibre/geotiff';
 
                   const renderMode = ref<MosaicRenderMode>('trueColor');
                   const stacItems = ref<MosaicSource[]>([]);
@@ -167,7 +167,7 @@
 
                   <template>
                     <VMap :options="mapOptions">
-                      <VLayerDeckglMosaic
+                      <VLayerMosaic
                         id="naip-mosaic"
                         :sources="stacItems"
                         :render-mode="renderMode"
@@ -204,7 +204,7 @@
             :interactive="false"
           />
 
-          <VLayerDeckglMosaic
+          <VLayerMosaic
             v-if="stacItems.length > 0"
             id="naip-mosaic"
             :sources="stacItems"

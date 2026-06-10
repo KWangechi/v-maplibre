@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
-  import { VLayerDeckglMultiCOG } from '@geoql/v-maplibre/geotiff';
+  import { VLayerMultiCog } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import {
     Select,
@@ -147,7 +147,7 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
 import { VMap } from '@geoql/v-maplibre';
-import { VLayerDeckglMultiCOG } from '@geoql/v-maplibre/geotiff';
+import { VLayerMultiCog } from '@geoql/v-maplibre/geotiff';
 
 const base =
   'https://sentinel-cogs.s3.us-west-2.amazonaws.com/' +
@@ -164,7 +164,7 @@ ${SCRIPT_END}
 
 <template>
   <VMap :options="mapOptions">
-    <VLayerDeckglMultiCOG
+    <VLayerMultiCog
       id="sentinel2"
       :sources="sources"
       :composite="composite"
@@ -192,7 +192,7 @@ ${SCRIPT_END}
         >
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
-          <VLayerDeckglMultiCOG
+          <VLayerMultiCog
             id="sentinel2"
             :sources="sources"
             :composite="composite"

@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
-  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
+  import { VLayerCog } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import { Slider } from '~/components/ui/slider';
 
@@ -20,7 +20,7 @@
   // Slider 100% = pure 2024 (after-cog fully opaque)
   // In between = blended view of both timestamps
   // Note: true left/right swipe clipping requires layer-level bounds clipping
-  // which is not yet exposed by VLayerDeckglCOG — opacity fade is the
+  // which is not yet exposed by VLayerCog — opacity fade is the
   // honest fallback that still demonstrates change-detection workflows.
 
   const { mapStyle } = useMapStyle();
@@ -72,7 +72,7 @@
 
   const codeExample = `${SCRIPT_START}
 import { VMap, VControlNavigation } from '@geoql/v-maplibre';
-import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
+import { VLayerCog } from '@geoql/v-maplibre/geotiff';
 import { Slider } from '~/components/ui/slider';
 
 const BEFORE_COG = 'https://.../S2A_2018.tif';
@@ -91,8 +91,8 @@ ${SCRIPT_END}
   <div class="relative">
     <VMap :options="mapOptions" class="h-125 w-full">
       <VControlNavigation position="top-right" />
-      <VLayerDeckglCOG id="before" :geotiff="BEFORE_COG" />
-      <VLayerDeckglCOG
+      <VLayerCog id="before" :geotiff="BEFORE_COG" />
+      <VLayerCog
         id="after"
         :geotiff="AFTER_COG"
         :bounds-clip="{ leftRatio: splitPosition[0] / 100 }"
@@ -122,12 +122,12 @@ ${SCRIPT_END}
         >
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
-          <VLayerDeckglCOG
+          <VLayerCog
             id="before-cog"
             :geotiff="BEFORE_COG"
             @geotiff-load="handleGeotiffLoad"
           />
-          <VLayerDeckglCOG
+          <VLayerCog
             id="after-cog"
             :geotiff="AFTER_COG"
             :opacity="afterOpacity"

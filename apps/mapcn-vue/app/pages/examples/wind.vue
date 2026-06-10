@@ -50,7 +50,7 @@
   const codeExample = `${SCRIPT_START}
                 import { ref, onMounted } from 'vue';
                 import { VMap, VControlNavigation } from '@geoql/v-maplibre';
-                import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
+                import { VLayerWindParticle } from '@geoql/v-maplibre/wind';
                 import type { WindDataPoint, ColorStop } from '@geoql/v-maplibre/wind';
                 import { createWindDataFromOpenWeatherMap } from 'maplibre-gl-wind';
 
@@ -96,7 +96,7 @@
 
               <template>
                 <VMap :options="mapOptions" class="h-125 w-full">
-                  <VLayerDeckglWindParticle
+                  <VLayerWindParticle
                     v-if="windData.length > 0"
                     id="wind-particles"
                     :wind-data="windData"
