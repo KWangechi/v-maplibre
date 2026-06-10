@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglSolidPolygon } from '@geoql/v-maplibre';
+  import { VLayerDeckglSolidPolygon } from '@geoql/v-maplibre/deck.gl';
   import type { SolidPolygonLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

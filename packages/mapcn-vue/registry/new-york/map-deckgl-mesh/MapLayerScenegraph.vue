@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglScenegraph } from '@geoql/v-maplibre';
+  import { VLayerDeckglScenegraph } from '@geoql/v-maplibre/deck.gl';
   import type { ScenegraphLayerProps } from '@deck.gl/mesh-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

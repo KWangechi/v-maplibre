@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglBitmap } from '@geoql/v-maplibre';
+  import { VLayerDeckglBitmap } from '@geoql/v-maplibre/deck.gl';
   import type { BitmapLayerProps } from '@deck.gl/layers';
 
   export interface MapLayerBitmapProps extends Partial<BitmapLayerProps> {

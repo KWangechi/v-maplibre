@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglSimpleMesh } from '@geoql/v-maplibre';
+  import { VLayerDeckglSimpleMesh } from '@geoql/v-maplibre/deck.gl';
   import type { SimpleMeshLayerProps } from '@deck.gl/mesh-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

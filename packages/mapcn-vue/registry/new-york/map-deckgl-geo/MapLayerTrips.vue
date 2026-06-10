@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglTrips } from '@geoql/v-maplibre';
+  import { VLayerDeckglTrips } from '@geoql/v-maplibre/deck.gl';
   import type { TripsLayerProps } from '@deck.gl/geo-layers';
 
   export interface MapLayerTripsProps extends Partial<TripsLayerProps> {

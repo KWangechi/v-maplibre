@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglGreatCircle } from '@geoql/v-maplibre';
+  import { VLayerDeckglGreatCircle } from '@geoql/v-maplibre/deck.gl';
   import type { GreatCircleLayerProps } from '@deck.gl/geo-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

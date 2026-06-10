@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglWMS } from '@geoql/v-maplibre';
+  import { VLayerDeckglWMS } from '@geoql/v-maplibre/deck.gl';
   import type { PickingInfo } from '@deck.gl/core';
 
   export interface MapLayerWMSProps {

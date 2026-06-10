@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglGeohash } from '@geoql/v-maplibre';
+  import { VLayerDeckglGeohash } from '@geoql/v-maplibre/deck.gl';
   import type { GeohashLayerProps } from '@deck.gl/geo-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

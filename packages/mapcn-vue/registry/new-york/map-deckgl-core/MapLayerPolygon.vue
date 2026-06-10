@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglPolygon } from '@geoql/v-maplibre';
+  import { VLayerDeckglPolygon } from '@geoql/v-maplibre/deck.gl';
   import type { PolygonLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

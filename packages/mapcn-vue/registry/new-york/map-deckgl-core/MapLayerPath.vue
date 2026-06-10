@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglPath } from '@geoql/v-maplibre';
+  import { VLayerDeckglPath } from '@geoql/v-maplibre/deck.gl';
   import type { PathLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

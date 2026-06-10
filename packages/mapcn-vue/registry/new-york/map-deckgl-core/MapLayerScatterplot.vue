@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type { ScatterplotLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

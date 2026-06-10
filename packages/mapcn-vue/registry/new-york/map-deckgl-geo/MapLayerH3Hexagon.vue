@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglH3Hexagon } from '@geoql/v-maplibre';
+  import { VLayerDeckglH3Hexagon } from '@geoql/v-maplibre/deck.gl';
   import type { H3HexagonLayerProps } from '@deck.gl/geo-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

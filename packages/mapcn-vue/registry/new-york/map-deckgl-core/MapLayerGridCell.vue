@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglGridCell } from '@geoql/v-maplibre';
+  import { VLayerDeckglGridCell } from '@geoql/v-maplibre/deck.gl';
   import type { GridCellLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

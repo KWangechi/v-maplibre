@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglTerrain } from '@geoql/v-maplibre';
+  import { VLayerDeckglTerrain } from '@geoql/v-maplibre/deck.gl';
   import type { TerrainLayerProps } from '@deck.gl/geo-layers';
 
   export interface MapLayerTerrainProps extends Partial<TerrainLayerProps> {

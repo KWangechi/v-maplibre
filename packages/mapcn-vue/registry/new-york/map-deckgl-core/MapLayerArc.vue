@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglArc } from '@geoql/v-maplibre';
+  import { VLayerDeckglArc } from '@geoql/v-maplibre/deck.gl';
   import type { ArcLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

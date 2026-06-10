@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglCOG } from '@geoql/v-maplibre';
+  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
   import type { PickingInfo, Color } from '@deck.gl/core';
 
   export interface MapLayerCOGProps {

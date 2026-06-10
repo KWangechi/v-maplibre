@@ -1,7 +1,10 @@
 <script setup lang="ts">
   import { computed } from 'vue';
-  import { VControlLidar } from '@geoql/v-maplibre';
-  import type { LidarControlOptions, ColorScheme } from '@geoql/v-maplibre';
+  import { VControlLidar } from '@geoql/v-maplibre/lidar';
+  import type {
+    LidarControlOptions,
+    ColorScheme,
+  } from '@geoql/v-maplibre/lidar';
 
   export interface MapControlLidarProps {
     position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';

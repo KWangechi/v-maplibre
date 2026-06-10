@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglH3Cluster } from '@geoql/v-maplibre';
+  import { VLayerDeckglH3Cluster } from '@geoql/v-maplibre/deck.gl';
   import type { H3ClusterLayerProps } from '@deck.gl/geo-layers';
   import type { PickingInfo } from '@deck.gl/core';
 

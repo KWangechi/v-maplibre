@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglWindParticle } from '@geoql/v-maplibre';
+  import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
   import type { PickingInfo, Color } from '@deck.gl/core';
   import type { ColorStop, WindDataPoint } from 'maplibre-gl-wind';
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglContour } from '@geoql/v-maplibre';
+  import { VLayerDeckglContour } from '@geoql/v-maplibre/deck.gl';
   import type { ContourLayerProps } from '@deck.gl/aggregation-layers';
 
   export interface MapLayerContourProps extends Partial<ContourLayerProps> {

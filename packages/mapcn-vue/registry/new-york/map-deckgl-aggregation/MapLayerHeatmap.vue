@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglHeatmap } from '@geoql/v-maplibre';
+  import { VLayerDeckglHeatmap } from '@geoql/v-maplibre/deck.gl';
   import type { HeatmapLayerProps } from '@deck.gl/aggregation-layers';
 
   export interface MapLayerHeatmapProps extends Partial<HeatmapLayerProps> {

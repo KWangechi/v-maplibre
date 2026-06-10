@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglTile } from '@geoql/v-maplibre';
+  import { VLayerDeckglTile } from '@geoql/v-maplibre/deck.gl';
   import type { TileLayerProps } from '@deck.gl/geo-layers';
 
   export interface MapLayerTileProps extends Partial<TileLayerProps> {

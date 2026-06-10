@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglPointCloud } from '@geoql/v-maplibre';
+  import { VLayerDeckglPointCloud } from '@geoql/v-maplibre/deck.gl';
   import type { PointCloudLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

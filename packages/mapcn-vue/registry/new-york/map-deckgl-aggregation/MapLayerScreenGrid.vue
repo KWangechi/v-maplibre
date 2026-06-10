@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglScreenGrid } from '@geoql/v-maplibre';
+  import { VLayerDeckglScreenGrid } from '@geoql/v-maplibre/deck.gl';
   import type { ScreenGridLayerProps } from '@deck.gl/aggregation-layers';
 
   export interface MapLayerScreenGridProps extends Partial<ScreenGridLayerProps> {

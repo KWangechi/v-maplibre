@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglText } from '@geoql/v-maplibre';
+  import { VLayerDeckglText } from '@geoql/v-maplibre/deck.gl';
   import type { TextLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

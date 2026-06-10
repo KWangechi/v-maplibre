@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglGeojson } from '@geoql/v-maplibre';
+  import { VLayerDeckglGeojson } from '@geoql/v-maplibre/deck.gl';
   import type { GeoJsonLayerProps } from '@deck.gl/layers';
   import type { PickingInfo } from '@deck.gl/core';
 

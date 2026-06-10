@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglQuadkey } from '@geoql/v-maplibre';
+  import { VLayerDeckglQuadkey } from '@geoql/v-maplibre/deck.gl';
   import type { QuadkeyLayerProps } from '@deck.gl/geo-layers';
   import type { PickingInfo } from '@deck.gl/core';
 
