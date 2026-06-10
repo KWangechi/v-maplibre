@@ -47,11 +47,11 @@ Add the optional packages below **only** for the layers you actually use. Since 
 | Geo / tiles    | `@geoql/v-maplibre/deck.gl`   | `VLayerDeckglTrips`, `VLayerDeckglMVT`, `VLayerDeckglTile`, `VLayerDeckglTile3D`, `VLayerDeckglTerrain`, `VLayerDeckglH3Hexagon`, `VLayerDeckglH3Cluster`, `VLayerDeckglS2`, `VLayerDeckglGeohash`, `VLayerDeckglQuadkey`, `VLayerDeckglGreatCircle`, `VLayerDeckglWMS`                      | + `@deck.gl/geo-layers`                                                                                             |
 | GeoArrow       | `@geoql/v-maplibre/deck.gl`   | `VLayerDeckglGeoArrowScatterplot`, `VLayerDeckglGeoArrowPath`, `VLayerDeckglGeoArrowPolygon`, `VLayerDeckglGeoArrowSolidPolygon`, `VLayerDeckglGeoArrowText`, `VLayerDeckglGeoArrowTrips`                                                                                                    | + `apache-arrow`                                                                                                    |
 | 3D mesh        | `@geoql/v-maplibre/deck.gl`   | `VLayerDeckglSimpleMesh`, `VLayerDeckglScenegraph`                                                                                                                                                                                                                                           | + `@deck.gl/mesh-layers`                                                                                            |
-| Raster (COG)   | `@geoql/v-maplibre/geotiff`   | `VLayerDeckglCOG`, `VLayerDeckglMultiCOG`, `VLayerDeckglMosaic`                                                                                                                                                                                                                              | + `@developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj` |
-| Zarr           | `@geoql/v-maplibre/geotiff`   | `VLayerDeckglZarr`                                                                                                                                                                                                                                                                           | + `@developmentseed/deck.gl-zarr zarrita`                                                                           |
-| Wind particles | `@geoql/v-maplibre/wind`      | `VLayerDeckglWindParticle`                                                                                                                                                                                                                                                                   | + `maplibre-gl-wind`                                                                                                |
+| Raster (COG)   | `@geoql/v-maplibre/geotiff`   | `VLayerCog`, `VLayerMultiCog`, `VLayerMosaic`                                                                                                                                                                                                                                                | + `@developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj` |
+| Zarr           | `@geoql/v-maplibre/geotiff`   | `VLayerZarr`                                                                                                                                                                                                                                                                                 | + `@developmentseed/deck.gl-zarr zarrita`                                                                           |
+| Wind particles | `@geoql/v-maplibre/wind`      | `VLayerWindParticle`                                                                                                                                                                                                                                                                         | + `maplibre-gl-wind`                                                                                                |
 | LiDAR          | `@geoql/v-maplibre/lidar`     | `VControlLidar`                                                                                                                                                                                                                                                                              | + `maplibre-gl-lidar`                                                                                               |
-| Starfield      | `@geoql/v-maplibre/starfield` | `VLayerMaplibreStarfield`                                                                                                                                                                                                                                                                    | + `@geoql/maplibre-gl-starfield three`                                                                              |
+| Starfield      | `@geoql/v-maplibre/starfield` | `VLayerStarfield`                                                                                                                                                                                                                                                                            | + `@geoql/maplibre-gl-starfield three`                                                                              |
 
 See the [Peer Dependencies guide](https://v-maplibre.geoql.in/guide/peer-dependencies) for the full per-component reference.
 
@@ -89,7 +89,7 @@ This copies theme-aware map components directly into your project.
 
 v2.0.0 moves the optional-peer layers out of the root entry into dedicated subpaths. This fixes [#114](https://github.com/geoql/v-maplibre/issues/114): a core-only install (`@geoql/v-maplibre maplibre-gl`) previously failed to bundle because the root entry transitively referenced deck.gl / lidar / wind specifiers. Now the root entry only references `vue`, `maplibre-gl`, and `pmtiles`.
 
-**Nothing changes for `VMap`, `VMarker`, `VPopup`, every `VControl*` (except `VControlLidar`), and every `VLayerMaplibre*` (except `VLayerMaplibreStarfield`)** — keep importing those from `@geoql/v-maplibre`.
+**Nothing changes for `VMap`, `VMarker`, `VPopup`, every `VControl*` (except `VControlLidar`), and every `VLayerMaplibre*` (except `VLayerStarfield`)** — keep importing those from `@geoql/v-maplibre`.
 
 Only the optional-peer components move. Update their import path:
 
@@ -99,13 +99,13 @@ Only the optional-peer components move. Update their import path:
 + import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 ```
 
-| Components                                                                          | Old import          | New import                    |
-| ----------------------------------------------------------------------------------- | ------------------- | ----------------------------- |
-| All `VLayerDeckgl*` (base, aggregation, geo, mesh, GeoArrow)                        | `@geoql/v-maplibre` | `@geoql/v-maplibre/deck.gl`   |
-| `VLayerDeckglCOG`, `VLayerDeckglMultiCOG`, `VLayerDeckglMosaic`, `VLayerDeckglZarr` | `@geoql/v-maplibre` | `@geoql/v-maplibre/geotiff`   |
-| `VLayerDeckglWindParticle`                                                          | `@geoql/v-maplibre` | `@geoql/v-maplibre/wind`      |
-| `VLayerMaplibreStarfield`                                                           | `@geoql/v-maplibre` | `@geoql/v-maplibre/starfield` |
-| `VControlLidar`                                                                     | `@geoql/v-maplibre` | `@geoql/v-maplibre/lidar`     |
+| Components                                                   | Old import          | New import                    |
+| ------------------------------------------------------------ | ------------------- | ----------------------------- |
+| All `VLayerDeckgl*` (base, aggregation, geo, mesh, GeoArrow) | `@geoql/v-maplibre` | `@geoql/v-maplibre/deck.gl`   |
+| `VLayerCog`, `VLayerMultiCog`, `VLayerMosaic`, `VLayerZarr`  | `@geoql/v-maplibre` | `@geoql/v-maplibre/geotiff`   |
+| `VLayerWindParticle`                                         | `@geoql/v-maplibre` | `@geoql/v-maplibre/wind`      |
+| `VLayerStarfield`                                            | `@geoql/v-maplibre` | `@geoql/v-maplibre/starfield` |
+| `VControlLidar`                                              | `@geoql/v-maplibre` | `@geoql/v-maplibre/lidar`     |
 
 Associated TypeScript types (e.g. `MosaicSource`, `WindDataPoint`, `LidarControlOptions`) move with their component to the same subpath.
 

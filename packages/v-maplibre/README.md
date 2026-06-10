@@ -63,11 +63,11 @@ pnpm add @deck.gl/geo-layers
 pnpm add @deck.gl/mesh-layers
 
 # Cloud-Optimized GeoTIFF — import from '@geoql/v-maplibre/geotiff'
-# VLayerDeckglCOG, VLayerDeckglMultiCOG, VLayerDeckglMosaic
+# VLayerCog, VLayerMultiCog, VLayerMosaic
 pnpm add @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj
 
 # Zarr — import from '@geoql/v-maplibre/geotiff'
-# VLayerDeckglZarr
+# VLayerZarr
 pnpm add @developmentseed/deck.gl-zarr zarrita
 
 # GeoArrow — import from '@geoql/v-maplibre/deck.gl'
@@ -79,7 +79,7 @@ pnpm add @developmentseed/deck.gl-zarr zarrita
 pnpm add apache-arrow
 
 # Wind particles — import from '@geoql/v-maplibre/wind'
-# VLayerDeckglWindParticle
+# VLayerWindParticle
 # (Wind-data helpers — createWindDataFromOpenWeatherMap, generateWindTexture,
 # WindParticleLayer — must be imported directly from 'maplibre-gl-wind'.)
 pnpm add maplibre-gl-wind
@@ -89,7 +89,7 @@ pnpm add maplibre-gl-wind
 pnpm add maplibre-gl-lidar
 
 # Three.js starfield skybox for globe projections — import from '@geoql/v-maplibre/starfield'
-# VLayerMaplibreStarfield
+# VLayerStarfield
 pnpm add @geoql/maplibre-gl-starfield three
 ```
 
@@ -97,14 +97,14 @@ If you import a layer without its peer deps installed, your bundler will surface
 
 ## Migrating to v2.0.0
 
-v2.0.0 moves the optional-peer layers off the root entry onto dedicated subpaths so a core-only install no longer transitively references deck.gl / lidar / wind (fixes [#114](https://github.com/geoql/v-maplibre/issues/114)). Core components are unchanged — keep importing `VMap`, `VMarker`, `VPopup`, every `VControl*` (except `VControlLidar`), and every `VLayerMaplibre*` (except `VLayerMaplibreStarfield`) from `@geoql/v-maplibre`. Only update the optional-peer components:
+v2.0.0 moves the optional-peer layers off the root entry onto dedicated subpaths so a core-only install no longer transitively references deck.gl / lidar / wind (fixes [#114](https://github.com/geoql/v-maplibre/issues/114)). Core components are unchanged — keep importing `VMap`, `VMarker`, `VPopup`, every `VControl*` (except `VControlLidar`), and every `VLayerMaplibre*` (except `VLayerStarfield`) from `@geoql/v-maplibre`. Only update the optional-peer components:
 
 | Components                                                   | New import                    |
 | ------------------------------------------------------------ | ----------------------------- |
 | All `VLayerDeckgl*` (base, aggregation, geo, mesh, GeoArrow) | `@geoql/v-maplibre/deck.gl`   |
-| `VLayerDeckglCOG`/`MultiCOG`/`Mosaic`/`Zarr`                 | `@geoql/v-maplibre/geotiff`   |
-| `VLayerDeckglWindParticle`                                   | `@geoql/v-maplibre/wind`      |
-| `VLayerMaplibreStarfield`                                    | `@geoql/v-maplibre/starfield` |
+| `VLayerCog`/`MultiCog`/`Mosaic`/`Zarr`                       | `@geoql/v-maplibre/geotiff`   |
+| `VLayerWindParticle`                                         | `@geoql/v-maplibre/wind`      |
+| `VLayerStarfield`                                            | `@geoql/v-maplibre/starfield` |
 | `VControlLidar`                                              | `@geoql/v-maplibre/lidar`     |
 
 ```diff
@@ -156,7 +156,7 @@ Component-specific TypeScript types (e.g. `MosaicSource`, `WindDataPoint`, `Lida
 - **`VLayerMaplibreCluster`** - Clustered point layers
 - **`VLayerMaplibrePmtile`** - PMTiles layers
 - **`VLayerMaplibreRoute`** - Route/delivery tracking visualization
-- **`VLayerMaplibreStarfield`** - Three.js starfield skybox for globe projections (requires `@geoql/maplibre-gl-starfield`, `three`)
+- **`VLayerStarfield`** - Three.js starfield skybox for globe projections (requires `@geoql/maplibre-gl-starfield`, `three`)
 
 ### deck.gl Layer Components
 
@@ -214,8 +214,8 @@ High-performance WebGL visualization layers powered by deck.gl:
 
 **Raster Layers** (requires `@developmentseed/deck.gl-raster` and `@developmentseed/deck.gl-geotiff`)
 
-- `VLayerDeckglCOG` - Cloud-Optimized GeoTIFF visualization (GPU-accelerated, auto-reprojection)
-- `VLayerDeckglMosaic` - Client-side COG mosaic from STAC items (requires `flatbush`, `proj4`)
+- `VLayerCog` - Cloud-Optimized GeoTIFF visualization (GPU-accelerated, auto-reprojection)
+- `VLayerMosaic` - Client-side COG mosaic from STAC items (requires `flatbush`, `proj4`)
 
 **GeoArrow Layers** (requires `@deck.gl/layers` + `apache-arrow`; trips also needs `@deck.gl/geo-layers`)
 
@@ -230,7 +230,7 @@ Render Apache Arrow `Table` / `RecordBatch` data with GeoArrow extension types d
 
 **Wind Visualization** (requires `maplibre-gl-wind`)
 
-- `VLayerDeckglWindParticle` - Animated wind particle flow with speed-based color ramps
+- `VLayerWindParticle` - Animated wind particle flow with speed-based color ramps
 
 > The wind-data helpers (`createWindDataFromOpenWeatherMap`, `generateWindTexture`, `WindParticleLayer`, `windUniforms`) are **not** re-exported from `@geoql/v-maplibre`. Import them directly from `maplibre-gl-wind`:
 >
@@ -289,7 +289,7 @@ Render Apache Arrow `Table` / `RecordBatch` data with GeoArrow extension types d
 
 ```vue
 <script setup lang="ts">
-  import { VMap, VLayerDeckglWindParticle } from '@geoql/v-maplibre';
+  import { VMap, VLayerWindParticle } from '@geoql/v-maplibre';
 
   const mapOptions = {
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
@@ -307,7 +307,7 @@ Render Apache Arrow `Table` / `RecordBatch` data with GeoArrow extension types d
 
 <template>
   <VMap :options="mapOptions" style="height: 500px">
-    <VLayerDeckglWindParticle
+    <VLayerWindParticle
       id="wind"
       :wind-data="windData"
       :num-particles="8192"
@@ -318,7 +318,7 @@ Render Apache Arrow `Table` / `RecordBatch` data with GeoArrow extension types d
         [1.0, [213, 62, 79, 255]],
       ]"
       :speed-range="[0, 30]"
-    ></VLayerDeckglWindParticle>
+    ></VLayerWindParticle>
   </VMap>
 </template>
 ```
