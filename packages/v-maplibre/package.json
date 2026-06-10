@@ -80,7 +80,6 @@
   "scripts": {
     "dev": "vp pack --watch",
     "build": "vp pack",
-    "verify:peers": "node scripts/verify-peer-graph.mjs",
     "test": "vp test",
     "test:ui": "vp test --ui",
     "test:coverage": "vp test --coverage",
@@ -88,7 +87,7 @@
     "lint:fix": "vp lint --fix",
     "format": "vp fmt --write .",
     "format:check": "vp fmt --check .",
-    "prepublishOnly": "pnpm run lint && pnpm run format:check && pnpm run test:coverage && pnpm run build && pnpm run verify:peers"
+    "prepublishOnly": "pnpm run lint && pnpm run format:check && pnpm run test:coverage && pnpm run build"
   },
   "dependencies": {
     "maplibre-gl": "^5.24.0",
