@@ -1,5 +1,12 @@
-import { vi } from 'vitest';
+import { vi, afterEach } from 'vitest';
+import { enableAutoUnmount } from '@vue/test-utils';
 import type { StyleSpecification, MapOptions } from 'maplibre-gl';
+
+enableAutoUnmount(afterEach);
+
+afterEach(async () => {
+  await vi.dynamicImportSettled();
+});
 
 type LngLatLike = [number, number] | { lng: number; lat: number };
 type EventCallback = (...args: unknown[]) => void;
