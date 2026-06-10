@@ -39,10 +39,11 @@ That covers `VMap`, `VMarker`, `VPopup`, all controls (`VControl*`), and every M
 
 ### Optional peer dependencies
 
-Add these **only** for the layers you actually use — picking what you need keeps your bundle lean:
+Add these **only** for the layers you actually use — picking what you need keeps your bundle lean. Since **v2.0.0**, each group is imported from a dedicated subpath (`@geoql/v-maplibre/deck.gl`, `/geotiff`, `/wind`, `/lidar`, `/starfield`) so the core entry never references deck.gl — see [Migrating to v2.0.0](#migrating-to-v200).
 
 ```bash
-# deck.gl base — VLayerDeckgl, VLayerDeckglScatterplot, VLayerDeckglArc,
+# deck.gl base — import from '@geoql/v-maplibre/deck.gl'
+# VLayerDeckgl, VLayerDeckglScatterplot, VLayerDeckglArc,
 # VLayerDeckglLine, VLayerDeckglPath, VLayerDeckglPolygon, VLayerDeckglSolidPolygon,
 # VLayerDeckglGeojson, VLayerDeckglIcon, VLayerDeckglText, VLayerDeckglColumn,
 # VLayerDeckglBitmap, VLayerDeckglPointCloud
@@ -61,32 +62,58 @@ pnpm add @deck.gl/geo-layers
 # 3D mesh — VLayerDeckglSimpleMesh, VLayerDeckglScenegraph
 pnpm add @deck.gl/mesh-layers
 
-# Cloud-Optimized GeoTIFF — VLayerDeckglCOG, VLayerDeckglMultiCOG, VLayerDeckglMosaic
+# Cloud-Optimized GeoTIFF — import from '@geoql/v-maplibre/geotiff'
+# VLayerDeckglCOG, VLayerDeckglMultiCOG, VLayerDeckglMosaic
 pnpm add @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj
 
-# Zarr — VLayerDeckglZarr
+# Zarr — import from '@geoql/v-maplibre/geotiff'
+# VLayerDeckglZarr
 pnpm add @developmentseed/deck.gl-zarr zarrita
 
-# GeoArrow — VLayerDeckglGeoArrowScatterplot, VLayerDeckglGeoArrowPath,
+# GeoArrow — import from '@geoql/v-maplibre/deck.gl'
+# VLayerDeckglGeoArrowScatterplot, VLayerDeckglGeoArrowPath,
 # VLayerDeckglGeoArrowPolygon, VLayerDeckglGeoArrowSolidPolygon,
 # VLayerDeckglGeoArrowText, VLayerDeckglGeoArrowTrips
 # (Trips additionally needs @deck.gl/geo-layers — already covered by the
 #  deck.gl tile/route line above.)
 pnpm add apache-arrow
 
-# Wind particles — VLayerDeckglWindParticle
+# Wind particles — import from '@geoql/v-maplibre/wind'
+# VLayerDeckglWindParticle
 # (Wind-data helpers — createWindDataFromOpenWeatherMap, generateWindTexture,
 # WindParticleLayer — must be imported directly from 'maplibre-gl-wind'.)
 pnpm add maplibre-gl-wind
 
-# LiDAR point cloud viewer — VControlLidar
+# LiDAR point cloud viewer — import from '@geoql/v-maplibre/lidar'
+# VControlLidar
 pnpm add maplibre-gl-lidar
 
-# Three.js starfield skybox for globe projections — VLayerMaplibreStarfield
+# Three.js starfield skybox for globe projections — import from '@geoql/v-maplibre/starfield'
+# VLayerMaplibreStarfield
 pnpm add @geoql/maplibre-gl-starfield three
 ```
 
 If you import a layer without its peer deps installed, your bundler will surface a `Cannot find module '...'` error — install the missing package(s) from the table above to resolve it.
+
+## Migrating to v2.0.0
+
+v2.0.0 moves the optional-peer layers off the root entry onto dedicated subpaths so a core-only install no longer transitively references deck.gl / lidar / wind (fixes [#114](https://github.com/geoql/v-maplibre/issues/114)). Core components are unchanged — keep importing `VMap`, `VMarker`, `VPopup`, every `VControl*` (except `VControlLidar`), and every `VLayerMaplibre*` (except `VLayerMaplibreStarfield`) from `@geoql/v-maplibre`. Only update the optional-peer components:
+
+| Components                                                   | New import                    |
+| ------------------------------------------------------------ | ----------------------------- |
+| All `VLayerDeckgl*` (base, aggregation, geo, mesh, GeoArrow) | `@geoql/v-maplibre/deck.gl`   |
+| `VLayerDeckglCOG`/`MultiCOG`/`Mosaic`/`Zarr`                 | `@geoql/v-maplibre/geotiff`   |
+| `VLayerDeckglWindParticle`                                   | `@geoql/v-maplibre/wind`      |
+| `VLayerMaplibreStarfield`                                    | `@geoql/v-maplibre/starfield` |
+| `VControlLidar`                                              | `@geoql/v-maplibre/lidar`     |
+
+```diff
+- import { VMap, VLayerDeckglScatterplot } from '@geoql/v-maplibre';
++ import { VMap } from '@geoql/v-maplibre';
++ import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
+```
+
+Component-specific TypeScript types (e.g. `MosaicSource`, `WindDataPoint`, `LidarControlOptions`) move to the same subpath as their component.
 
 ## Quick Start
 
