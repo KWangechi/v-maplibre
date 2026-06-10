@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
+  import { VLayerWindParticle } from '@geoql/v-maplibre/wind';
   import type { PickingInfo, Color } from '@deck.gl/core';
   import type { ColorStop, WindDataPoint } from 'maplibre-gl-wind';
 
@@ -64,11 +64,11 @@
 </script>
 
 <template>
-  <VLayerDeckglWindParticle
+  <VLayerWindParticle
     v-bind="props"
     @click="(info) => emit('click', info)"
     @hover="(info) => emit('hover', info)"
     @loaded="emit('loaded')"
     @error="(err) => emit('error', err)"
-  ></VLayerDeckglWindParticle>
+  ></VLayerWindParticle>
 </template>

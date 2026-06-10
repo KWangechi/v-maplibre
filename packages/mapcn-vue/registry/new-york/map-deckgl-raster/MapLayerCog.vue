@@ -1,8 +1,8 @@
 <script setup lang="ts">
-  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
+  import { VLayerCog } from '@geoql/v-maplibre/geotiff';
   import type { PickingInfo, Color } from '@deck.gl/core';
 
-  export interface MapLayerCOGProps {
+  export interface MapLayerCogProps {
     id: string;
     geotiff: string | ArrayBuffer | Blob | object;
     tileSize?: number;
@@ -21,7 +21,7 @@
     debugOpacity?: number;
   }
 
-  const props = withDefaults(defineProps<MapLayerCOGProps>(), {
+  const props = withDefaults(defineProps<MapLayerCogProps>(), {
     tileSize: 256,
     minZoom: 0,
     refinementStrategy: 'best-available',
@@ -52,10 +52,10 @@
 </script>
 
 <template>
-  <VLayerDeckglCOG
+  <VLayerCog
     v-bind="props"
     @click="(info) => emit('click', info)"
     @hover="(info) => emit('hover', info)"
     @geotiff-load="(tiff, options) => emit('geotiffLoad', tiff, options)"
-  ></VLayerDeckglCOG>
+  ></VLayerCog>
 </template>

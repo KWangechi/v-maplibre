@@ -1,2 +1,2 @@
-export { default as MapLayerCOG } from './MapLayerCOG.vue';
-export type { MapLayerCOGProps } from './MapLayerCOG.vue';
+export { default as MapLayerCog } from './MapLayerCog.vue';
+export type { MapLayerCogProps } from './MapLayerCog.vue';
