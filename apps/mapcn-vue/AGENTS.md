@@ -172,7 +172,7 @@ import type { RoutePoint, MapState } from '~/types/map';
   import {
     VLayerDeckglTrips,
     VLayerDeckglScatterplot,
-  } from '@geoql/v-maplibre';
+  } from '@geoql/v-maplibre/deck.gl';
   function getPath(d: TripDatum) {
     return d.path;
   }
@@ -414,7 +414,7 @@ app/composables/use-route-utils.ts            # Shared utilities (kebab-case fil
 
 ```vue
 <!-- WRONG - Inline arrow function in template -->
-<VLayerDeckGlScatterplot
+<VLayerDeckglScatterplot
   :data="points"
   :get-position="(d) => d.coordinates"
   :get-fill-color="(d, { index }) => getColorByIndex(index)"
@@ -437,7 +437,7 @@ app/composables/use-route-utils.ts            # Shared utilities (kebab-case fil
 </script>
 
 <template>
-  <VLayerDeckGlScatterplot
+  <VLayerDeckglScatterplot
     :data="points"
     :get-position="getPosition"
     :get-fill-color="getFillColor"
@@ -710,7 +710,8 @@ npx shadcn-vue@latest add https://mapcn-vue.geoql.in/r/map
 
 ```vue
 <script setup lang="ts">
-  import { VMap, VLayerDeckGlScatterplot } from '@geoql/v-maplibre';
+  import { VMap } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 
   const points = ref([
     { position: [-74.5, 40], color: [255, 0, 0] },
@@ -720,7 +721,7 @@ npx shadcn-vue@latest add https://mapcn-vue.geoql.in/r/map
 
 <template>
   <VMap :options="mapOptions">
-    <VLayerDeckGlScatterplot
+    <VLayerDeckglScatterplot
       id="scatter"
       :data="points"
       :get-position="(d) => d.position"

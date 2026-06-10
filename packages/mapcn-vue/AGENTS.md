@@ -431,7 +431,7 @@ For example:
 
 ```vue
 <script setup lang="ts">
-  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type { Color, PickingInfo } from '@deck.gl/core';
 
   interface Props {
