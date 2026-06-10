@@ -4,7 +4,6 @@ import type {
   BattlefieldPosition,
   BattlefieldStats,
   MilitaryUnitType,
-  MissionPhase,
   MissionPhaseInfo,
 } from '~/types/defense-terrain';
 
