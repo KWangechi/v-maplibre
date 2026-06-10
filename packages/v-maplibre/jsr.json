@@ -1,7 +1,14 @@
 {
   "name": "@geoql/v-maplibre",
   "version": "1.11.0",
-  "exports": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./deck.gl": "./dist/deckgl.js",
+    "./geotiff": "./dist/geotiff.js",
+    "./wind": "./dist/wind.js",
+    "./starfield": "./dist/starfield.js",
+    "./lidar": "./dist/lidar.js"
+  },
   "imports": {
     "vue": "npm:vue@^3.5.0",
     "maplibre-gl": "npm:maplibre-gl@^5.24.0",

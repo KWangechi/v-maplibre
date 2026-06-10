@@ -42,7 +42,14 @@ function isExternal(id: string): boolean {
 
 export default defineConfig({
   pack: {
-    entry: ['src/index.ts'],
+    entry: [
+      'src/index.ts',
+      'src/deckgl.ts',
+      'src/geotiff.ts',
+      'src/wind.ts',
+      'src/starfield.ts',
+      'src/lidar.ts',
+    ],
     format: ['esm'],
     platform: 'neutral',
     target: 'es2020',

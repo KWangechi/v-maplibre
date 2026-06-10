@@ -3,23 +3,6 @@ export { FullscreenControl as VControlFullscreen } from './fullscreen';
 export { GeolocateControl as VControlGeolocate } from './geolocate';
 export { NavigationControl as VControlNavigation } from './navigation';
 export { ScaleControl as VControlScale } from './scale';
-export { LidarControl as VControlLidar } from './lidar';
-export type {
-  LidarControlOptions,
-  ColorScheme,
-  ColorSchemeType,
-  ColorSchemeConfig,
-  CopcLoadingMode,
-  ColormapName,
-  ColorRangeConfig,
-  PointCloudInfo,
-  PointCloudBounds,
-  StreamingProgress,
-  StreamingLoaderOptions,
-  LidarLoadEventData,
-  LidarErrorEventData,
-  LidarUnloadEventData,
-} from './lidar';
 export { VControlLayer, VControlLayerGroup } from './layer';
 export type {
   LayerControlOptions,

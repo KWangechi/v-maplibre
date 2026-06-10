@@ -4,7 +4,6 @@ import {
   VControlGeolocate,
   VControlNavigation,
   VControlScale,
-  VControlLidar,
   VControlLayer,
   VControlLayerGroup,
   VControlLegend,
@@ -21,7 +20,6 @@ import {
   VLayerMaplibrePmtile,
   VLayerMaplibreRoute,
   VLayerMaplibreIsochrone,
-  VLayerMaplibreStarfield,
 } from './layers';
 
 import VMap from './map/VMap.vue';
@@ -44,30 +42,17 @@ export {
   VLayerMaplibrePmtile,
   VLayerMaplibreRoute,
   VLayerMaplibreIsochrone,
-  VLayerMaplibreStarfield,
   VControlAttribution,
   VControlFullscreen,
   VControlGeolocate,
   VControlNavigation,
   VControlScale,
-  VControlLidar,
   VControlLayer,
   VControlLayerGroup,
   VControlLegend,
 };
 
 export type {
-  LidarControlOptions,
-  ColorScheme,
-  ColorSchemeType,
-  ColorSchemeConfig,
-  CopcLoadingMode,
-  ColormapName,
-  ColorRangeConfig,
-  PointCloudInfo,
-  PointCloudBounds,
-  StreamingProgress,
-  StreamingLoaderOptions,
   LayerControlOptions,
   LayerType,
   ControlPosition,
@@ -80,7 +65,5 @@ export type {
   LegendControlOptions,
   FilterState,
 } from './controls';
-
-export * from './layers/deckgl';
 
 export default VMap;

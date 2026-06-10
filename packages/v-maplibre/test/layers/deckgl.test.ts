@@ -1,7 +1,17 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import * as deckglExports from '../../src/layers/deckgl';
+import * as coreDeckglExports from '../../src/layers/deckgl';
+import * as geotiffExports from '../../src/layers/deckgl/geotiff';
+import * as windExports from '../../src/layers/deckgl/wind';
 import VMap from '../../src/map/VMap.vue';
+
+// COG/Zarr/wind moved to `/geotiff` and `/wind` subpaths in v2.0.0 (#114);
+// merge the barrels so existing export assertions stay complete.
+const deckglExports = {
+  ...coreDeckglExports,
+  ...geotiffExports,
+  ...windExports,
+};
 import '../setup';
 
 describe('Deck.gl Layer Exports', () => {

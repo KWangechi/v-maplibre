@@ -49,6 +49,26 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./deck.gl": {
+      "types": "./dist/deckgl.d.ts",
+      "import": "./dist/deckgl.js"
+    },
+    "./geotiff": {
+      "types": "./dist/geotiff.d.ts",
+      "import": "./dist/geotiff.js"
+    },
+    "./wind": {
+      "types": "./dist/wind.d.ts",
+      "import": "./dist/wind.js"
+    },
+    "./starfield": {
+      "types": "./dist/starfield.d.ts",
+      "import": "./dist/starfield.js"
+    },
+    "./lidar": {
+      "types": "./dist/lidar.d.ts",
+      "import": "./dist/lidar.js"
+    },
     "./style.css": "./dist/v-maplibre.css",
     "./v-maplibre.css": "./dist/v-maplibre.css",
     "./dist/style.css": "./dist/v-maplibre.css",
@@ -60,6 +80,7 @@
   "scripts": {
     "dev": "vp pack --watch",
     "build": "vp pack",
+    "verify:peers": "node scripts/verify-peer-graph.mjs",
     "test": "vp test",
     "test:ui": "vp test --ui",
     "test:coverage": "vp test --coverage",
@@ -67,7 +88,7 @@
     "lint:fix": "vp lint --fix",
     "format": "vp fmt --write .",
     "format:check": "vp fmt --check .",
-    "prepublishOnly": "pnpm run lint && pnpm run format:check && pnpm run test:coverage && pnpm run build"
+    "prepublishOnly": "pnpm run lint && pnpm run format:check && pnpm run test:coverage && pnpm run build && pnpm run verify:peers"
   },
   "dependencies": {
     "maplibre-gl": "^5.24.0",
