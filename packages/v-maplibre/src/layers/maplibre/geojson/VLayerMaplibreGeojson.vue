@@ -1,6 +1,5 @@
 <!-- web/app/lib/v-mapbox/layers/maplibre/geojson/VLayerMaplibreGeojson.vue -->
 <script setup lang="ts">
-  import type { Ref } from 'vue';
   import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue';
   import type {
     GeoJSONSource,
@@ -38,7 +37,6 @@
   }>();
 
   const map = injectStrict(MapKey);
-  const loaded: Ref<boolean> = ref(false);
 
   // Helper to check if data is valid GeoJSON with features
   const hasValidData = (
@@ -69,46 +67,35 @@
     return instance;
   };
 
-  // Setup functions
-  const setupMap = (mapInstance: Map) => {
-    if (!mapInstance) {
-      return;
-    }
+  // Track if layer has been initialized to prevent duplicate setup
+  const initialized = ref(false);
 
-    mapInstance.on('style.load', () => {
-      const styleTimeout = () => {
-        if (!mapInstance.isStyleLoaded()) {
-          loaded.value = false;
-          setTimeout(styleTimeout, 200);
-        } else {
-          loaded.value = true;
-        }
-      };
-      styleTimeout();
-    });
-  };
+  // The bound style.load handler (if any) so it can be removed on unmount /
+  // when the map ref is reassigned.
+  let boundMap: Map | null = null;
+  let styleLoadHandler: (() => void) | null = null;
+  let dataHandler: (() => void) | null = null;
 
-  const addLayer = (): void => {
+  // Single, idempotent entry point. Adds the source + layer + events exactly
+  // once, but only when the style is loaded AND the data is valid. Safe to
+  // call from any number of triggers (style.load, data, prop changes, mount).
+  const tryAddLayer = (): boolean => {
+    if (initialized.value) return true;
+
     const mapInstance = getMapInstance();
-    if (!mapInstance || !mapInstance.isStyleLoaded()) {
-      return;
-    }
+    if (!mapInstance) return false;
 
-    // For clustering support, wait for valid data before adding source/layer
-    if (!hasValidData(props.source.data)) {
-      console.log(
-        `[${props.layerId}] Waiting for valid data before adding layer`,
-      );
-      return;
-    }
+    // Style must be ready before sources/layers can be added.
+    if (!mapInstance.isStyleLoaded()) return false;
+
+    // Data must be valid before adding the source (clustering / async loads).
+    if (!hasValidData(props.source.data)) return false;
 
     try {
-      // Only add source if it doesn't exist
       if (!mapInstance.getSource(props.sourceId)) {
         mapInstance.addSource(props.sourceId, props.source);
       }
 
-      // Only add layer if it doesn't exist
       if (!mapInstance.getLayer(props.layerId)) {
         const layerSpec = {
           ...props.layer,
@@ -118,9 +105,61 @@
 
         mapInstance.addLayer(layerSpec, props.before);
       }
+
+      setupLayerEvents(mapInstance);
+      initialized.value = true;
+      return true;
     } catch (error) {
       console.error('Error adding GeoJSON layer:', error);
+      return false;
     }
+  };
+
+  // Bind the readiness handlers to a map instance exactly once. This must
+  // handle BOTH cases robustly:
+  //   1. style.load fires AFTER we bind  -> the 'style.load' listener catches it
+  //   2. style.load already fired BEFORE we bind (fast prod basemap) -> the
+  //      synchronous tryAddLayer() below catches the already-loaded style; if
+  //      the style reports not-yet-loaded only because sprite/glyph/source data
+  //      is still in flight, the 'idle' listener retries once everything settles.
+  const bindReadyHandlers = (mapInstance: Map): void => {
+    if (boundMap === mapInstance) return;
+
+    // Clean up any handlers bound to a previous map instance.
+    unbindReadyHandlers();
+    boundMap = mapInstance;
+
+    // (1) Catch style.load firing after we bind (e.g. theme switch, late style).
+    styleLoadHandler = () => {
+      tryAddLayer();
+    };
+    mapInstance.on('style.load', styleLoadHandler);
+
+    // (2) Catch the window where style.load already fired but the style was not
+    // fully ready at this exact tick (sprite/glyph/source still loading). The
+    // 'idle' event fires once the map has finished loading and rendering.
+    dataHandler = () => {
+      if (initialized.value) {
+        if (dataHandler && boundMap) boundMap.off('idle', dataHandler);
+        dataHandler = null;
+        return;
+      }
+      tryAddLayer();
+    };
+    mapInstance.on('idle', dataHandler);
+
+    // (3) Synchronous attempt for the already-fully-loaded case.
+    tryAddLayer();
+  };
+
+  const unbindReadyHandlers = (): void => {
+    if (boundMap) {
+      if (styleLoadHandler) boundMap.off('style.load', styleLoadHandler);
+      if (dataHandler) boundMap.off('idle', dataHandler);
+    }
+    boundMap = null;
+    styleLoadHandler = null;
+    dataHandler = null;
   };
 
   const updateSource = (): void => {
@@ -154,7 +193,7 @@
         }
       } else if (!source) {
         // If source doesn't exist, try to add the layer
-        addLayer();
+        tryAddLayer();
       }
     } catch (error) {
       console.error('Error updating GeoJSON source:', error);
@@ -177,7 +216,7 @@
         });
       } else {
         // If layer doesn't exist, try to add it
-        addLayer();
+        tryAddLayer();
       }
     } catch (error) {
       console.error('Error updating GeoJSON layer:', error);
@@ -213,81 +252,51 @@
     }
   };
 
-  // Track if layer has been initialized to prevent duplicate setup
-  const initialized = ref(false);
-
-  // Initialize layer - single entry point to prevent race conditions
-  const initializeLayer = async () => {
-    if (initialized.value) return;
-
-    const mapInstance = getMapInstance();
-    if (!mapInstance || !mapInstance.isStyleLoaded()) return;
-    if (!hasValidData(props.source.data)) return;
-
-    // Use nextTick to ensure Vue has finished setup
-    await nextTick();
-
-    // Double-check conditions after nextTick
-    if (initialized.value) return;
-    if (!mapInstance.isStyleLoaded()) return;
-
-    addLayer();
-    setupLayerEvents(mapInstance);
-    initialized.value = true;
-  };
-
-  // Watch loaded state - MUST be defined BEFORE watch(map) to catch immediate changes
-  watch(loaded, (value) => {
-    if (value) {
-      initializeLayer();
-    }
-  });
-
-  // Watch for map instance changes
+  // Watch for map instance changes. Immediate so a map that already exists
+  // when this component mounts is bound right away. bindReadyHandlers is
+  // idempotent and handles the "style already loaded" race internally.
   watch(
     map,
     (newMap) => {
       if (newMap) {
-        setupMap(newMap);
-        // Check if style is already loaded
-        if (newMap.isStyleLoaded()) {
-          loaded.value = true;
-          // Also try to initialize directly in case watch(loaded) already fired
-          initializeLayer();
-        }
+        bindReadyHandlers(newMap);
+      } else {
+        // Map ref cleared (e.g. VMap unmounted / remounted on key change).
+        unbindReadyHandlers();
+        initialized.value = false;
       }
     },
     { immediate: true },
   );
 
-  // Watchers for updates after initialization
+  // Watchers for updates after initialization. Watching `props.source.data`
+  // (not a deep watch on the whole object) catches the common case where the
+  // page fetches GeoJSON asynchronously and assigns it AFTER the component has
+  // mounted — at which point we either add the layer (if not yet added) or
+  // update the existing source's data.
   watch(
-    () => props.source,
-    (newSource, oldSource) => {
-      // Wait for valid data before doing anything
-      if (!hasValidData(newSource?.data)) {
+    () => props.source.data,
+    (newData, oldData) => {
+      if (!hasValidData(newData)) {
         return;
       }
 
-      // Only update if the data actually changed
-      if (JSON.stringify(newSource.data) !== JSON.stringify(oldSource?.data)) {
+      // Layer not added yet: this data arrival may be the missing piece.
+      if (!initialized.value) {
         const mapInstance = getMapInstance();
-        if (mapInstance?.isStyleLoaded()) {
-          // If source doesn't exist yet, add the whole layer
-          if (!mapInstance.getSource(props.sourceId)) {
-            addLayer();
-            if (!initialized.value) {
-              setupLayerEvents(mapInstance);
-              initialized.value = true;
-            }
-          } else {
-            // Source exists, just update data
-            updateSource();
-          }
+        if (mapInstance && !boundMap) {
+          bindReadyHandlers(mapInstance);
+        } else {
+          tryAddLayer();
         }
+        return;
+      }
+
+      // Layer already added: update the source data in place when it changed.
+      if (JSON.stringify(newData) !== JSON.stringify(oldData)) {
+        updateSource();
       }
     },
-    { deep: true },
   );
 
   watch(() => props.layer, updateLayer, { deep: true });
@@ -304,7 +313,7 @@
       if (!hasLayer && newVisibility === 'visible') {
         // Add layer if it doesn't exist and should be visible
         if (hasValidData(props.source.data)) {
-          addLayer();
+          tryAddLayer();
         }
       } else if (hasLayer) {
         // Update visibility of existing layer
@@ -327,13 +336,16 @@
 
   // Lifecycle hooks
   onMounted(() => {
-    // Use nextTick to ensure all watchers are set up
+    // Final attempt after Vue has finished mounting, in case the map + style +
+    // data were all ready synchronously before the watchers settled.
     nextTick(() => {
-      initializeLayer();
+      tryAddLayer();
     });
   });
 
   onBeforeUnmount(() => {
+    unbindReadyHandlers();
+
     const mapInstance = getMapInstance();
     if (!mapInstance) return;
 

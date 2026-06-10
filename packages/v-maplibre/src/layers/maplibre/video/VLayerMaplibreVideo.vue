@@ -5,7 +5,7 @@
     VideoSource,
     Map,
   } from 'maplibre-gl';
-  import type { PropType, Ref } from 'vue';
+  import type { PropType } from 'vue';
   import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
   import { injectStrict, MapKey } from '../../../utils';
 
@@ -37,33 +37,30 @@
   });
 
   const map = injectStrict(MapKey);
-  const loaded: Ref<boolean> = ref(false);
 
   // Helper function to safely get map instance
   const getMapInstance = (): Map | null => {
     return map.value || null;
   };
 
-  // Setup functions
-  const setupMap = (mapInstance: Map) => {
-    if (!mapInstance) return;
+  // Track if layer has been initialized to prevent duplicate setup
+  const initialized = ref(false);
 
-    mapInstance.on('style.load', () => {
-      const styleTimeout = () => {
-        if (!mapInstance.isStyleLoaded()) {
-          loaded.value = false;
-          setTimeout(styleTimeout, 200);
-        } else {
-          loaded.value = true;
-        }
-      };
-      styleTimeout();
-    });
-  };
+  // Bound readiness handlers so they can be removed on unmount / map rebind.
+  let boundMap: Map | null = null;
+  let styleLoadHandler: (() => void) | null = null;
+  let idleHandler: (() => void) | null = null;
 
-  const addLayer = (): void => {
+  // Single, idempotent entry point. Adds the source + layer exactly once, but
+  // only when the style is loaded. Safe to call from any trigger.
+  const tryAddLayer = (): boolean => {
+    if (initialized.value) return true;
+
     const mapInstance = getMapInstance();
-    if (!mapInstance) return;
+    if (!mapInstance) return false;
+
+    // Style must be ready before sources/layers can be added.
+    if (!mapInstance.isStyleLoaded()) return false;
 
     try {
       if (!mapInstance.getSource(props.sourceId)) {
@@ -77,9 +74,52 @@
         } as AnyLayer;
         mapInstance.addLayer(layerSpec, props.before);
       }
+      initialized.value = true;
+      return true;
     } catch (error) {
       console.error('Error adding Video layer:', error);
+      return false;
     }
+  };
+
+  // Bind readiness handlers exactly once, handling BOTH the "style.load fires
+  // after we bind" case (style.load listener) AND the "style.load already fired
+  // before we bind" case (synchronous attempt + idle fallback). This fixes the
+  // production race where the basemap style loads before the layer mounts
+  // (mapbox-gl-js#6707).
+  const bindReadyHandlers = (mapInstance: Map): void => {
+    if (boundMap === mapInstance) return;
+
+    unbindReadyHandlers();
+    boundMap = mapInstance;
+
+    styleLoadHandler = () => {
+      tryAddLayer();
+    };
+    mapInstance.on('style.load', styleLoadHandler);
+
+    idleHandler = () => {
+      if (initialized.value) {
+        if (idleHandler && boundMap) boundMap.off('idle', idleHandler);
+        idleHandler = null;
+        return;
+      }
+      tryAddLayer();
+    };
+    mapInstance.on('idle', idleHandler);
+
+    // Synchronous attempt for the already-fully-loaded case.
+    tryAddLayer();
+  };
+
+  const unbindReadyHandlers = (): void => {
+    if (boundMap) {
+      if (styleLoadHandler) boundMap.off('style.load', styleLoadHandler);
+      if (idleHandler) boundMap.off('idle', idleHandler);
+    }
+    boundMap = null;
+    styleLoadHandler = null;
+    idleHandler = null;
   };
 
   const updateSource = (): void => {
@@ -143,33 +183,31 @@
   watch(() => props.source, updateSource, { deep: true });
   watch(() => props.layer, updateLayer, { deep: true });
 
-  // Watch for map instance changes
+  // Watch for map instance changes. Immediate so an already-present map is
+  // bound right away; bindReadyHandlers is idempotent and handles the
+  // already-loaded style race internally.
   watch(
     map,
     (newMap) => {
       if (newMap) {
-        setupMap(newMap);
+        bindReadyHandlers(newMap);
+      } else {
+        unbindReadyHandlers();
+        initialized.value = false;
       }
     },
     { immediate: true },
   );
 
-  // Watch loaded state
-  watch(loaded, (value) => {
-    if (value) {
-      addLayer();
-    }
-  });
-
   // Lifecycle hooks
   onMounted(() => {
-    const mapInstance = getMapInstance();
-    if (mapInstance?.isStyleLoaded()) {
-      addLayer();
-    }
+    // Final attempt after mount, in case map + style were ready synchronously.
+    tryAddLayer();
   });
 
   onBeforeUnmount(() => {
+    unbindReadyHandlers();
+
     const mapInstance = getMapInstance();
     if (!mapInstance) return;
 
