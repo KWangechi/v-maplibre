@@ -13,7 +13,7 @@
    * `pnpm add @deck.gl/core @deck.gl/mapbox @developmentseed/deck.gl-raster @developmentseed/deck.gl-zarr @developmentseed/proj zarrita`
    */
   /**
-   * VLayerDeckglZarr — GeoZarr tile rendering with reprojection.
+   * VLayerZarr — GeoZarr tile rendering with reprojection.
    *
    * Wraps @developmentseed/deck.gl-zarr ZarrLayer.
    * The caller MUST open the zarr store with zarrita and pass the opened

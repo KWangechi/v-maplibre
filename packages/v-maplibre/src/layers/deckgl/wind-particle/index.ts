@@ -1,4 +1,4 @@
-export { default as VLayerDeckglWindParticle } from './VLayerDeckglWindParticle.vue';
+export { default as VLayerWindParticle } from './VLayerWindParticle.vue';
 
 /**
  * Type-only re-exports from `maplibre-gl-wind` (erased at compile time).
@@ -16,7 +16,7 @@ export { default as VLayerDeckglWindParticle } from './VLayerDeckglWindParticle.
  * "two required deps, everything else opt-in" contract from the README
  * (issue #103). Consumers needing those helpers must import them directly
  * from `maplibre-gl-wind` — which they already have installed to use
- * `VLayerDeckglWindParticle`.
+ * `VLayerWindParticle`.
  */
 export type {
   WindParticleLayerProps,

@@ -1,1 +1,1 @@
-export { default as VLayerDeckglCOG } from './VLayerDeckglCOG.vue';
+export { default as VLayerCog } from './VLayerCog.vue';

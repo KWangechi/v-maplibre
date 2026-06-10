@@ -1,1 +1,1 @@
-export { default as StarfieldLayer } from './VLayerMaplibreStarfield.vue';
+export { default as StarfieldLayer } from './VLayerStarfield.vue';

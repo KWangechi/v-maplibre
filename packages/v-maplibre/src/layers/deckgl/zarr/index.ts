@@ -1,1 +1,1 @@
-export { default as VLayerDeckglZarr } from './VLayerDeckglZarr.vue';
+export { default as VLayerZarr } from './VLayerZarr.vue';

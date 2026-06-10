@@ -1,16 +1,16 @@
 import { defineAsyncComponent, type Component } from 'vue';
 
-export const VLayerDeckglCOG: Component = defineAsyncComponent(() =>
-  import('./cog').then((m) => m.VLayerDeckglCOG),
+export const VLayerCog: Component = defineAsyncComponent(() =>
+  import('./cog').then((m) => m.VLayerCog),
 );
-export const VLayerDeckglMosaic: Component = defineAsyncComponent(() =>
-  import('./mosaic').then((m) => m.VLayerDeckglMosaic),
+export const VLayerMosaic: Component = defineAsyncComponent(() =>
+  import('./mosaic').then((m) => m.VLayerMosaic),
 );
 export type { MosaicSource, MosaicRenderMode, RenderModule } from './mosaic';
-export const VLayerDeckglMultiCOG: Component = defineAsyncComponent(() =>
-  import('./multi-cog').then((m) => m.VLayerDeckglMultiCOG),
+export const VLayerMultiCog: Component = defineAsyncComponent(() =>
+  import('./multi-cog').then((m) => m.VLayerMultiCog),
 );
-export type { MultiCOGComposite } from './multi-cog';
-export const VLayerDeckglZarr: Component = defineAsyncComponent(() =>
-  import('./zarr').then((m) => m.VLayerDeckglZarr),
+export type { MultiCogComposite } from './multi-cog';
+export const VLayerZarr: Component = defineAsyncComponent(() =>
+  import('./zarr').then((m) => m.VLayerZarr),
 );

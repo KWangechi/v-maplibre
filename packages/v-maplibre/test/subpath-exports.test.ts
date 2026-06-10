@@ -16,33 +16,31 @@ describe('Subpath Exports (issue #114)', () => {
     });
 
     it('does NOT re-export geotiff or wind layers', () => {
+      expect((deckgl as Record<string, unknown>).VLayerCog).toBeUndefined();
       expect(
-        (deckgl as Record<string, unknown>).VLayerDeckglCOG,
-      ).toBeUndefined();
-      expect(
-        (deckgl as Record<string, unknown>).VLayerDeckglWindParticle,
+        (deckgl as Record<string, unknown>).VLayerWindParticle,
       ).toBeUndefined();
     });
   });
 
   describe('@geoql/v-maplibre/geotiff', () => {
     it('exports COG/Mosaic/MultiCOG/Zarr layers', () => {
-      expect(geotiff.VLayerDeckglCOG).toBeDefined();
-      expect(geotiff.VLayerDeckglMosaic).toBeDefined();
-      expect(geotiff.VLayerDeckglMultiCOG).toBeDefined();
-      expect(geotiff.VLayerDeckglZarr).toBeDefined();
+      expect(geotiff.VLayerCog).toBeDefined();
+      expect(geotiff.VLayerMosaic).toBeDefined();
+      expect(geotiff.VLayerMultiCog).toBeDefined();
+      expect(geotiff.VLayerZarr).toBeDefined();
     });
   });
 
   describe('@geoql/v-maplibre/wind', () => {
     it('exports the wind particle layer', () => {
-      expect(wind.VLayerDeckglWindParticle).toBeDefined();
+      expect(wind.VLayerWindParticle).toBeDefined();
     });
   });
 
   describe('@geoql/v-maplibre/starfield', () => {
     it('exports the starfield layer', () => {
-      expect(starfield.VLayerMaplibreStarfield).toBeDefined();
+      expect(starfield.VLayerStarfield).toBeDefined();
     });
   });
 
@@ -64,9 +62,9 @@ describe('Subpath Exports (issue #114)', () => {
     it('does NOT export optional-peer layers/controls', () => {
       const r = root as Record<string, unknown>;
       expect(r.VLayerDeckglScatterplot).toBeUndefined();
-      expect(r.VLayerDeckglCOG).toBeUndefined();
-      expect(r.VLayerDeckglWindParticle).toBeUndefined();
-      expect(r.VLayerMaplibreStarfield).toBeUndefined();
+      expect(r.VLayerCog).toBeUndefined();
+      expect(r.VLayerWindParticle).toBeUndefined();
+      expect(r.VLayerStarfield).toBeUndefined();
       expect(r.VControlLidar).toBeUndefined();
     });
   });

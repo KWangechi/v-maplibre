@@ -1,2 +1,2 @@
-export { default as VLayerDeckglMultiCOG } from './VLayerDeckglMultiCOG.vue';
-export type { MultiCOGComposite } from './VLayerDeckglMultiCOG.vue';
+export { default as VLayerMultiCog } from './VLayerMultiCog.vue';
+export type { MultiCogComposite } from './VLayerMultiCog.vue';

@@ -14,7 +14,7 @@
    * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj`
    */
   /**
-   * VLayerDeckglMultiCOG — multi-band split-resolution COG compositing.
+   * VLayerMultiCog — multi-band split-resolution COG compositing.
    *
    * Wraps @developmentseed/deck.gl-geotiff MultiCOGLayer.
    * Use case: render Sentinel-2 or other multi-band imagery where bands live in
@@ -38,7 +38,7 @@
   /**
    * Maps source band names to RGB(A) output channels for the compositing step.
    */
-  export interface MultiCOGComposite {
+  export interface MultiCogComposite {
     r: string;
     g?: string;
     b?: string;
@@ -56,7 +56,7 @@
      * Map source band names to RGB(A) output channels. Defaults to passing
      * the first source through to all channels (greyscale) if omitted.
      */
-    composite?: MultiCOGComposite;
+    composite?: MultiCogComposite;
     /**
      * Post-processing render pipeline modules applied after band compositing
      * (e.g. LinearRescale, ColormapSprite, NDVI).

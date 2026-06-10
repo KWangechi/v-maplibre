@@ -1,7 +1,7 @@
 import { defineAsyncComponent, type Component } from 'vue';
 
-export const VLayerDeckglWindParticle: Component = defineAsyncComponent(() =>
-  import('./wind-particle').then((m) => m.VLayerDeckglWindParticle),
+export const VLayerWindParticle: Component = defineAsyncComponent(() =>
+  import('./wind-particle').then((m) => m.VLayerWindParticle),
 );
 export type {
   WindDataPoint,

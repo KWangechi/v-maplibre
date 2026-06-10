@@ -1,6 +1,6 @@
-export { default as VLayerDeckglMosaic } from './VLayerDeckglMosaic.vue';
+export { default as VLayerMosaic } from './VLayerMosaic.vue';
 export type {
   MosaicSource,
   MosaicRenderMode,
   RenderModule,
-} from './VLayerDeckglMosaic.vue';
+} from './VLayerMosaic.vue';

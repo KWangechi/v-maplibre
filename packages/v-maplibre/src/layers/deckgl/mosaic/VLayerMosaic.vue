@@ -14,7 +14,7 @@
    * `pnpm add @deck.gl/core @deck.gl/mapbox @deck.gl/layers @developmentseed/deck.gl-geotiff @developmentseed/deck.gl-raster @developmentseed/geotiff @developmentseed/proj`
    */
   /**
-   * VLayerDeckglMosaic - Client-side COG mosaic layer for STAC items
+   * VLayerMosaic - Client-side COG mosaic layer for STAC items
    *
    * Uses @developmentseed/deck.gl-geotiff v0.3.0 MosaicLayer for efficient
    * client-side rendering of multiple COGs from STAC APIs.

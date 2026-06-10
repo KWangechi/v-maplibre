@@ -35,11 +35,24 @@ describe('Deck.gl Layer Exports', () => {
     expect(typeof deckglExports.DeckLayersKey).toBe('symbol');
   });
 
-  it('exports all 44 layer components', () => {
-    const layerComponents = Object.keys(deckglExports).filter((key) =>
+  it('exports all deck.gl-core layer components', () => {
+    const coreLayerComponents = Object.keys(coreDeckglExports).filter((key) =>
       key.startsWith('VLayerDeckgl'),
     );
-    expect(layerComponents.length).toBe(44);
+    expect(coreLayerComponents.length).toBe(39);
+  });
+
+  it('exports the geotiff and wind subpath layer components', () => {
+    const subpathComponents = [
+      'VLayerCog',
+      'VLayerMultiCog',
+      'VLayerMosaic',
+      'VLayerZarr',
+      'VLayerWindParticle',
+    ] as const;
+    for (const name of subpathComponents) {
+      expect(deckglExports[name]).toBeDefined();
+    }
   });
 });
 
@@ -412,17 +425,17 @@ describe('Deck.gl Layer Components', () => {
     });
   });
 
-  describe('VLayerDeckglCOG', () => {
+  describe('VLayerCog', () => {
     it('renders within VMap', () => {
       const wrapper = mount(VMap, {
         props: { options: defaultMapOptions },
         slots: {
           default: {
-            template: `<VLayerDeckglCOG 
+            template: `<VLayerCog 
               id="test-cog" 
               geotiff="https://example.com/test.tif"
             />`,
-            components: { VLayerDeckglCOG: deckglExports.VLayerDeckglCOG },
+            components: { VLayerCog: deckglExports.VLayerCog },
           },
         },
       });
@@ -434,7 +447,7 @@ describe('Deck.gl Layer Components', () => {
         props: { options: defaultMapOptions },
         slots: {
           default: {
-            template: `<VLayerDeckglCOG 
+            template: `<VLayerCog 
               id="test-cog-props" 
               geotiff="https://example.com/test.tif"
               :opacity="0.8"
@@ -443,7 +456,7 @@ describe('Deck.gl Layer Components', () => {
               :tile-size="512"
               :debug="false"
             />`,
-            components: { VLayerDeckglCOG: deckglExports.VLayerDeckglCOG },
+            components: { VLayerCog: deckglExports.VLayerCog },
           },
         },
       });

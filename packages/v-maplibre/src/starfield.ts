@@ -7,6 +7,6 @@
  */
 import { defineAsyncComponent, type Component } from 'vue';
 
-export const VLayerMaplibreStarfield: Component = defineAsyncComponent(() =>
+export const VLayerStarfield: Component = defineAsyncComponent(() =>
   import('./layers/maplibre/custom/starfield').then((m) => m.StarfieldLayer),
 );
