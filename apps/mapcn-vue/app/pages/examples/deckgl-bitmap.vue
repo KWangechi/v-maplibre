@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VLayerDeckglBitmap,
-    VControlNavigation,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglBitmap } from '@geoql/v-maplibre/deck.gl';
 
   usePageGeo({
     title: 'Bitmap Layer (deck.gl) - mapcn-vue Examples',
@@ -38,7 +34,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                    import { VMap, VLayerDeckglBitmap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VLayerDeckglBitmap } from '@geoql/v-maplibre/deck.gl';
 
                     const mapOptions = {
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',

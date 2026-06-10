@@ -6,10 +6,10 @@
     VControlNavigation,
     VControlScale,
     VControlLegend,
-    VLayerDeckglScatterplot,
     VPopup,
     type CategoryLegendItem,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type {
     ZipRenderPoint,
     ZipDataPoint,

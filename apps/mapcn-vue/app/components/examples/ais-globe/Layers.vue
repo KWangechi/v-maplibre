@@ -7,7 +7,10 @@
     WakeArcDatum,
   } from '~/types/maritime-ais';
   import type { Position, Color } from '@deck.gl/core';
-  import { VLayerDeckglScatterplot, VLayerDeckglArc } from '@geoql/v-maplibre';
+  import {
+    VLayerDeckglScatterplot,
+    VLayerDeckglArc,
+  } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     vessels: Vessel[];

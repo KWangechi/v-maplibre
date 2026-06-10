@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VControlNavigation,
-    VControlScale,
-    VLayerMaplibreStarfield,
-    VMap,
-  } from '@geoql/v-maplibre';
+  import { VControlNavigation, VControlScale, VMap } from '@geoql/v-maplibre';
+  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
 
   usePageGeo({
     title: 'Globe Day/Night - mapcn-vue Examples',
@@ -62,7 +58,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                    import { VMap, VLayerMaplibreStarfield, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
                     // Geocentric sun position (subsolar lng + declination) + local altitude for fading
                     const { sunAzimuth, sunAltitude, localSunAltitude, skyMode } = useSunPosition();
                   ${SCRIPT_END}

@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglSimpleMesh,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglSimpleMesh } from '@geoql/v-maplibre/deck.gl';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import { CubeGeometry } from '@luma.gl/engine';
 
@@ -96,7 +96,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                  import { VMap, VLayerDeckglSimpleMesh, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VLayerDeckglSimpleMesh } from '@geoql/v-maplibre/deck.gl';
                   import { CubeGeometry } from '@luma.gl/engine';
 
                   const mapOptions = {

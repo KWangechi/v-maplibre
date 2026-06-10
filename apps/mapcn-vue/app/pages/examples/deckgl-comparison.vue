@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VLayerDeckglCOG,
-    VControlNavigation,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import { Slider } from '~/components/ui/slider';
 
@@ -75,11 +71,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-import {
-  VMap,
-  VLayerDeckglCOG,
-  VControlNavigation,
-} from '@geoql/v-maplibre';
+import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+import { VLayerDeckglCOG } from '@geoql/v-maplibre/geotiff';
 import { Slider } from '~/components/ui/slider';
 
 const BEFORE_COG = 'https://.../S2A_2018.tif';

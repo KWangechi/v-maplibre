@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VControlNavigation,
-    VControlScale,
-    VLayerMaplibreStarfield,
-    VMap,
-  } from '@geoql/v-maplibre';
+  import { VControlNavigation, VControlScale, VMap } from '@geoql/v-maplibre';
+  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
   import type { Map as MaplibreMap } from 'maplibre-gl';
   import type { SkyMode } from '~/types/globe';
 
@@ -82,7 +78,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                import { VMap, VLayerMaplibreStarfield, VControlNavigation } from '@geoql/v-maplibre';
+                import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
 
                 const { sunAzimuth, sunAltitude, setMode, modes, currentMode } =
                 useGlobeAtmosphere('night');

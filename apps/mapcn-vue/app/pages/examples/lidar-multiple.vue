@@ -2,11 +2,11 @@
   import type { GradientLegendItem } from '@geoql/v-maplibre';
   import {
     VMap,
-    VControlLidar,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VControlLidar } from '@geoql/v-maplibre/lidar';
 
   usePageGeo({
     title: 'Multiple Point Clouds - LiDAR Examples - mapcn-vue',
@@ -56,7 +56,8 @@
 
   const codeExample = `${SCRIPT_START}
                   import { ref } from 'vue';
-                  import { VMap, VControlLidar, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VControlLidar } from '@geoql/v-maplibre/lidar';
                   import 'maplibre-gl-lidar/style.css';
 
                   const lidarRef = ref<InstanceType<typeof VControlLidar> | null>(null);

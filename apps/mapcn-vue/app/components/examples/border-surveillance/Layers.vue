@@ -8,7 +8,7 @@
     CameraDatum,
     PatrolVehicleDatum,
   } from '~/types/defense-border';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     borderLine: [number, number][];

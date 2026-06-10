@@ -1,17 +1,14 @@
 <script setup lang="ts">
-  import type {
-    WindDataPoint,
-    ColorStop,
-    GradientLegendItem,
-  } from '@geoql/v-maplibre';
+  import type { GradientLegendItem } from '@geoql/v-maplibre';
+  import type { WindDataPoint, ColorStop } from '@geoql/v-maplibre/wind';
   import type { Map } from 'maplibre-gl';
   import {
     VMap,
     VControlNavigation,
     VControlScale,
     VControlLegend,
-    VLayerDeckglWindParticle,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
 
   defineProps<{
     windData: WindDataPoint[];

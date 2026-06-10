@@ -4,7 +4,7 @@
     ThreatEvent,
     CoverageZone,
   } from '~/types/defense-sensor';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     sensors: Sensor[];

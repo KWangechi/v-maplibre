@@ -7,12 +7,8 @@
    * SampleAefRgb GPU shader module in renderTile. The CPU never dequantizes
    * — the shader samples 3 bands per fragment, dequantizes, rescales.
    */
-  import {
-    VMap,
-    VControlNavigation,
-    VControlScale,
-    VLayerDeckglZarr,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import type {
     MinimalTileData,
@@ -282,7 +278,8 @@
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
-import { VMap, VLayerDeckglZarr } from '@geoql/v-maplibre';
+import { VMap } from '@geoql/v-maplibre';
+import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
 import { SampleAefRgb } from '~/utils/gpu/sample-aef-rgb';
 import * as zarr from 'zarrita';
 

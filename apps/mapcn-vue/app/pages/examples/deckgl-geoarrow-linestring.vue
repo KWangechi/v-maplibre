@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VLayerDeckglGeoArrowPath,
-    VControlNavigation,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglGeoArrowPath } from '@geoql/v-maplibre/deck.gl';
   import { tableFromIPC } from 'apache-arrow';
   import type { Table } from 'apache-arrow';
   import { shallowRef } from 'vue';
@@ -62,7 +58,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-    import { VMap, VLayerDeckglGeoArrowPath } from '@geoql/v-maplibre';
+    import { VMap } from '@geoql/v-maplibre';
+    import { VLayerDeckglGeoArrowPath } from '@geoql/v-maplibre/deck.gl';
     import { tableFromIPC } from 'apache-arrow';
 
     const table = shallowRef(null);

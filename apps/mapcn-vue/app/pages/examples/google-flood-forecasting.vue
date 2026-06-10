@@ -64,7 +64,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-  import { VMap, VLayerDeckglScatterplot, VControlNavigation } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 
   const { data } = await useFetch('/api/flood-forecasting', {
     method: 'POST',

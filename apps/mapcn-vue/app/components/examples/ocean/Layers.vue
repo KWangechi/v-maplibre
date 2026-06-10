@@ -10,7 +10,7 @@
     VLayerDeckglScatterplot,
     VLayerDeckglTrips,
     VLayerDeckglText,
-  } from '@geoql/v-maplibre';
+  } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     oceanGrid: OceanGridCell[];

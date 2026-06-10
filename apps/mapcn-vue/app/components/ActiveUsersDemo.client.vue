@@ -1,11 +1,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount } from 'vue';
-  import {
-    VMap,
-    VLayerDeckglScatterplot,
-    VPopup,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VPopup, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type { PickingInfo } from '@deck.gl/core';
 
   const { mapStyle } = useMapStyle();

@@ -7,8 +7,8 @@
     VControlLayer,
     VControlLayerGroup,
     VLayerMaplibreGeojson,
-    VLayerDeckglScatterplot,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 
   usePageGeo({
     title: 'Layer Control - mapcn-vue Examples',
@@ -169,7 +169,8 @@
               </template>`;
 
   const deckglCodeExample = `${SCRIPT_START}
-                import { VMap, VControlScale, VControlLayer, VLayerDeckglScatterplot } from '@geoql/v-maplibre';
+                import { VMap, VControlScale, VControlLayer } from '@geoql/v-maplibre';
+                import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 
                 const scatterData = [
                 { coordinates: [-122.4, 37.8], size: 50000 },

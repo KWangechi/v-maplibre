@@ -40,12 +40,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-  import {
-    VMap,
-    VControlNavigation,
-    VControlScale,
-    useDeckLayers,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
   import { ScatterplotLayer, LineLayer, TextLayer } from '@deck.gl/layers';
 
   const mapOptions = computed(() => ({

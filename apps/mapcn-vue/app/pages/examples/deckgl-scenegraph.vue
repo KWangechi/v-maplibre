@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VLayerDeckglScenegraph,
-    VControlNavigation,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglScenegraph } from '@geoql/v-maplibre/deck.gl';
   import { GLTFLoader } from '@loaders.gl/gltf';
   import { registerLoaders } from '@loaders.gl/core';
 
@@ -55,7 +51,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                  import { VMap, VLayerDeckglScenegraph, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VLayerDeckglScenegraph } from '@geoql/v-maplibre/deck.gl';
                   import { GLTFLoader } from '@loaders.gl/gltf';
                   import { registerLoaders } from '@loaders.gl/core';
 

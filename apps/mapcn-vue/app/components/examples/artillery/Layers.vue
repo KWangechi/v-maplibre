@@ -5,7 +5,7 @@
     ArtilleryPositionDatum,
     ArtilleryLabelDatum,
   } from '~/types/defense-artillery';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     positions: ArtilleryPosition[];

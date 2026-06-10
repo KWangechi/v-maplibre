@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglPolygon,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglPolygon } from '@geoql/v-maplibre/deck.gl';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
 
   usePageGeo({
@@ -90,7 +90,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                    import { VMap, VLayerDeckglPolygon, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VLayerDeckglPolygon } from '@geoql/v-maplibre/deck.gl';
 
                     const mapOptions = {
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',

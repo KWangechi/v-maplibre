@@ -9,7 +9,7 @@
     SarPositionDatum,
   } from '~/types/defense-sar';
   import type { PickingInfo } from '@deck.gl/core';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     sectors: SarSector[];

@@ -7,7 +7,7 @@
     ConvoyLabelDatum,
     CheckpointDatum,
   } from '~/types/defense-convoy';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     convoys: ConvoyUnit[];

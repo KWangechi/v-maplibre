@@ -1,13 +1,15 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglScatterplot,
-    VLayerDeckglHeatmap,
     VPopup,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import {
+    VLayerDeckglScatterplot,
+    VLayerDeckglHeatmap,
+  } from '@geoql/v-maplibre/deck.gl';
   import type { PickingInfo } from '@deck.gl/core';
   import type {
     CategoryLegendItem,
@@ -186,12 +188,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                      import {
-                        VMap,
-                        VLayerDeckglHeatmap,
-                        VLayerDeckglScatterplot,
-                        VControlNavigation,
-                      } from '@geoql/v-maplibre';
+                      import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                      import { VLayerDeckglHeatmap, VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
 
                       const colorMode = useColorMode();
                       const mapStyle = computed(() =>

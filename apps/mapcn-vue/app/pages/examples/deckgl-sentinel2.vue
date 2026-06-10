@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VControlNavigation,
-    VControlScale,
-    VLayerDeckglMultiCOG,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglMultiCOG } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import {
     Select,
@@ -150,10 +146,8 @@
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
-import {
-  VMap,
-  VLayerDeckglMultiCOG,
-} from '@geoql/v-maplibre';
+import { VMap } from '@geoql/v-maplibre';
+import { VLayerDeckglMultiCOG } from '@geoql/v-maplibre/geotiff';
 
 const base =
   'https://sentinel-cogs.s3.us-west-2.amazonaws.com/' +

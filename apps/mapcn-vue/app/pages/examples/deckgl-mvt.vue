@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglMVT,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglMVT } from '@geoql/v-maplibre/deck.gl';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { MVTFeature } from '~/types/mvt';
 
@@ -55,7 +55,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                  import { VMap, VLayerDeckglMVT, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                  import { VLayerDeckglMVT } from '@geoql/v-maplibre/deck.gl';
 
                   const mapOptions = {
                   style: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',

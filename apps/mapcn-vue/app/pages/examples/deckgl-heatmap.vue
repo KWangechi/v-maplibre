@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglHeatmap,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglHeatmap } from '@geoql/v-maplibre/deck.gl';
   import type { GradientLegendItem } from '@geoql/v-maplibre';
 
   usePageGeo({
@@ -85,7 +85,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                    import { VMap, VLayerDeckglHeatmap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                    import { VLayerDeckglHeatmap } from '@geoql/v-maplibre/deck.gl';
 
                     const mapOptions = {
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',

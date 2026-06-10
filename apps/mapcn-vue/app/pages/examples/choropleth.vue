@@ -5,10 +5,10 @@
     VControlLegend,
     VControlNavigation,
     VControlScale,
-    VLayerDeckglGeojson,
     VLayerMaplibreGeojson,
     VMap,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglGeojson } from '@geoql/v-maplibre/deck.gl';
   import type { TableLegendItem } from '@geoql/v-maplibre';
   import type {
     Feature,
@@ -324,7 +324,8 @@
               </template>`;
 
   const deckglCodeExample = `${SCRIPT_START}
-                import { VMap, VControlLegend, VLayerDeckglGeojson } from '@geoql/v-maplibre';
+                import { VMap, VControlLegend } from '@geoql/v-maplibre';
+                import { VLayerDeckglGeojson } from '@geoql/v-maplibre/deck.gl';
 
                 const statesGeoJson = ref(null);
                 const hoveredState = ref(null);

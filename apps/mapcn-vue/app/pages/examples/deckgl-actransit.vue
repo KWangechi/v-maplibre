@@ -1,13 +1,15 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglPath,
-    VLayerDeckglIcon,
-    VLayerDeckglScatterplot,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import {
+    VLayerDeckglPath,
+    VLayerDeckglIcon,
+    VLayerDeckglScatterplot,
+  } from '@geoql/v-maplibre/deck.gl';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { Map as MapLibreMap } from 'maplibre-gl';
   import type { PickingInfo } from '@deck.gl/core';
@@ -194,7 +196,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                import { VMap, VLayerDeckglPath, VLayerDeckglIcon } from '@geoql/v-maplibre';
+                import { VMap } from '@geoql/v-maplibre';
+                import { VLayerDeckglPath, VLayerDeckglIcon } from '@geoql/v-maplibre/deck.gl';
 
                 // Fetch real-time AC Transit data
                 const { buses, trails } = useActransitData();

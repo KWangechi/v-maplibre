@@ -5,7 +5,7 @@
     ZoneLabelDatum,
     ZoneCenterDatum,
   } from '~/types/defense-zone-planner';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     zones: DangerZone[];

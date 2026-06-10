@@ -7,12 +7,8 @@
    * dynamical-zarr-ecmwf demo at
    * https://github.com/developmentseed/deck.gl-raster/blob/main/examples/dynamical-zarr-ecmwf/src/App.tsx
    */
-  import {
-    VMap,
-    VControlNavigation,
-    VControlScale,
-    VLayerDeckglZarr,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import type {
     MinimalTileData,
@@ -153,7 +149,8 @@
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
   const codeExample = `${SCRIPT_START}
-import { VMap, VLayerDeckglZarr } from '@geoql/v-maplibre';
+import { VMap } from '@geoql/v-maplibre';
+import { VLayerDeckglZarr } from '@geoql/v-maplibre/geotiff';
 import * as zarr from 'zarrita';
 
 const ZARR_URL = 'https://.../ecmwf.zarr';

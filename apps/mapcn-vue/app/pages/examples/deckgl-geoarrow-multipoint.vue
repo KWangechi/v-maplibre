@@ -1,11 +1,11 @@
 <script setup lang="ts">
   import {
     VMap,
-    VLayerDeckglGeoArrowScatterplot,
     VControlNavigation,
     VControlScale,
     VControlLegend,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglGeoArrowScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import { tableFromIPC } from 'apache-arrow';
   import type { Table } from 'apache-arrow';
@@ -70,7 +70,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-    import { VMap, VLayerDeckglGeoArrowScatterplot } from '@geoql/v-maplibre';
+    import { VMap } from '@geoql/v-maplibre';
+    import { VLayerDeckglGeoArrowScatterplot } from '@geoql/v-maplibre/deck.gl';
     import { tableFromIPC } from 'apache-arrow';
 
     const table = shallowRef(null);

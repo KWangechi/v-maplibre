@@ -10,7 +10,7 @@
     VLayerDeckglPath,
     VLayerDeckglScatterplot,
     VLayerDeckglText,
-  } from '@geoql/v-maplibre';
+  } from '@geoql/v-maplibre/deck.gl';
 
   defineProps<{
     filteredSegments: CableSegment[];

@@ -1,10 +1,6 @@
 <script setup lang="ts">
-  import {
-    VMap,
-    VLayerDeckglText,
-    VControlNavigation,
-    VControlScale,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglText } from '@geoql/v-maplibre/deck.gl';
 
   usePageGeo({
     title: 'Text Layer (deck.gl) - mapcn-vue Examples',
@@ -57,7 +53,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                import { VMap, VLayerDeckglText, VControlNavigation } from '@geoql/v-maplibre';
+                import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                import { VLayerDeckglText } from '@geoql/v-maplibre/deck.gl';
 
                 const mapOptions = {
                 style: 'https://basemaps.cartocdn.com/gl/dark-matter-nolabels-gl-style/style.json',

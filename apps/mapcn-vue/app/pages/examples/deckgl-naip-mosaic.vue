@@ -4,13 +4,13 @@
     VControlNavigation,
     VControlScale,
     VControlLegend,
-    VLayerDeckglMosaic,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglMosaic } from '@geoql/v-maplibre/geotiff';
+  import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type {
     MosaicSource,
     MosaicRenderMode,
-    CategoryLegendItem,
-  } from '@geoql/v-maplibre';
+  } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
   import {
     Select,
@@ -139,12 +139,8 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                  import {
-                    VMap,
-                    VLayerDeckglMosaic,
-                    type MosaicSource,
-                    type MosaicRenderMode,
-                  } from '@geoql/v-maplibre';
+                  import { VMap } from '@geoql/v-maplibre';
+                  import { VLayerDeckglMosaic, type MosaicSource, type MosaicRenderMode } from '@geoql/v-maplibre/geotiff';
 
                   const renderMode = ref<MosaicRenderMode>('trueColor');
                   const stacItems = ref<MosaicSource[]>([]);

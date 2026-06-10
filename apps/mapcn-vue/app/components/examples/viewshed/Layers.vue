@@ -5,7 +5,7 @@
     ObserverDatum,
     ObserverLabelDatum,
   } from '~/types/defense-viewshed';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     observers: Observer[];

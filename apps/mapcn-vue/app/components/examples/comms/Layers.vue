@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type { CommNode, CommLink } from '~/types/defense-comms';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     nodes: CommNode[];

@@ -4,7 +4,7 @@
     BattlefieldPosition,
     BattlefieldUnit,
   } from '~/types/defense-terrain';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     paths: BattlefieldPath[];

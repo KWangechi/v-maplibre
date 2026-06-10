@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import type { DronePosition, DroneTrip } from '~/types/drone';
-  import { useDeckLayers } from '@geoql/v-maplibre';
+  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     tripData: DroneTrip[];

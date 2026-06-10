@@ -3,10 +3,10 @@
     VControlNavigation,
     VControlScale,
     VControlLegend,
-    VLayerDeckglScatterplot,
     VMap,
     VPopup,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
   import type { PickingInfo } from '@deck.gl/core';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type {

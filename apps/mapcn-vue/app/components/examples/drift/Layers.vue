@@ -13,7 +13,7 @@
     VLayerDeckglScatterplot,
     VLayerDeckglPath,
     VLayerDeckglHeatmap,
-  } from '@geoql/v-maplibre';
+  } from '@geoql/v-maplibre/deck.gl';
 
   const props = defineProps<{
     particlePositionData: ParticlePositionDatum[];

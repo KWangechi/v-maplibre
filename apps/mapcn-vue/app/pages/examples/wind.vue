@@ -49,12 +49,9 @@
 
   const codeExample = `${SCRIPT_START}
                 import { ref, onMounted } from 'vue';
-                import {
-                VMap,
-                VControlNavigation,
-                VLayerDeckglWindParticle,
-                } from '@geoql/v-maplibre';
-                import type { WindDataPoint, ColorStop } from '@geoql/v-maplibre';
+                import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                import { VLayerDeckglWindParticle } from '@geoql/v-maplibre/wind';
+                import type { WindDataPoint, ColorStop } from '@geoql/v-maplibre/wind';
                 import { createWindDataFromOpenWeatherMap } from 'maplibre-gl-wind';
 
                 const windData = ref<WindDataPoint[]>([]);

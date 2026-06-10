@@ -1,11 +1,8 @@
 <script setup lang="ts">
   import { ref, shallowRef, onUnmounted, computed } from 'vue';
   import type { Map, MapOptions } from 'maplibre-gl';
-  import {
-    VMap,
-    VControlScale,
-    VLayerMaplibreStarfield,
-  } from '@geoql/v-maplibre';
+  import { VMap, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
   import { MapboxOverlay } from '@deck.gl/mapbox';
   import AnimatedArcLayer from '~/utils/animated-arc-layer';
 

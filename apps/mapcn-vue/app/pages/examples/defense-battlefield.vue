@@ -41,7 +41,7 @@
 
   const codeExample = `${SCRIPT_START}
                   import { VMap, VControlNavigation } from '@geoql/v-maplibre';
-                  import { useDeckLayers } from '@geoql/v-maplibre';
+                  import { useDeckLayers } from '@geoql/v-maplibre/deck.gl';
                   import { TripsLayer } from '@deck.gl/geo-layers';
                   import { ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 

@@ -3,10 +3,10 @@
     VControlLegend,
     VControlNavigation,
     VControlScale,
-    VLayerDeckglScatterplot,
-    VLayerMaplibreStarfield,
     VMap,
   } from '@geoql/v-maplibre';
+  import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
+  import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
   import type { PickingInfo } from '@deck.gl/core';
   import type { CategoryLegendItem } from '@geoql/v-maplibre';
   import type { EarthquakeData } from '~/types/earthquake';
@@ -112,12 +112,9 @@
   const SCRIPT_START = '<' + 'script setup lang="ts">';
 
   const codeExample = `${SCRIPT_START}
-                import {
-                VMap,
-                VLayerDeckglScatterplot,
-                VLayerMaplibreStarfield,
-                VControlNavigation,
-                } from '@geoql/v-maplibre';
+                import { VMap, VControlNavigation } from '@geoql/v-maplibre';
+                import { VLayerDeckglScatterplot } from '@geoql/v-maplibre/deck.gl';
+                import { VLayerMaplibreStarfield } from '@geoql/v-maplibre/starfield';
 
                 // Geocentric sun position + local altitude for star fading
                 const { sunAzimuth, sunAltitude, localSunAltitude } = useSunPosition();

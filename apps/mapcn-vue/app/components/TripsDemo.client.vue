@@ -1,5 +1,6 @@
 <script setup lang="ts">
-  import { VMap, VLayerDeckglTrips, VControlScale } from '@geoql/v-maplibre';
+  import { VMap, VControlScale } from '@geoql/v-maplibre';
+  import { VLayerDeckglTrips } from '@geoql/v-maplibre/deck.gl';
 
   const { mapStyle } = useMapStyle();
 
