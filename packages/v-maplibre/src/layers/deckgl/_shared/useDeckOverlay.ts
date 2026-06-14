@@ -148,6 +148,16 @@ export function useDeckOverlay(
       .then(({ MapboxOverlay }) => {
         if (overlay.value) return;
 
+        // If every layer was removed while the @deck.gl/mapbox import was still
+        // in flight, there is nothing left to render — skip overlay construction
+        // so a transient layer does not leave a peer-backed overlay behind
+        // (issue #124). Reset initPromise so a later addLayer() can re-init
+        // instead of being stranded on this resolved no-op promise.
+        if (layerRegistry.size === 0) {
+          initPromise = null;
+          return;
+        }
+
         if (globe && mapInstance.getProjection()?.type !== 'globe') {
           const center = mapInstance.getCenter();
           const zoom = mapInstance.getZoom();
@@ -263,6 +273,19 @@ export function useDeckOverlay(
     map,
     (mapInstance) => {
       if (!mapInstance || overlay.value) return;
+      // Only initialize the overlay when at least one deck.gl layer is
+      // registered. addLayer() always populates layerRegistry before it queues
+      // anything, so an empty registry means there is genuinely nothing to
+      // render (this also covers the add-then-remove-before-map-ready case,
+      // where a stale pendingSyncCalls entry would otherwise force a needless
+      // init). Core-only consumers (VMap with no deck layers) never register a
+      // layer, so they must NOT reach initOverlay() — it dynamically imports the
+      // optional '@deck.gl/mapbox' peer, which is absent for core-only installs
+      // and logs a caught console.error on every map load (issue #124). The lazy
+      // addLayer() path still calls initOverlay() on the first real layer, so
+      // deck consumers are unaffected; this watch only flushes layers that
+      // registered before the map was ready.
+      if (layerRegistry.size === 0) return;
       if (mapInstance.isStyleLoaded()) {
         initOverlay();
         return;

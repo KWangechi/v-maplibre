@@ -122,6 +122,10 @@ class MockMap {
     return true;
   }
 
+  triggerRepaint() {
+    return this;
+  }
+
   private _layoutProperties: Map<string, Map<string, unknown>> = new Map();
   private _paintProperties: Map<string, Map<string, unknown>> = new Map();
   private _layers: Map<string, { type: string }> = new Map();
@@ -361,10 +365,27 @@ class MockLayer {
 
 // Mock MapboxOverlay
 class MockMapboxOverlay {
+  // Counts how many times the overlay has been constructed. A core-only VMap
+  // (no deck.gl layers) must NEVER construct one — construction only happens
+  // after import('@deck.gl/mapbox') resolves, so a non-zero count for a
+  // core-only map means the eager peer probe regressed (issue #124). Tests
+  // reset this in beforeEach and assert on it.
+  static constructionCount = 0;
+
   private _layers: MockLayer[] = [];
   private _map: unknown = null;
 
-  constructor(_props?: Record<string, unknown>) {}
+  constructor(_props?: Record<string, unknown>) {
+    MockMapboxOverlay.constructionCount++;
+  }
+
+  finalize() {
+    this._map = null;
+  }
+
+  pickObject(_opts: unknown) {
+    return null;
+  }
 
   setProps(props: { layers?: MockLayer[] }) {
     if (props.layers) {
