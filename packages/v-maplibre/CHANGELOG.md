@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.1](https://github.com/geoql/v-maplibre/compare/v2.0.0...v2.0.1) (2026-06-14)
+
+
+### Bug Fixes
+
+* **v-maplibre:** stop core VMap eagerly probing [@deck](https://github.com/deck).gl/mapbox at runtime ([#124](https://github.com/geoql/v-maplibre/issues/124)) ([63e8185](https://github.com/geoql/v-maplibre/commit/63e818590bb0b4171e55bc11d6d0d5c4e5b759a8))
+
+
+### Miscellaneous
+
+* **deps:** bump dependencies ✨ ([03a022e](https://github.com/geoql/v-maplibre/commit/03a022eeb5c4e18d074830906f33c64e9995215b))
+* **deps:** bump dependencies ✨ ([0313869](https://github.com/geoql/v-maplibre/commit/031386946a8206f615159f57a4d2a9c3e7636bcc))
+
 ## [2.0.0](https://github.com/geoql/v-maplibre/compare/v1.11.0...v2.0.0) (2026-06-10)
 
 
