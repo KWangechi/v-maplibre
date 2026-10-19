@@ -263,8 +263,17 @@
 
       // LOD traversal + georeference sync runs every rendered frame.
       removeFrameHook = entry.addFrameHook(() => {
-        if (!tiles || !entry) return;
+        if (!tiles || !entry || !contentGroup) return;
         applyTransform();
+        // The traversal reads `tiles.group.matrixWorld` to place bounding
+        // volumes against the camera frustum. three only refreshes world
+        // matrices inside `renderer.render()`, which runs AFTER this hook, so
+        // without this the traversal sees last frame's transform. With
+        // on-demand rendering there may be no next frame: the first update
+        // after the root tileset loads saw the un-recentred ECEF group, judged
+        // every tile out of view, requested nothing, and the layer stayed
+        // empty until the user moved the map.
+        contentGroup.updateMatrixWorld(true);
         tiles.setResolutionFromRenderer(entry.lodCamera, entry.renderer);
         tiles.update();
       });

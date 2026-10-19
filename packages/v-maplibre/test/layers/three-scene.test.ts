@@ -9,6 +9,7 @@ vi.mock('three', async (importOriginal) => {
     setPixelRatio = vi.fn();
     setSize = vi.fn();
     resetState = vi.fn();
+    clearDepth = vi.fn();
     render = vi.fn();
     dispose = vi.fn();
     getContext = vi.fn();
@@ -48,6 +49,10 @@ const makeMap = (): Map => {
     transform: {
       cameraPosition: [0.5, 0.35, 0.001],
       fov: 45,
+      pitch: 30,
+      bearing: 10,
+      cameraToCenterDistance: 800,
+      worldSize: 512 * 2 ** 14,
     },
   } as unknown as Map;
 };
@@ -115,6 +120,29 @@ describe('useThreeScene registry (issue #140)', () => {
     expect(entry.sparkRenderer).toBeNull();
 
     releaseThreeScene(map);
+    releaseThreeScene(map);
+  });
+
+  it('does not repaint every frame while a splat renderer is attached', () => {
+    const map = makeMap();
+    const entry = acquireThreeScene(map);
+    retainSparkRenderer(entry, () => ({ dispose: vi.fn() }) as never);
+    const customLayer = vi.mocked(map.addLayer).mock.calls[0]![0] as {
+      render: () => void;
+    };
+
+    customLayer.render();
+    customLayer.render();
+
+    // Spark >= 2.3 signals async sort / LoD work through `onDirty`, which the
+    // splat layers route to requestRender(); an idle scene must stay idle.
+    expect(entry.renderer.render).toHaveBeenCalledTimes(2);
+    expect(map.triggerRepaint).not.toHaveBeenCalled();
+
+    entry.requestRender();
+    expect(map.triggerRepaint).toHaveBeenCalledTimes(1);
+
+    releaseSparkRenderer(entry);
     releaseThreeScene(map);
   });
 

@@ -258,13 +258,10 @@ export function acquireThreeScene(map: Map): ThreeSceneEntry {
       // scene while compositing over the basemap.
       renderer.clearDepth();
       renderer.render(scene, camera);
-
-      // Spark streams and re-sorts splats across frames (async GPU readback),
-      // so a single MapLibre repaint is never enough — keep the map painting
-      // while any splat renderer is attached.
-      if (entry.sparkRenderer) {
-        map.triggerRepaint();
-      }
+      // No unconditional repaint here. Spark (>= 2.3) reports every finished
+      // async sort and LoD update through `SparkRenderer.onDirty`, which the
+      // splat layers route to `requestRender()`, so an idle splat scene stops
+      // painting instead of redrawing the whole map every frame.
     },
   };
 
