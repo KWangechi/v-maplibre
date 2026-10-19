@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import { ref, nextTick } from 'vue';
 import VControlLegend from '../../src/controls/legend/VControlLegend.vue';

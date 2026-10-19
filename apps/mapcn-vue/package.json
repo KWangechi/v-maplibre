@@ -11,10 +11,10 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
-    "format": "oxfmt --write .",
-    "format:check": "oxfmt --check ."
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
+    "format": "vp fmt --write .",
+    "format:check": "vp fmt --check ."
   },
   "dependencies": {
     "@deck.gl/aggregation-layers": "catalog:app:mapcn-vue",
@@ -96,11 +96,10 @@
     "@types/geojson": "catalog:app:mapcn-vue",
     "better-sqlite3": "catalog:app:mapcn-vue",
     "jszip": "catalog:app:mapcn-vue",
-    "oxfmt": "catalog:default",
-    "oxlint": "catalog:default",
     "shadcn-nuxt": "catalog:app:mapcn-vue",
     "tailwindcss": "catalog:app:mapcn-vue",
     "typescript": "catalog:default",
+    "vite-plus": "catalog:",
     "vue": "catalog:default",
     "vue-tsc": "catalog:app:mapcn-vue",
     "wrangler": "catalog:app:mapcn-vue"

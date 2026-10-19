@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vite-plus/test';
 import type { Map } from 'maplibre-gl';
 
 // jsdom has no WebGL2 context: keep three's real math/scene classes and

@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ### Prerequisites
 
-- Node.js (LTS, see [`.nvmrc`](./.nvmrc))
+- Node.js 26 (see [`.node-version`](./.node-version))
 - pnpm v11
 - Git
 

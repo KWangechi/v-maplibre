@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import { nextTick, ref, defineComponent, h } from 'vue';
 import VLayerMaplibreGeojson from '../../src/layers/maplibre/geojson/VLayerMaplibreGeojson.vue';

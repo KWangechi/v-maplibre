@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite-plus';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import Vue from 'unplugin-vue/rolldown';
 import vue from '@vitejs/plugin-vue';
 
@@ -106,7 +106,7 @@ export default defineConfig({
     },
   },
 
-  plugins: [vue()],
+  plugins: lazyPlugins(() => [vue()]),
 
   test: {
     globals: true,
@@ -154,8 +154,8 @@ export default defineConfig({
     // oxfmt 0.68 stopped indenting `<script>` / `<style>` content in SFCs by
     // default; keep the house style (and avoid a 12k-line reformat diff).
     vueIndentScriptAndStyle: true,
-    // Release-please owns CHANGELOG/jsr and the root config excludes these too —
-    // `vp fmt` must not rewrite them (it does not read .oxfmtrc.jsonc).
+    // Release-please owns CHANGELOG/jsr and the root vite.config.ts excludes
+    // these too — `vp fmt` run here resolves this nearest config, not the root.
     ignorePatterns: [
       'dist',
       'node_modules',

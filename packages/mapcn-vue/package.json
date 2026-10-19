@@ -24,15 +24,15 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build-registry.ts",
-    "lint": "oxlint"
+    "lint": "vp lint"
   },
   "dependencies": {
     "@geoql/v-maplibre": "workspace:*"
   },
   "devDependencies": {
-    "oxlint": "catalog:default",
     "shadcn-vue": "catalog:pkg:mapcn-vue",
     "typescript": "catalog:default",
+    "vite-plus": "catalog:",
     "vue": "catalog:default"
   },
   "peerDependencies": {

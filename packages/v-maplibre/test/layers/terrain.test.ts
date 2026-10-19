@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import { ref, nextTick } from 'vue';
 import Terrain from '../../src/layers/maplibre/terrain/VTerrain.vue';

@@ -6,8 +6,8 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "lint": "oxlint",
-    "lint:fix": "oxlint --fix",
+    "lint": "vp lint",
+    "lint:fix": "vp lint --fix",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
@@ -21,7 +21,7 @@
   "devDependencies": {
     "@nuxtjs/plausible": "catalog:app:docs",
     "agents": "catalog:app:docs",
-    "oxlint": "catalog:default",
+    "vite-plus": "catalog:",
     "wrangler": "catalog:app:docs"
   }
 }

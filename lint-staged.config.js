@@ -4,10 +4,10 @@ export default {
     'pnpm --filter @geoql/mapcn-vue-app run lint:fix',
   ],
   '*.{js,jsx,ts,tsx,vue}': [
-    'oxlint --fix',
-    'oxfmt --write --no-error-on-unmatched-pattern',
+    'vp lint --fix',
+    'vp fmt --write --no-error-on-unmatched-pattern',
   ],
   '*.{json,md,yml,yaml,css,html}': [
-    'oxfmt --write --no-error-on-unmatched-pattern',
+    'vp fmt --write --no-error-on-unmatched-pattern',
   ],
 };

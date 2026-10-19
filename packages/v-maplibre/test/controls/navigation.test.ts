@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import VControlNavigation from '../../src/controls/navigation/VControlNavigation.vue';
 import VMap from '../../src/map/VMap.vue';

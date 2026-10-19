@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import * as deckgl from '../src/deckgl';
 import * as geotiff from '../src/geotiff';
 import * as wind from '../src/wind';

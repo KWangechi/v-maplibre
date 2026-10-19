@@ -1,4 +1,4 @@
-import { vi, afterEach } from 'vitest';
+import { vi, afterEach } from 'vite-plus/test';
 import { enableAutoUnmount } from '@vue/test-utils';
 import type { StyleSpecification, MapOptions } from 'maplibre-gl';
 

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { requirePeer } from '../../src/utils/require-peer';
 
 describe('requirePeer', () => {

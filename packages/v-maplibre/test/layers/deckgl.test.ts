@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import * as coreDeckglExports from '../../src/layers/deckgl';
 import * as geotiffExports from '../../src/layers/deckgl/geotiff';
