@@ -29,10 +29,17 @@
       fontFamily: 'Geist, sans-serif',
     }"
   >
+    <!--
+      Font weights sit in static `style="font-weight: N"` attributes, not in the
+      :style objects: nuxt-og-image 7 scans templates for CSS `font-weight`
+      declarations to pick which static Geist weights to ship to Satori. It
+      does not read JS `fontWeight` keys, so those rendered at 400.
+    -->
     <!-- Top: Category badge -->
     <div :style="{ display: 'flex', alignItems: 'center', gap: '12px' }">
       <div
         v-if="category"
+        style="font-weight: 500"
         :style="{
           display: 'flex',
           alignItems: 'center',
@@ -41,7 +48,6 @@
           border: '1px solid #166534',
           borderRadius: '9999px',
           fontSize: '14px',
-          fontWeight: 500,
           color: '#86efac',
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
@@ -54,9 +60,9 @@
     <!-- Middle: Title + Description -->
     <div :style="{ display: 'flex', flexDirection: 'column', gap: '16px' }">
       <div
+        style="font-weight: 800"
         :style="{
           fontSize: '64px',
-          fontWeight: 800,
           color: '#fafafa',
           lineHeight: 1.1,
           letterSpacing: '-0.03em',
@@ -86,9 +92,9 @@
       }"
     >
       <div
+        style="font-weight: 700"
         :style="{
           fontSize: '28px',
-          fontWeight: 700,
           color: '#fafafa',
           letterSpacing: '-0.02em',
         }"
