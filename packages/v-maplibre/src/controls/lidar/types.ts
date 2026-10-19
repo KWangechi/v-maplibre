@@ -144,6 +144,52 @@ export interface LidarControlOptions {
   streamingViewportDebounceMs?: number;
 }
 
+/**
+ * Display name and colour overrides per ASPRS classification code, for
+ * example custom classes (64-255) from an annotation tool. A code without an
+ * entry keeps its standard name and colour. Requires maplibre-gl-lidar 0.19+.
+ */
+export type ClassificationStyles = Record<
+  number,
+  { name?: string; color?: [number, number, number] }
+>;
+
+/** A picked LiDAR point (the `point` of a `pointclick` event). */
+export interface PickedPointInfo {
+  /** Id of the point cloud the point belongs to */
+  pointCloudId?: string;
+  /** Point index within the point cloud */
+  index: number;
+  longitude: number;
+  latitude: number;
+  /** Elevation in meters */
+  elevation: number;
+  /** Intensity (0-1) if available */
+  intensity?: number;
+  /** ASPRS classification code if available */
+  classification?: number;
+  red?: number;
+  green?: number;
+  blue?: number;
+  /** Every extra attribute available for this point */
+  attributes?: Record<string, number>;
+  /** Screen X coordinate */
+  x: number;
+  /** Screen Y coordinate */
+  y: number;
+}
+
+/** Payload of the `pointclick` event (maplibre-gl-lidar 0.21+). */
+export interface LidarPointClickEventData {
+  point?: PickedPointInfo;
+}
+
+/** Result of `loadRegion`: how much of the cloud is now pinned. */
+export interface LidarRegionLoadResult {
+  nodes: number;
+  points: number;
+}
+
 export interface LidarLoadEventData {
   pointCloud: PointCloudInfo;
 }

@@ -11,4 +11,6 @@ export const lidarControlEvents: string[] = [
   'streamingstop',
   'streamingprogress',
   'budgetreached',
+  // maplibre-gl-lidar >= 0.21, fired on click when `pickable` is on.
+  'pointclick',
 ];

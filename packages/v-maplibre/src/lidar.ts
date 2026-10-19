@@ -21,4 +21,8 @@ export type {
   LidarLoadEventData,
   LidarErrorEventData,
   LidarUnloadEventData,
+  ClassificationStyles,
+  PickedPointInfo,
+  LidarPointClickEventData,
+  LidarRegionLoadResult,
 } from './controls/lidar';

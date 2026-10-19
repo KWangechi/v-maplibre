@@ -7,7 +7,7 @@
    * Install with:
    * `pnpm add maplibre-gl-lidar`
    */
-  import { onMounted, onUnmounted, ref } from 'vue';
+  import { onMounted, onUnmounted, ref, watch } from 'vue';
   import type { IControl } from 'maplibre-gl';
   import { MapKey, injectStrict, requirePeer } from '../../utils';
   import { lidarControlEvents as events } from './events';
@@ -20,6 +20,8 @@
     PointCloudInfo,
     StreamingLoaderOptions,
     CopcLoadingMode,
+    ClassificationStyles,
+    LidarRegionLoadResult,
   } from './types';
 
   const defaultOptions: LidarControlOptions = {
@@ -35,11 +37,18 @@
       options?: LidarControlOptions;
       position?: ControlPosition;
       defaultUrl?: string;
+      /**
+       * Reactive name/colour overrides per classification code. Applies to
+       * point colours, the legend and the tooltip. Requires
+       * maplibre-gl-lidar 0.19+.
+       */
+      classificationStyles?: ClassificationStyles;
     }>(),
     {
       options: undefined,
       position: 'top-right',
       defaultUrl: undefined,
+      classificationStyles: undefined,
     },
   );
 
@@ -99,6 +108,20 @@
     getStreamingProgress: () => unknown;
     getMap: () => unknown;
     getPanelElement: () => HTMLElement | null;
+    // maplibre-gl-lidar 0.18+
+    pauseStreaming: (id: string) => boolean;
+    resumeStreaming: (id: string) => void;
+    isStreamingLoading: (id: string) => boolean;
+    // maplibre-gl-lidar 0.19+
+    setClassificationStyles: (styles: ClassificationStyles) => void;
+    getClassificationStyles: () => ClassificationStyles;
+    // maplibre-gl-lidar 0.20+
+    loadRegion: (
+      id: string,
+      bounds: [number, number, number, number],
+      options?: { maxPoints?: number },
+    ) => Promise<LidarRegionLoadResult>;
+    clearPinnedRegion: (id: string) => void;
   }
 
   const control = ref<LidarControlInstance | null>(null);
@@ -133,10 +156,22 @@
       });
     });
 
+    if (props.classificationStyles) {
+      instance.setClassificationStyles(props.classificationStyles);
+    }
+
     if (props.defaultUrl) {
       control.value.loadPointCloud(props.defaultUrl);
     }
   };
+
+  watch(
+    () => props.classificationStyles,
+    (styles) => {
+      control.value?.setClassificationStyles(styles ?? {});
+    },
+    { deep: true },
+  );
 
   defineExpose({
     loadPointCloud: (
@@ -196,6 +231,18 @@
     getStreamingProgress: () => control.value?.getStreamingProgress(),
     getMap: () => control.value?.getMap(),
     getPanelElement: () => control.value?.getPanelElement(),
+    pauseStreaming: (id: string) => control.value?.pauseStreaming(id),
+    resumeStreaming: (id: string) => control.value?.resumeStreaming(id),
+    isStreamingLoading: (id: string) => control.value?.isStreamingLoading(id),
+    setClassificationStyles: (styles: ClassificationStyles) =>
+      control.value?.setClassificationStyles(styles),
+    getClassificationStyles: () => control.value?.getClassificationStyles(),
+    loadRegion: (
+      id: string,
+      bounds: [number, number, number, number],
+      options?: { maxPoints?: number },
+    ) => control.value?.loadRegion(id, bounds, options),
+    clearPinnedRegion: (id: string) => control.value?.clearPinnedRegion(id),
     getControl: () => control.value,
   });
 </script>
