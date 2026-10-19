@@ -28,7 +28,7 @@
   import type { PickingInfo } from '@deck.gl/core';
   import type { RasterModule } from '@developmentseed/deck.gl-raster';
   import type { MultiCOGSourceConfig } from '@developmentseed/deck.gl-geotiff';
-  import type { GeoTIFF } from '@developmentseed/geotiff';
+  import type { ConcurrencyLimiter, GeoTIFF } from '@developmentseed/geotiff';
   import { injectStrict, MapKey, requirePeer } from '../../../utils';
 
   const MULTICOG_PEER_INSTALL =
@@ -90,6 +90,12 @@
     debugOpacity?: number;
     /** Debug verbosity: 1=coords, 2=+uv/tiles, 3=+stitched-size/meters/px. */
     debugLevel?: 1 | 2 | 3;
+    /**
+     * Per-origin request limiter shared by every source (deck.gl-geotiff
+     * 0.8+). Omit it to use the library default (6 requests per origin);
+     * pass `null` to turn limiting off for HTTP/2 or HTTP/3 sources.
+     */
+    concurrencyLimiter?: ConcurrencyLimiter | null;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -108,6 +114,8 @@
   const emit = defineEmits<{
     click: [info: PickingInfo];
     hover: [info: PickingInfo];
+    /** A source could not be opened or a tile failed (deck.gl-geotiff 0.8+). */
+    error: [error: Error];
     geotiffLoad: [
       sources: Map<string, GeoTIFF>,
       options: {
@@ -170,6 +178,12 @@
       layerProps.refinementStrategy = toRaw(props.refinementStrategy);
     if (props.beforeId !== undefined)
       layerProps.beforeId = toRaw(props.beforeId);
+    // `undefined` keeps the shared default limiter; `null` opts out.
+    if (props.concurrencyLimiter !== undefined)
+      layerProps.concurrencyLimiter = toRaw(props.concurrencyLimiter);
+    layerProps.onError = (error: Error) => {
+      emit('error', error);
+    };
 
     layerProps.onGeoTIFFLoad = (
       sources: Map<string, GeoTIFF>,
@@ -245,6 +259,7 @@
       () => props.debugOpacity,
       () => props.debugLevel,
       () => props.maxError,
+      () => props.concurrencyLimiter,
     ],
     () => {
       const layer = createLayer();

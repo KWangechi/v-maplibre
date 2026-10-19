@@ -15,6 +15,7 @@
    */
   import { onBeforeUnmount, watch, shallowRef, toRaw, markRaw } from 'vue';
   import type { Color, PickingInfo } from '@deck.gl/core';
+  import type { ConcurrencyLimiter } from '@developmentseed/geotiff';
   import { injectStrict, MapKey, requirePeer } from '../../../utils';
   import { useDeckOverlay } from '../_shared/useDeckOverlay';
 
@@ -83,6 +84,15 @@
      * Opacity of debug overlay (0-1)
      */
     debugOpacity?: number;
+    /**
+     * Per-origin request limiter for tile fetches (deck.gl-geotiff 0.8+).
+     * Omit it to share the library default (6 requests per origin, the
+     * HTTP/1.1 browser limit). Pass `null` to turn limiting off for
+     * HTTP/2 or HTTP/3 sources, or a `PerOriginSemaphore` from
+     * `@developmentseed/geotiff` for a custom limit. Ignored when `geotiff`
+     * is an already-opened GeoTIFF instance.
+     */
+    concurrencyLimiter?: ConcurrencyLimiter | null;
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -101,6 +111,8 @@
   const emit = defineEmits<{
     click: [info: PickingInfo];
     hover: [info: PickingInfo];
+    /** The COG could not be opened or a tile failed (deck.gl-geotiff 0.8+). */
+    error: [error: Error];
     geotiffLoad: [
       tiff: unknown,
       options: {
@@ -156,7 +168,14 @@
     ) => {
       emit('geotiffLoad', tiff, options);
     };
+    layerProps.onError = (error: Error) => {
+      emit('error', error);
+    };
 
+    // `undefined` keeps the library's shared default limiter; `null` is a
+    // deliberate opt-out, so only an omitted prop is skipped.
+    if (props.concurrencyLimiter !== undefined)
+      layerProps.concurrencyLimiter = toRaw(props.concurrencyLimiter);
     if (props.tileSize !== 256) layerProps.tileSize = toRaw(props.tileSize);
     if (props.maxZoom !== undefined) layerProps.maxZoom = toRaw(props.maxZoom);
     if (props.minZoom !== 0) layerProps.minZoom = toRaw(props.minZoom);
@@ -227,6 +246,7 @@
       () => props.visible,
       () => props.debug,
       () => props.debugOpacity,
+      () => props.concurrencyLimiter,
     ],
     () => {
       const layer = createLayer();
