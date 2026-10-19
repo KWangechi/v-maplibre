@@ -83,7 +83,7 @@ function buildTrailsFromHistory(
   currentBuses.forEach((bus) => currentBusMap.set(bus.tripId, bus));
 
   return Object.entries(tripGroups)
-    .filter(([_, group]) => group.coordinates.length > 1)
+    .filter(([, group]) => group.coordinates.length > 1)
     .map(([tripId, group]): BusTrail => {
       const sorted = group.coordinates
         .map((coord, i) => ({ coord, ts: group.timestamps[i] as number }))

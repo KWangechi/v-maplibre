@@ -19,11 +19,14 @@
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'space-between',
+      // Satori 0.47 uses native CSS box sizing: without border-box the 60px
+      // padding grows the root past the canvas and clips the branding row.
+      boxSizing: 'border-box',
       width: '100%',
       height: '100%',
       backgroundColor: '#0a0a0f',
       padding: '60px',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'Geist, sans-serif',
     }"
   >
     <!-- Top: Category badge -->

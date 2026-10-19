@@ -54,18 +54,30 @@ export default defineNuxtConfig({
   // two families (Geist + Geist Mono), both from Google. Declaring them here
   // means the font module never has to scan main.css or any SFC <style> block.
   fonts: {
+    // `global: true` registers the families app-wide; nuxt-og-image v7 reads
+    // fonts through @nuxt/fonts' `fonts:resolved` hook and only embeds
+    // global families, so the OG template renders in Geist instead of the
+    // bundled Inter fallback.
     families: [
-      { name: 'Geist', provider: 'google', weights: [300, 400, 500, 700, 800] },
-      { name: 'Geist Mono', provider: 'google', weights: [400, 500, 700] },
+      {
+        name: 'Geist',
+        provider: 'google',
+        weights: [300, 400, 500, 700, 800],
+        global: true,
+      },
+      {
+        name: 'Geist Mono',
+        provider: 'google',
+        weights: [400, 500, 700],
+        global: true,
+      },
     ],
     defaults: {
       weights: [400, 700],
       styles: ['normal'],
       subsets: ['latin'],
     },
-    experimental: {
-      processCSSVariables: false,
-    },
+    processCSSVariables: false,
   },
 
   app: {
