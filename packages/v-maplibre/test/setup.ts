@@ -20,6 +20,13 @@ interface MockMapOptions extends Partial<MapOptions> {
 
 // Mock MapLibre GL
 class MockMap {
+  /** The most recently constructed map, for tests that drive VMap props. */
+  static lastInstance: MockMap | null = null;
+
+  readonly options: MockMapOptions;
+  readonly setGlobalStateProperty = vi.fn();
+  readonly dragRotate = { enable: vi.fn(), disable: vi.fn() };
+
   private _container: HTMLElement | string;
   private _style: string | StyleSpecification | undefined;
   private _center: [number, number];
@@ -27,6 +34,8 @@ class MockMap {
   private _listeners: Map<string, Set<EventCallback>> = new Map();
 
   constructor(options: MockMapOptions) {
+    MockMap.lastInstance = this;
+    this.options = options;
     this._container = options.container;
     this._style = options.style;
     this._center = options.center || [0, 0];
@@ -515,4 +524,4 @@ vi.mock('@deck.gl/mapbox', () => ({
 }));
 
 // Export mocks for use in tests
-export { MockMapboxOverlay, MockLayer, mockWorkerUrl };
+export { MockMap, MockMapboxOverlay, MockLayer, mockWorkerUrl };

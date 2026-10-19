@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import VMap from '../../src/map/VMap.vue';
-import '../setup';
+import { MockMap } from '../setup';
 
 describe('VMap', () => {
   const defaultOptions = {
@@ -90,6 +90,95 @@ describe('VMap', () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(wrapper.html()).toContain('test-child');
+  });
+
+  it('applies globalState as the initial state, over options.globalState', () => {
+    mount(VMap, {
+      props: {
+        options: { ...defaultOptions, globalState: { mode: 'base' } },
+        globalState: { mode: 'dark', minPop: 1000 },
+      },
+    });
+
+    expect(MockMap.lastInstance?.options.globalState).toEqual({
+      mode: 'dark',
+      minPop: 1000,
+    });
+  });
+
+  it('syncs changed, nested and removed globalState keys to the map', async () => {
+    const wrapper = mount(VMap, {
+      props: {
+        options: defaultOptions,
+        globalState: { mode: 'dark', classes: ['a'], keep: 1 },
+      },
+    });
+    const instance = MockMap.lastInstance!;
+
+    await wrapper.setProps({
+      globalState: { mode: 'light', classes: ['a', 'b'], keep: 1 },
+    });
+    expect(instance.setGlobalStateProperty).toHaveBeenCalledWith(
+      'mode',
+      'light',
+    );
+    expect(instance.setGlobalStateProperty).toHaveBeenCalledWith('classes', [
+      'a',
+      'b',
+    ]);
+    expect(instance.setGlobalStateProperty).not.toHaveBeenCalledWith(
+      'keep',
+      expect.anything(),
+    );
+
+    instance.setGlobalStateProperty.mockClear();
+    await wrapper.setProps({ globalState: { mode: 'light' } });
+    // Removed keys reset to the style default with `null`.
+    expect(instance.setGlobalStateProperty).toHaveBeenCalledWith(
+      'classes',
+      null,
+    );
+    expect(instance.setGlobalStateProperty).toHaveBeenCalledWith('keep', null);
+    expect(instance.setGlobalStateProperty).toHaveBeenCalledTimes(2);
+  });
+
+  it('passes dragRotate to the map and toggles it reactively', async () => {
+    const wrapper = mount(VMap, {
+      props: {
+        options: defaultOptions,
+        dragRotate: { around: 'pointer' },
+      },
+    });
+    const instance = MockMap.lastInstance!;
+    expect(instance.options.dragRotate).toEqual({ around: 'pointer' });
+
+    await wrapper.setProps({ dragRotate: false });
+    expect(instance.dragRotate.disable).toHaveBeenCalledTimes(1);
+
+    await wrapper.setProps({
+      dragRotate: { around: 'center', movement: 'linear' },
+    });
+    expect(instance.dragRotate.enable).toHaveBeenCalledWith({
+      around: 'center',
+      movement: 'linear',
+    });
+  });
+
+  it('leaves options.dragRotate and options.globalState alone when the props are unset', () => {
+    mount(VMap, {
+      props: {
+        options: {
+          ...defaultOptions,
+          dragRotate: false,
+          globalState: { mode: 'base' },
+        },
+      },
+    });
+
+    expect(MockMap.lastInstance?.options.dragRotate).toBe(false);
+    expect(MockMap.lastInstance?.options.globalState).toEqual({
+      mode: 'base',
+    });
   });
 
   it('uses default options when not provided', () => {
