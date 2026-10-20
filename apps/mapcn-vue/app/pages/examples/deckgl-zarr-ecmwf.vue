@@ -10,11 +10,11 @@
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
   import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
-  import type {
-    MinimalTileData,
-    RenderTileResult,
-  } from '@developmentseed/deck.gl-raster';
+  import type { RenderTileResult } from '@developmentseed/deck.gl-raster';
+  import type { Array as ZarrArray, Readable } from 'zarrita';
   import type { Slider } from '~/components/ui/slider';
+  import type { ZarrSelection, ZarrTileData } from '~/types/zarr';
+  import { registerCspSafeZarrCodecs } from '~/utils/zarr-codecs';
 
   usePageGeo({
     title: 'ECMWF GeoZarr - mapcn-vue Examples',
@@ -75,28 +75,29 @@
 
   // Tile fetch: zarrita slice on the spatial dims (returned in sliceSpec).
   async function getTileData(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    arr: any,
+    arr: ZarrArray<'float32', Readable>,
     options: { sliceSpec: unknown[]; width: number; height: number },
-  ): Promise<MinimalTileData> {
+  ): Promise<ZarrTileData> {
     const zarr = await import('zarrita');
-    const result = await zarr.get(arr, options.sliceSpec as never);
+    const result = await zarr.get(arr, options.sliceSpec as ZarrSelection);
     return {
       data: result.data,
       width: options.width,
       height: options.height,
-    } as MinimalTileData;
+    };
   }
 
   // Simple grayscale render: pass the Float32 data into an ImageData via a
   // canvas. For a production colormap pipeline see the upstream ECMWF demo.
-  function renderTile(data: MinimalTileData): RenderTileResult {
+  // The store keeps `temperature_2m` in degrees Celsius (measured range over
+  // the full globe: -59.75 °C … 38.5 °C), so the rescale window is in °C.
+  function renderTile(data: ZarrTileData): RenderTileResult {
     const float = data.data as Float32Array;
     const { width, height } = data;
     const pixels = new Uint8ClampedArray(width * height * 4);
-    // Rescale 200K..320K (typical 2m temperature range) → 0..255.
-    const min = 200;
-    const max = 320;
+    // Rescale -60 °C..40 °C → 0..255.
+    const min = -60;
+    const max = 40;
     for (let i = 0; i < float.length; i++) {
       const v = ((float[i]! - min) / (max - min)) * 255;
       const c = Math.max(0, Math.min(255, v));
@@ -118,6 +119,12 @@
     try {
       loading.value = true;
       error.value = null;
+      // The store's chunks are Blosc compressed (Zstandard inside a Blosc
+      // container). zarrita's default `blosc` codec is numcodecs' Emscripten
+      // build, which needs `unsafe-eval` and is therefore blocked by this
+      // app's Content-Security-Policy. Swap in the pure-JS codec before any
+      // chunk is read.
+      registerCspSafeZarrCodecs();
       const zarr = await import('zarrita');
       const probe = await fetch(`${ZARR_URL}/zarr.json`, {
         method: 'HEAD',
@@ -188,7 +195,7 @@ ${SCRIPT_END}
 <template>
   <ComponentDemo
     title="ECMWF GeoZarr"
-    description="GeoZarr temperature dataset (ECMWF Open Data) rendered with deck.gl-raster ZarrLayer + zarrita. Single time slice, grayscale rescale 200–320 K. The full animated 4D version with colormap controls is documented upstream."
+    description="GeoZarr temperature dataset (ECMWF Open Data) rendered with deck.gl-raster ZarrLayer + zarrita. Single time slice, grayscale rescale -60–40 °C. The full animated 4D version with colormap controls is documented upstream."
     :code="codeExample"
     registry="map-deckgl-raster"
     full-width
@@ -249,7 +256,7 @@ ${SCRIPT_END}
             rel="noopener noreferrer"
             class="font-mono text-primary hover:underline"
             >@developmentseed/deck.gl-zarr</a
-          >. GPU rescale: 200 K → 320 K (grayscale).
+          >. GPU rescale: -60 °C → 40 °C (grayscale).
         </p>
 
         <div v-if="initTimeCount > 0">

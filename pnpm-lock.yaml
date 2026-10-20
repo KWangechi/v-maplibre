@@ -219,6 +219,9 @@ catalogs:
     '@developmentseed/deck.gl-raster':
       specifier: ^0.8.1
       version: 0.8.1
+    '@developmentseed/deck.gl-zarr':
+      specifier: ^0.8.1
+      version: 0.8.1
     '@developmentseed/geotiff':
       specifier: ^0.8.1
       version: 0.8.1
@@ -342,6 +345,9 @@ catalogs:
     flatbush:
       specifier: ^4.6.2
       version: 4.6.2
+    fzstd:
+      specifier: ^0.1.1
+      version: 0.1.1
     gaussian-splat-lite:
       specifier: ^1.3.2
       version: 1.3.2
@@ -426,6 +432,9 @@ catalogs:
     yoga-wasm-web:
       specifier: ^0.3.3
       version: 0.3.3
+    zarrita:
+      specifier: ^0.7.5
+      version: 0.7.5
   default:
     maplibre-gl:
       specifier: ^6.15.0
@@ -456,6 +465,7 @@ overrides:
 
 patchedDependencies:
   maplibre-gl-interpolate-heatmap@0.1.3: ae753930ca5d378f6b5875808e5fc3ecbc77fb96fc756ebc2276ca9006c4b2c4
+  maplibre-gl-lidar@0.21.0: d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d
 
 importers:
 
@@ -553,6 +563,9 @@ importers:
         specifier: catalog:app:mapcn-vue
         version: 0.8.1(231c7b1251bdf16253a5d24ae9723bbc)
       '@developmentseed/deck.gl-raster':
+        specifier: catalog:app:mapcn-vue
+        version: 0.8.1(3c6f3202aacf4e8177af2d5c1b3ac8a2)
+      '@developmentseed/deck.gl-zarr':
         specifier: catalog:app:mapcn-vue
         version: 0.8.1(3c6f3202aacf4e8177af2d5c1b3ac8a2)
       '@developmentseed/geotiff':
@@ -657,6 +670,9 @@ importers:
       flatbush:
         specifier: catalog:app:mapcn-vue
         version: 4.6.2
+      fzstd:
+        specifier: catalog:app:mapcn-vue
+        version: 0.1.1
       gaussian-splat-lite:
         specifier: catalog:app:mapcn-vue
         version: 1.3.2(three@0.186.1)
@@ -671,7 +687,7 @@ importers:
         version: 0.1.3(patch_hash=ae753930ca5d378f6b5875808e5fc3ecbc77fb96fc756ebc2276ca9006c4b2c4)(maplibre-gl@6.15.0)
       maplibre-gl-lidar:
         specifier: catalog:app:mapcn-vue
-        version: 0.21.0(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
+        version: 0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
       maplibre-gl-wind:
         specifier: catalog:app:mapcn-vue
         version: 0.2.1(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@deck.gl/layers@9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@loaders.gl/core@4.5.4)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))
@@ -729,6 +745,9 @@ importers:
       yoga-wasm-web:
         specifier: catalog:app:mapcn-vue
         version: 0.3.3
+      zarrita:
+        specifier: catalog:app:mapcn-vue
+        version: 0.7.5
     devDependencies:
       '@iconify-json/vscode-icons':
         specifier: catalog:app:mapcn-vue
@@ -902,7 +921,7 @@ importers:
         version: 21.0.3
       maplibre-gl-lidar:
         specifier: ^0.21.0
-        version: 0.21.0(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
+        version: 0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
       maplibre-gl-wind:
         specifier: ^0.2.1
         version: 0.2.1(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@deck.gl/layers@9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@loaders.gl/core@4.5.4)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))
@@ -21445,7 +21464,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.8
 
-  maplibre-gl-lidar@0.21.0(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8):
+  maplibre-gl-lidar@0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8):
     dependencies:
       '@deck.gl/core': 9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))
       '@deck.gl/extensions': 9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))

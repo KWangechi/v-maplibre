@@ -25,6 +25,7 @@
     "@deck.gl/mesh-layers": "catalog:app:mapcn-vue",
     "@developmentseed/deck.gl-geotiff": "catalog:app:mapcn-vue",
     "@developmentseed/deck.gl-raster": "catalog:app:mapcn-vue",
+    "@developmentseed/deck.gl-zarr": "catalog:app:mapcn-vue",
     "@developmentseed/geotiff": "catalog:app:mapcn-vue",
     "@dvt3d/maplibre-three-plugin": "catalog:app:mapcn-vue",
     "@geoql/maplibre-gl-compare": "catalog:app:mapcn-vue",
@@ -57,11 +58,12 @@
     "@vueuse/nuxt": "catalog:app:mapcn-vue",
     "3d-tiles-renderer": "catalog:app:mapcn-vue",
     "3d-tiles-rendererjs-3dgs-plugin": "catalog:app:mapcn-vue",
-    "gaussian-splat-lite": "catalog:app:mapcn-vue",
     "apache-arrow": "catalog:app:mapcn-vue",
     "class-variance-authority": "catalog:app:mapcn-vue",
     "clsx": "catalog:app:mapcn-vue",
     "flatbush": "catalog:app:mapcn-vue",
+    "fzstd": "catalog:app:mapcn-vue",
+    "gaussian-splat-lite": "catalog:app:mapcn-vue",
     "lerc": "catalog:app:mapcn-vue",
     "maplibre-gl": "catalog:default",
     "maplibre-gl-interpolate-heatmap": "catalog:app:mapcn-vue",
@@ -84,7 +86,8 @@
     "three": "catalog:app:mapcn-vue",
     "tw-animate-css": "catalog:app:mapcn-vue",
     "vue-sonner": "catalog:app:mapcn-vue",
-    "yoga-wasm-web": "catalog:app:mapcn-vue"
+    "yoga-wasm-web": "catalog:app:mapcn-vue",
+    "zarrita": "catalog:app:mapcn-vue"
   },
   "devDependencies": {
     "@iconify-json/vscode-icons": "catalog:app:mapcn-vue",

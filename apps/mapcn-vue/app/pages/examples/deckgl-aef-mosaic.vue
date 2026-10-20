@@ -10,13 +10,10 @@
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
   import { VLayerZarr } from '@geoql/v-maplibre/geotiff';
   import type { Map } from 'maplibre-gl';
-  import type {
-    MinimalTileData,
-    RenderTileResult,
-  } from '@developmentseed/deck.gl-raster';
+  import type { RenderTileResult } from '@developmentseed/deck.gl-raster';
   import type { GetTileDataOptions } from '@developmentseed/deck.gl-zarr';
-  import type { Texture } from '@luma.gl/core';
   import * as zarr from 'zarrita';
+  import type { AefTileData, ZarrSelection } from '~/types/zarr';
   import {
     NumberField,
     NumberFieldContent,
@@ -34,6 +31,7 @@
   } from '~/components/ui/select';
   import { Slider } from '~/components/ui/slider';
   import { SampleAefRgb } from '~/utils/gpu/sample-aef-rgb';
+  import { registerCspSafeZarrCodecs } from '~/utils/zarr-codecs';
 
   usePageGeo({
     title: 'AEF Mosaic - mapcn-vue Examples',
@@ -154,15 +152,13 @@
     band: null,
   }));
 
-  type AefTileData = MinimalTileData & { texture: Texture };
-
   async function getTileData(
     arr: zarr.Array<'int8', zarr.Readable>,
     options: GetTileDataOptions,
   ): Promise<AefTileData> {
     const { device, sliceSpec, width, height, signal } = options;
 
-    const chunk = await zarr.get(arr, sliceSpec as never, { signal });
+    const chunk = await zarr.get(arr, sliceSpec as ZarrSelection, { signal });
     const { data } = chunk;
 
     if (chunk.shape.length !== 3) {
@@ -244,6 +240,11 @@
     try {
       loading.value = true;
       error.value = null;
+      // The store's chunks are Zstandard compressed. zarrita's default `zstd`
+      // codec is numcodecs' Emscripten build, which needs `unsafe-eval` and
+      // is therefore blocked by this app's Content-Security-Policy. Swap in
+      // the pure-JS codec before any chunk is read.
+      registerCspSafeZarrCodecs();
       const store = new zarr.FetchStore(ZARR_URL);
       const root = await zarr.open.v3(store, { kind: 'group' });
       const opened = await zarr.open.v3(root.resolve(VARIABLE), {
