@@ -161,7 +161,14 @@
     }
 
     if (props.defaultUrl) {
-      control.value.loadPointCloud(props.defaultUrl);
+      // Removing the control mid-load rejects with an AbortError. That is a
+      // cancellation (the map unmounted), not a failure, so it is ignored.
+      // Real load errors still reject and still fire `loaderror`.
+      control.value.loadPointCloud(props.defaultUrl).catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError')
+          return;
+        throw error;
+      });
     }
   };
 

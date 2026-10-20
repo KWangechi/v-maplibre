@@ -1,8 +1,20 @@
 diff --git a/dist/LidarLayerAdapter-BmYgjZT_.js b/dist/LidarLayerAdapter-BmYgjZT_.js
-index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edbcf197013 100644
+index b032f8349e84bedb2137d4250c1f297332f5af6f..9321c92a2bd8fbe9448bd337b32582cec8437d0d 100644
 --- a/dist/LidarLayerAdapter-BmYgjZT_.js
 +++ b/dist/LidarLayerAdapter-BmYgjZT_.js
-@@ -1909,7 +1909,10 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -173,9 +173,11 @@ var DeckOverlay = class {
+ 	*/
+ 	destroy() {
+ 		this._layers.clear();
++		const canvas = this._overlay.getCanvas();
+ 		try {
+ 			this._map.removeControl(this._overlay);
+ 		} catch {}
++		canvas?.getContext("webgl2")?.getExtension("WEBGL_lose_context")?.loseContext();
+ 		this._container?.remove();
+ 		this._container = null;
+ 	}
+@@ -1909,7 +1911,10 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  			}
  			function createNamedFunction(name, body) {
  				name = makeLegalFunctionName(name);
@@ -14,7 +26,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			}
  			function extendError(baseErrorType, errorName) {
  				var errorClass = createNamedFunction(errorName, function(message) {
-@@ -2484,14 +2487,6 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -2484,14 +2489,6 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  					destructors.pop()(ptr);
  				}
  			}
@@ -29,7 +41,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			function craftInvokerFunction(humanName, argTypes, classType, cppInvokerFunc, cppTargetFunc) {
  				var argCount = argTypes.length;
  				if (argCount < 2) throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!");
-@@ -2502,52 +2497,35 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -2502,52 +2499,35 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  					break;
  				}
  				var returns = argTypes[0].name !== "void";
@@ -110,7 +122,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			}
  			function __embind_register_class_constructor(rawClassType, argCount, rawArgTypesAddr, invokerSignature, invoker, rawConstructor) {
  				assert(argCount > 0);
-@@ -4007,13 +3985,13 @@ var PointData = {
+@@ -4007,13 +3987,13 @@ var PointData = {
  	decompressFile
  };
  var ourLazPerfPromise = void 0;
@@ -126,7 +138,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	const outBuffer = new Uint8Array(pointCount * pointDataRecordLength);
  	let blobPointer = 0;
  	let dataPointer = 0;
-@@ -4036,7 +4014,7 @@ async function decompressChunk(compressed, { pointCount, pointDataRecordFormat,
+@@ -4036,7 +4016,7 @@ async function decompressChunk(compressed, { pointCount, pointDataRecordFormat,
  	return outBuffer;
  }
  async function decompressFile(file, suppliedLazPerf) {
@@ -135,7 +147,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	const { pointCount, pointDataRecordLength } = Header.parse(file);
  	const outBuffer = new Uint8Array(pointCount * pointDataRecordLength);
  	let blobPointer = 0;
-@@ -4306,6 +4284,25 @@ async function loadPointDataView(filename, copc, node, { lazPerf, include } = {}
+@@ -4306,6 +4286,25 @@ async function loadPointDataView(filename, copc, node, { lazPerf, include } = {}
  	return View.create(buffer, copc.header, copc.eb, include);
  }
  //#endregion
@@ -161,14 +173,10 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  //#region node_modules/@loaders.gl/loader-utils/dist/lib/env-utils/assert.js
  /**
  * Throws an `Error` with the optional `message` if `condition` is falsy
-@@ -6752,16700 +6749,415 @@ function deduceMeshField(name, attribute, optionalMetadata) {
- 		metadata
- 	};
- }
--/**
--* Create fields array for mesh attributes
--* @param attributes
--* @returns
+@@ -6756,16696 +6755,411 @@ function deduceMeshField(name, attribute, optionalMetadata) {
+ * Create fields array for mesh attributes
+ * @param attributes
+ * @returns
 -*/
 -function deduceMeshFields(attributes) {
 -	const fields = [];
@@ -16812,10 +16820,6 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
 -				else Module["memoryInitializerRequest"].addEventListener("load", useRequest);
 -			} else doBrowserLoad();
 -		}
-+/**
-+* Create fields array for mesh attributes
-+* @param attributes
-+* @returns
 +*/
 +function deduceMeshFields(attributes) {
 +	const fields = [];
@@ -17110,7 +17114,12 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
 +	*/
 +	set num_points(arg0) {
 +		wasm.__wbg_set_wasmquickheader_num_points(this.__wbg_ptr, arg0);
-+	}
+ 	}
+-	var calledRun;
+-	function ExitStatus(status) {
+-		this.name = "ExitStatus";
+-		this.message = "Program terminated with exit(" + status + ")";
+-		this.status = status;
 +	/**
 +	* @returns {number}
 +	*/
@@ -17122,12 +17131,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
 +	*/
 +	set header_size(arg0) {
 +		wasm.__wbg_set_wasmquickheader_header_size(this.__wbg_ptr, arg0);
- 	}
--	var calledRun;
--	function ExitStatus(status) {
--		this.name = "ExitStatus";
--		this.message = "Program terminated with exit(" + status + ")";
--		this.status = status;
++	}
 +};
 +async function __wbg_load(module, imports) {
 +	if (typeof Response === "function" && module instanceof Response) {
@@ -17156,6 +17160,18 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
 +	imports.wbg = {};
 +	imports.wbg.__wbindgen_copy_to_typed_array = function(arg0, arg1, arg2) {
 +		new Uint8Array(arg2.buffer, arg2.byteOffset, arg2.byteLength).set(getArrayU8FromWasm0(arg0, arg1));
++	};
++	imports.wbg.__wbg_buffer_ccaed51a635d8a2d = function(arg0) {
++		return arg0.buffer;
++	};
++	imports.wbg.__wbg_new_fec2611eb9180f95 = function(arg0) {
++		return new Uint8Array(arg0);
++	};
++	imports.wbg.__wbg_set_ec2fcf81bc573fd9 = function(arg0, arg1, arg2) {
++		arg0.set(arg1, arg2 >>> 0);
++	};
++	imports.wbg.__wbg_length_9254c4bd3b9f23c4 = function(arg0) {
++		return arg0.length;
  	};
 -	function run(args) {
 -		args = args || arguments_;
@@ -17189,18 +17205,6 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
 -	}
 -	run();
 -	return Module;
-+	imports.wbg.__wbg_buffer_ccaed51a635d8a2d = function(arg0) {
-+		return arg0.buffer;
-+	};
-+	imports.wbg.__wbg_new_fec2611eb9180f95 = function(arg0) {
-+		return new Uint8Array(arg0);
-+	};
-+	imports.wbg.__wbg_set_ec2fcf81bc573fd9 = function(arg0, arg1, arg2) {
-+		arg0.set(arg1, arg2 >>> 0);
-+	};
-+	imports.wbg.__wbg_length_9254c4bd3b9f23c4 = function(arg0) {
-+		return arg0.length;
-+	};
 +	imports.wbg.__wbg_new_abda76e883ba8a5f = function() {
 +		return /* @__PURE__ */ new Error();
 +	};
@@ -17266,7 +17270,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  var POINT_FORMAT_READERS = {
  	0: (dv) => {
  		return {
-@@ -23500,6 +7212,103 @@ var POINT_FORMAT_READERS = {
+@@ -23500,6 +7214,103 @@ var POINT_FORMAT_READERS = {
  				dv.getUint16(32, true)
  			]
  		};
@@ -17370,7 +17374,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	}
  };
  /**
-@@ -23524,14 +7333,24 @@ function readAs(buf, Type = {}, offset, count) {
+@@ -23524,14 +7335,24 @@ function readAs(buf, Type = {}, offset, count) {
  * @returns header as LASHeader
  */
  function parseLASHeader(arraybuffer) {
@@ -17398,7 +17402,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	start += 24;
  	o.offset = readAs(arraybuffer, Float64Array, start, 3);
  	start += 24;
-@@ -23547,35 +7366,22 @@ function parseLASHeader(arraybuffer) {
+@@ -23547,35 +7368,22 @@ function parseLASHeader(arraybuffer) {
  		bounds[3],
  		bounds[5]
  	];
@@ -17445,7 +17449,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	constructor(arraybuffer) {
  		this.arraybuffer = arraybuffer;
  	}
-@@ -23597,7 +7403,7 @@ var LASLoader = class {
+@@ -23597,7 +7405,7 @@ var LASLoader = class {
  	* Reading data
  	* @param count
  	* @param skip
@@ -17454,7 +17458,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	*/
  	readData(count, skip) {
  		const { header, arraybuffer } = this;
-@@ -23651,11 +7457,11 @@ var LASLoader = class {
+@@ -23651,11 +7459,11 @@ var LASLoader = class {
  */
  var LAZLoader = class {
  	arraybuffer;
@@ -17467,7 +17471,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	}
  	/**
  	* Opens the file
-@@ -23663,60 +7469,49 @@ var LAZLoader = class {
+@@ -23663,60 +7471,49 @@ var LAZLoader = class {
  	*/
  	open() {
  		try {
@@ -17542,7 +17546,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			};
  		} catch (error) {
  			throw new Error(`Failed to read data: ${error.message}`);
-@@ -23729,10 +7524,10 @@ var LAZLoader = class {
+@@ -23729,10 +7526,10 @@ var LAZLoader = class {
  	close() {
  		try {
  			if (this.instance !== null) {
@@ -17555,7 +17559,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			return true;
  		} catch (error) {
  			throw new Error(`Failed to close file: ${error.message}`);
-@@ -23747,19 +7542,11 @@ var LASDecoder = class {
+@@ -23747,19 +7544,11 @@ var LASDecoder = class {
  	decoder;
  	pointsCount;
  	pointSize;
@@ -17575,7 +17579,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	}
  	/**
  	* Decodes data depends on this point size
-@@ -23785,13 +7572,18 @@ var LASFile = class {
+@@ -23785,13 +7574,18 @@ var LASFile = class {
  	versionAsString = "";
  	constructor(arraybuffer) {
  		this.arraybuffer = arraybuffer;
@@ -17597,7 +17601,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	*/
  	determineFormat() {
  		const formatId = readAs(this.arraybuffer, Uint8Array, 104);
-@@ -23806,7 +7598,7 @@ var LASFile = class {
+@@ -23806,7 +7600,7 @@ var LASFile = class {
  	* @returns version
  	*/
  	determineVersion() {
@@ -17606,7 +17610,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  		this.version = ver[0] * 10 + ver[1];
  		this.versionAsString = `${ver[0]}.${ver[1]}`;
  		return this.version;
-@@ -23827,8 +7619,9 @@ var LASFile = class {
+@@ -23827,8 +7621,9 @@ var LASFile = class {
  	}
  	/**
  	* @param count
@@ -17617,7 +17621,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  	*/
  	readData(count, skip) {
  		return this.loader.readData(count, skip);
-@@ -23846,7 +7639,7 @@ var LASFile = class {
+@@ -23846,7 +7641,7 @@ var LASFile = class {
  	}
  };
  //#endregion
@@ -17626,7 +17630,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  /**
  * Parsing of .las file
  * @param arrayBuffer
-@@ -24013,15 +7806,17 @@ function detectTwoByteColors(decoder = {}, batchSize, colorDepth) {
+@@ -24013,15 +7808,17 @@ function detectTwoByteColors(decoder = {}, batchSize, colorDepth) {
  	return twoByteColor;
  }
  //#endregion
@@ -17649,7 +17653,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  };
  //#endregion
  //#region node_modules/proj4/lib/global.js
-@@ -32126,14 +15921,6 @@ function createAttributeArray$2(type, length) {
+@@ -32126,14 +15923,6 @@ function createAttributeArray$2(type, length) {
  		default: return new Float32Array(length);
  	}
  }
@@ -17664,7 +17668,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  /**
  * Creates a getter function from an ArrayBuffer for copc.js
  */
-@@ -32247,7 +16034,7 @@ var PointCloudLoader = class {
+@@ -32247,7 +16036,7 @@ var PointCloudLoader = class {
  	async _loadCopcFromUrl(url) {
  		this._reportProgress(5, "Initializing decoder...");
  		await this._yieldToUI();
@@ -17673,7 +17677,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  		this._reportProgress(10, "Reading file header...");
  		await this._yieldToUI();
  		let copc;
-@@ -32274,7 +16061,7 @@ var PointCloudLoader = class {
+@@ -32274,7 +16063,7 @@ var PointCloudLoader = class {
  	async _loadCopcFromBuffer(buffer) {
  		this._reportProgress(10, "Initializing decoder...");
  		await this._yieldToUI();
@@ -17682,7 +17686,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  		const getter = createBufferGetter$1(buffer);
  		this._reportProgress(15, "Reading file header...");
  		await this._yieldToUI();
-@@ -32453,7 +16240,7 @@ var PointCloudLoader = class {
+@@ -32453,7 +16242,7 @@ var PointCloudLoader = class {
  	async _loadWithLoadersGL(buffer) {
  		this._reportProgress(20, "Parsing point cloud data...");
  		await this._yieldToUI();
@@ -17691,7 +17695,7 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			las: {
  				shape: "mesh",
  				fp64: false
-@@ -32859,14 +16646,6 @@ function createAttributeArray$1(type, length) {
+@@ -32859,14 +16648,6 @@ function createAttributeArray$1(type, length) {
  function toUint8Color(value) {
  	return value > 255 ? value >> 8 : value;
  }
@@ -17706,7 +17710,15 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  /**
  * Extracts the PROJCS section from a WKT string (handles COMPD_CS)
  */
-@@ -34560,7 +18339,7 @@ var EptStreamingLoader = class {
+@@ -33855,6 +17636,7 @@ var CopcStreamingLoader = class {
+ 	*/
+ 	destroy() {
+ 		if (this._updateBatchTimeout) clearTimeout(this._updateBatchTimeout);
++		this._onPointsLoaded = void 0;
+ 		this._loadingQueue = [];
+ 		this._nodeCache.clear();
+ 		this._hierarchyPages.clear();
+@@ -34560,7 +18342,7 @@ var EptStreamingLoader = class {
  	* @param startIndex - Starting index in buffers
  	*/
  	async _loadLazNode(url, _node, startIndex) {
@@ -17715,17 +17727,75 @@ index b032f8349e84bedb2137d4250c1f297332f5af6f..d6a8f2b87127da49d6f590010b294edb
  			las: {
  				shape: "mesh",
  				fp64: false
-@@ -43041,4 +26820,3 @@ var LidarLayerAdapter = class {
+@@ -34969,6 +18751,7 @@ var EptStreamingLoader = class {
+ 	*/
+ 	destroy() {
+ 		if (this._updateBatchTimeout) clearTimeout(this._updateBatchTimeout);
++		this._onPointsLoaded = void 0;
+ 		this._loadingQueue = [];
+ 		this._nodeCache.clear();
+ 		this._hierarchyCache.clear();
+@@ -41274,6 +25057,10 @@ var LidarControl = class LidarControl {
+ 			});
+ 			this._panelBuilder?.updateLoadingProgress(10, "Initializing COPC file...");
+ 			const { bounds, totalPoints, hasRGB, spacing } = await streamingLoader.initialize();
++			if (!this._map) {
++				streamingLoader.destroy();
++				throw new DOMException("LidarControl was removed while loading", "AbortError");
++			}
+ 			this._panelBuilder?.updateLoadingProgress(20, "Setting up streaming...");
+ 			let autoZOffsetApplied = false;
+ 			streamingLoader.setOnPointsLoaded((data) => {
+@@ -41358,6 +25145,7 @@ var LidarControl = class LidarControl {
+ 			this._emitWithData("load", { pointCloud: info });
+ 			return info;
+ 		} catch (err) {
++			if (err instanceof DOMException && err.name === "AbortError") throw err;
+ 			const error = err instanceof Error ? err : new Error(String(err));
+ 			if ((error.message.includes("CORS") || error.message === "Failed to fetch" || err instanceof TypeError && error.message === "Failed to fetch") && typeof source === "string") {
+ 				console.warn(`CORS error detected for ${source}. Falling back to download mode...`);
+@@ -41424,6 +25212,10 @@ var LidarControl = class LidarControl {
+ 			});
+ 			this._panelBuilder?.updateLoadingProgress(10, "Initializing EPT dataset...");
+ 			const { bounds, totalPoints, hasRGB, spacing } = await eptLoader.initialize();
++			if (!this._map) {
++				eptLoader.destroy();
++				throw new DOMException("LidarControl was removed while loading", "AbortError");
++			}
+ 			this._panelBuilder?.updateLoadingProgress(20, "Setting up streaming...");
+ 			let autoZOffsetApplied = false;
+ 			eptLoader.setOnPointsLoaded((data) => {
+@@ -41509,6 +25301,7 @@ var LidarControl = class LidarControl {
+ 			this._emitWithData("load", { pointCloud: info });
+ 			return info;
+ 		} catch (err) {
++			if (err instanceof DOMException && err.name === "AbortError") throw err;
+ 			const error = err instanceof Error ? err : new Error(String(err));
+ 			const eptLoader = this._eptStreamingLoaders.get(id);
+ 			if (eptLoader) {
+@@ -43041,4 +26834,3 @@ var LidarLayerAdapter = class {
  //#endregion
  export { formatNumericValue as A, COLORMAP_NAMES as C, debounce as D, classNames as E, CopcStreamingLoader as F, PointCloudLoader as I, DECK_CANVAS_CLASS as L, getFilename as M, throttle as N, formatBytes as O, EptStreamingLoader as P, DeckOverlay as R, COLORMAP_LABELS as S, clamp as T, PointCloudManager as _, createLidarSharePayload as a, getClassificationName as b, encodeLidarSharePayload as c, CrossSectionTool as d, ElevationProfileExtractor as f, ViewportManager as g, MetadataPanel as h, LIDAR_SHARE_VERSION as i, generateId as j, formatNumber as k, hasLidarShareParams as l, ElevationProfileChart as m, LidarControl as n, createLidarShareUrl as o, CrossSectionPanel as p, LIDAR_SHARE_PARAM as r, decodeLidarSharePayload as s, LidarLayerAdapter as t, parseLidarSharePayloadFromUrl as u, ColorSchemeProcessor as v, getColormap as w, COLORMAPS as x, getClassificationColor as y, __commonJSMin as z };
  
 -//# sourceMappingURL=LidarLayerAdapter-BmYgjZT_.js.map
 \ No newline at end of file
 diff --git a/dist/LidarLayerAdapter-Jv5iJ1RN.cjs b/dist/LidarLayerAdapter-Jv5iJ1RN.cjs
-index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d29f81f66a 100644
+index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..fd9e7eb1bb5f246a86b0e5f490f39c392461f598 100644
 --- a/dist/LidarLayerAdapter-Jv5iJ1RN.cjs
 +++ b/dist/LidarLayerAdapter-Jv5iJ1RN.cjs
-@@ -1905,7 +1905,10 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -169,9 +169,11 @@ var DeckOverlay = class {
+ 	*/
+ 	destroy() {
+ 		this._layers.clear();
++		const canvas = this._overlay.getCanvas();
+ 		try {
+ 			this._map.removeControl(this._overlay);
+ 		} catch {}
++		canvas?.getContext("webgl2")?.getExtension("WEBGL_lose_context")?.loseContext();
+ 		this._container?.remove();
+ 		this._container = null;
+ 	}
+@@ -1905,7 +1907,10 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  			}
  			function createNamedFunction(name, body) {
  				name = makeLegalFunctionName(name);
@@ -17737,7 +17807,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			}
  			function extendError(baseErrorType, errorName) {
  				var errorClass = createNamedFunction(errorName, function(message) {
-@@ -2480,14 +2483,6 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -2480,14 +2485,6 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  					destructors.pop()(ptr);
  				}
  			}
@@ -17752,7 +17822,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			function craftInvokerFunction(humanName, argTypes, classType, cppInvokerFunc, cppTargetFunc) {
  				var argCount = argTypes.length;
  				if (argCount < 2) throwBindingError("argTypes array size mismatch! Must at least get return value and 'this' types!");
-@@ -2498,52 +2493,35 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+@@ -2498,52 +2495,35 @@ var require_laz_perf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
  					break;
  				}
  				var returns = argTypes[0].name !== "void";
@@ -17833,7 +17903,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			}
  			function __embind_register_class_constructor(rawClassType, argCount, rawArgTypesAddr, invokerSignature, invoker, rawConstructor) {
  				assert(argCount > 0);
-@@ -4003,13 +3981,13 @@ var PointData = {
+@@ -4003,13 +3983,13 @@ var PointData = {
  	decompressFile
  };
  var ourLazPerfPromise = void 0;
@@ -17849,7 +17919,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	const outBuffer = new Uint8Array(pointCount * pointDataRecordLength);
  	let blobPointer = 0;
  	let dataPointer = 0;
-@@ -4032,7 +4010,7 @@ async function decompressChunk(compressed, { pointCount, pointDataRecordFormat,
+@@ -4032,7 +4012,7 @@ async function decompressChunk(compressed, { pointCount, pointDataRecordFormat,
  	return outBuffer;
  }
  async function decompressFile(file, suppliedLazPerf) {
@@ -17858,7 +17928,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	const { pointCount, pointDataRecordLength } = Header.parse(file);
  	const outBuffer = new Uint8Array(pointCount * pointDataRecordLength);
  	let blobPointer = 0;
-@@ -4302,6 +4280,25 @@ async function loadPointDataView(filename, copc, node, { lazPerf, include } = {}
+@@ -4302,6 +4282,25 @@ async function loadPointDataView(filename, copc, node, { lazPerf, include } = {}
  	return View.create(buffer, copc.header, copc.eb, include);
  }
  //#endregion
@@ -17884,14 +17954,10 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  //#region node_modules/@loaders.gl/loader-utils/dist/lib/env-utils/assert.js
  /**
  * Throws an `Error` with the optional `message` if `condition` is falsy
-@@ -6748,16700 +6745,415 @@ function deduceMeshField(name, attribute, optionalMetadata) {
- 		metadata
- 	};
- }
--/**
--* Create fields array for mesh attributes
--* @param attributes
--* @returns
+@@ -6752,16696 +6751,411 @@ function deduceMeshField(name, attribute, optionalMetadata) {
+ * Create fields array for mesh attributes
+ * @param attributes
+ * @returns
 -*/
 -function deduceMeshFields(attributes) {
 -	const fields = [];
@@ -34535,10 +34601,6 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
 -				else Module["memoryInitializerRequest"].addEventListener("load", useRequest);
 -			} else doBrowserLoad();
 -		}
-+/**
-+* Create fields array for mesh attributes
-+* @param attributes
-+* @returns
 +*/
 +function deduceMeshFields(attributes) {
 +	const fields = [];
@@ -34833,7 +34895,12 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
 +	*/
 +	set num_points(arg0) {
 +		wasm.__wbg_set_wasmquickheader_num_points(this.__wbg_ptr, arg0);
-+	}
+ 	}
+-	var calledRun;
+-	function ExitStatus(status) {
+-		this.name = "ExitStatus";
+-		this.message = "Program terminated with exit(" + status + ")";
+-		this.status = status;
 +	/**
 +	* @returns {number}
 +	*/
@@ -34845,12 +34912,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
 +	*/
 +	set header_size(arg0) {
 +		wasm.__wbg_set_wasmquickheader_header_size(this.__wbg_ptr, arg0);
- 	}
--	var calledRun;
--	function ExitStatus(status) {
--		this.name = "ExitStatus";
--		this.message = "Program terminated with exit(" + status + ")";
--		this.status = status;
++	}
 +};
 +async function __wbg_load(module, imports) {
 +	if (typeof Response === "function" && module instanceof Response) {
@@ -34879,6 +34941,18 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
 +	imports.wbg = {};
 +	imports.wbg.__wbindgen_copy_to_typed_array = function(arg0, arg1, arg2) {
 +		new Uint8Array(arg2.buffer, arg2.byteOffset, arg2.byteLength).set(getArrayU8FromWasm0(arg0, arg1));
++	};
++	imports.wbg.__wbg_buffer_ccaed51a635d8a2d = function(arg0) {
++		return arg0.buffer;
++	};
++	imports.wbg.__wbg_new_fec2611eb9180f95 = function(arg0) {
++		return new Uint8Array(arg0);
++	};
++	imports.wbg.__wbg_set_ec2fcf81bc573fd9 = function(arg0, arg1, arg2) {
++		arg0.set(arg1, arg2 >>> 0);
++	};
++	imports.wbg.__wbg_length_9254c4bd3b9f23c4 = function(arg0) {
++		return arg0.length;
  	};
 -	function run(args) {
 -		args = args || arguments_;
@@ -34912,18 +34986,6 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
 -	}
 -	run();
 -	return Module;
-+	imports.wbg.__wbg_buffer_ccaed51a635d8a2d = function(arg0) {
-+		return arg0.buffer;
-+	};
-+	imports.wbg.__wbg_new_fec2611eb9180f95 = function(arg0) {
-+		return new Uint8Array(arg0);
-+	};
-+	imports.wbg.__wbg_set_ec2fcf81bc573fd9 = function(arg0, arg1, arg2) {
-+		arg0.set(arg1, arg2 >>> 0);
-+	};
-+	imports.wbg.__wbg_length_9254c4bd3b9f23c4 = function(arg0) {
-+		return arg0.length;
-+	};
 +	imports.wbg.__wbg_new_abda76e883ba8a5f = function() {
 +		return /* @__PURE__ */ new Error();
 +	};
@@ -34989,7 +35051,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  var POINT_FORMAT_READERS = {
  	0: (dv) => {
  		return {
-@@ -23496,6 +7208,103 @@ var POINT_FORMAT_READERS = {
+@@ -23496,6 +7210,103 @@ var POINT_FORMAT_READERS = {
  				dv.getUint16(32, true)
  			]
  		};
@@ -35093,7 +35155,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	}
  };
  /**
-@@ -23520,14 +7329,24 @@ function readAs(buf, Type = {}, offset, count) {
+@@ -23520,14 +7331,24 @@ function readAs(buf, Type = {}, offset, count) {
  * @returns header as LASHeader
  */
  function parseLASHeader(arraybuffer) {
@@ -35121,7 +35183,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	start += 24;
  	o.offset = readAs(arraybuffer, Float64Array, start, 3);
  	start += 24;
-@@ -23543,35 +7362,22 @@ function parseLASHeader(arraybuffer) {
+@@ -23543,35 +7364,22 @@ function parseLASHeader(arraybuffer) {
  		bounds[3],
  		bounds[5]
  	];
@@ -35168,7 +35230,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	constructor(arraybuffer) {
  		this.arraybuffer = arraybuffer;
  	}
-@@ -23593,7 +7399,7 @@ var LASLoader = class {
+@@ -23593,7 +7401,7 @@ var LASLoader = class {
  	* Reading data
  	* @param count
  	* @param skip
@@ -35177,7 +35239,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	*/
  	readData(count, skip) {
  		const { header, arraybuffer } = this;
-@@ -23647,11 +7453,11 @@ var LASLoader = class {
+@@ -23647,11 +7455,11 @@ var LASLoader = class {
  */
  var LAZLoader = class {
  	arraybuffer;
@@ -35190,7 +35252,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	}
  	/**
  	* Opens the file
-@@ -23659,60 +7465,49 @@ var LAZLoader = class {
+@@ -23659,60 +7467,49 @@ var LAZLoader = class {
  	*/
  	open() {
  		try {
@@ -35265,7 +35327,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			};
  		} catch (error) {
  			throw new Error(`Failed to read data: ${error.message}`);
-@@ -23725,10 +7520,10 @@ var LAZLoader = class {
+@@ -23725,10 +7522,10 @@ var LAZLoader = class {
  	close() {
  		try {
  			if (this.instance !== null) {
@@ -35278,7 +35340,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			return true;
  		} catch (error) {
  			throw new Error(`Failed to close file: ${error.message}`);
-@@ -23743,19 +7538,11 @@ var LASDecoder = class {
+@@ -23743,19 +7540,11 @@ var LASDecoder = class {
  	decoder;
  	pointsCount;
  	pointSize;
@@ -35298,7 +35360,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	}
  	/**
  	* Decodes data depends on this point size
-@@ -23781,13 +7568,18 @@ var LASFile = class {
+@@ -23781,13 +7570,18 @@ var LASFile = class {
  	versionAsString = "";
  	constructor(arraybuffer) {
  		this.arraybuffer = arraybuffer;
@@ -35320,7 +35382,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	*/
  	determineFormat() {
  		const formatId = readAs(this.arraybuffer, Uint8Array, 104);
-@@ -23802,7 +7594,7 @@ var LASFile = class {
+@@ -23802,7 +7596,7 @@ var LASFile = class {
  	* @returns version
  	*/
  	determineVersion() {
@@ -35329,7 +35391,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  		this.version = ver[0] * 10 + ver[1];
  		this.versionAsString = `${ver[0]}.${ver[1]}`;
  		return this.version;
-@@ -23823,8 +7615,9 @@ var LASFile = class {
+@@ -23823,8 +7617,9 @@ var LASFile = class {
  	}
  	/**
  	* @param count
@@ -35340,7 +35402,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  	*/
  	readData(count, skip) {
  		return this.loader.readData(count, skip);
-@@ -23842,7 +7635,7 @@ var LASFile = class {
+@@ -23842,7 +7637,7 @@ var LASFile = class {
  	}
  };
  //#endregion
@@ -35349,7 +35411,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  /**
  * Parsing of .las file
  * @param arrayBuffer
-@@ -24009,15 +7802,17 @@ function detectTwoByteColors(decoder = {}, batchSize, colorDepth) {
+@@ -24009,15 +7804,17 @@ function detectTwoByteColors(decoder = {}, batchSize, colorDepth) {
  	return twoByteColor;
  }
  //#endregion
@@ -35372,7 +35434,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  };
  //#endregion
  //#region node_modules/proj4/lib/global.js
-@@ -32122,14 +15917,6 @@ function createAttributeArray$2(type, length) {
+@@ -32122,14 +15919,6 @@ function createAttributeArray$2(type, length) {
  		default: return new Float32Array(length);
  	}
  }
@@ -35387,7 +35449,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  /**
  * Creates a getter function from an ArrayBuffer for copc.js
  */
-@@ -32243,7 +16030,7 @@ var PointCloudLoader = class {
+@@ -32243,7 +16032,7 @@ var PointCloudLoader = class {
  	async _loadCopcFromUrl(url) {
  		this._reportProgress(5, "Initializing decoder...");
  		await this._yieldToUI();
@@ -35396,7 +35458,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  		this._reportProgress(10, "Reading file header...");
  		await this._yieldToUI();
  		let copc;
-@@ -32270,7 +16057,7 @@ var PointCloudLoader = class {
+@@ -32270,7 +16059,7 @@ var PointCloudLoader = class {
  	async _loadCopcFromBuffer(buffer) {
  		this._reportProgress(10, "Initializing decoder...");
  		await this._yieldToUI();
@@ -35405,7 +35467,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  		const getter = createBufferGetter$1(buffer);
  		this._reportProgress(15, "Reading file header...");
  		await this._yieldToUI();
-@@ -32449,7 +16236,7 @@ var PointCloudLoader = class {
+@@ -32449,7 +16238,7 @@ var PointCloudLoader = class {
  	async _loadWithLoadersGL(buffer) {
  		this._reportProgress(20, "Parsing point cloud data...");
  		await this._yieldToUI();
@@ -35414,7 +35476,7 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			las: {
  				shape: "mesh",
  				fp64: false
-@@ -32855,14 +16642,6 @@ function createAttributeArray$1(type, length) {
+@@ -32855,14 +16644,6 @@ function createAttributeArray$1(type, length) {
  function toUint8Color(value) {
  	return value > 255 ? value >> 8 : value;
  }
@@ -35429,7 +35491,15 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  /**
  * Extracts the PROJCS section from a WKT string (handles COMPD_CS)
  */
-@@ -34556,7 +18335,7 @@ var EptStreamingLoader = class {
+@@ -33851,6 +17632,7 @@ var CopcStreamingLoader = class {
+ 	*/
+ 	destroy() {
+ 		if (this._updateBatchTimeout) clearTimeout(this._updateBatchTimeout);
++		this._onPointsLoaded = void 0;
+ 		this._loadingQueue = [];
+ 		this._nodeCache.clear();
+ 		this._hierarchyPages.clear();
+@@ -34556,7 +18338,7 @@ var EptStreamingLoader = class {
  	* @param startIndex - Starting index in buffers
  	*/
  	async _loadLazNode(url, _node, startIndex) {
@@ -35438,7 +35508,53 @@ index 92c3d38e6cd39bd9e9c0150370ff4a532dcd0f35..f3368549a4dee009a1f54dc7ac2bf1d2
  			las: {
  				shape: "mesh",
  				fp64: false
-@@ -43270,4 +27049,3 @@ Object.defineProperty(exports, "throttle", {
+@@ -34965,6 +18747,7 @@ var EptStreamingLoader = class {
+ 	*/
+ 	destroy() {
+ 		if (this._updateBatchTimeout) clearTimeout(this._updateBatchTimeout);
++		this._onPointsLoaded = void 0;
+ 		this._loadingQueue = [];
+ 		this._nodeCache.clear();
+ 		this._hierarchyCache.clear();
+@@ -41270,6 +25053,10 @@ var LidarControl = class LidarControl {
+ 			});
+ 			this._panelBuilder?.updateLoadingProgress(10, "Initializing COPC file...");
+ 			const { bounds, totalPoints, hasRGB, spacing } = await streamingLoader.initialize();
++			if (!this._map) {
++				streamingLoader.destroy();
++				throw new DOMException("LidarControl was removed while loading", "AbortError");
++			}
+ 			this._panelBuilder?.updateLoadingProgress(20, "Setting up streaming...");
+ 			let autoZOffsetApplied = false;
+ 			streamingLoader.setOnPointsLoaded((data) => {
+@@ -41354,6 +25141,7 @@ var LidarControl = class LidarControl {
+ 			this._emitWithData("load", { pointCloud: info });
+ 			return info;
+ 		} catch (err) {
++			if (err instanceof DOMException && err.name === "AbortError") throw err;
+ 			const error = err instanceof Error ? err : new Error(String(err));
+ 			if ((error.message.includes("CORS") || error.message === "Failed to fetch" || err instanceof TypeError && error.message === "Failed to fetch") && typeof source === "string") {
+ 				console.warn(`CORS error detected for ${source}. Falling back to download mode...`);
+@@ -41420,6 +25208,10 @@ var LidarControl = class LidarControl {
+ 			});
+ 			this._panelBuilder?.updateLoadingProgress(10, "Initializing EPT dataset...");
+ 			const { bounds, totalPoints, hasRGB, spacing } = await eptLoader.initialize();
++			if (!this._map) {
++				eptLoader.destroy();
++				throw new DOMException("LidarControl was removed while loading", "AbortError");
++			}
+ 			this._panelBuilder?.updateLoadingProgress(20, "Setting up streaming...");
+ 			let autoZOffsetApplied = false;
+ 			eptLoader.setOnPointsLoaded((data) => {
+@@ -41505,6 +25297,7 @@ var LidarControl = class LidarControl {
+ 			this._emitWithData("load", { pointCloud: info });
+ 			return info;
+ 		} catch (err) {
++			if (err instanceof DOMException && err.name === "AbortError") throw err;
+ 			const error = err instanceof Error ? err : new Error(String(err));
+ 			const eptLoader = this._eptStreamingLoaders.get(id);
+ 			if (eptLoader) {
+@@ -43270,4 +27063,3 @@ Object.defineProperty(exports, "throttle", {
  	}
  });
  

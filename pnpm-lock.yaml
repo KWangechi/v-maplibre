@@ -465,7 +465,7 @@ overrides:
 
 patchedDependencies:
   maplibre-gl-interpolate-heatmap@0.1.3: ae753930ca5d378f6b5875808e5fc3ecbc77fb96fc756ebc2276ca9006c4b2c4
-  maplibre-gl-lidar@0.21.0: d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d
+  maplibre-gl-lidar@0.21.0: bd68d59e2bc3efa8ba263955e158705ce293b94dc0ab6e073b4849f4af755ba1
 
 importers:
 
@@ -687,7 +687,7 @@ importers:
         version: 0.1.3(patch_hash=ae753930ca5d378f6b5875808e5fc3ecbc77fb96fc756ebc2276ca9006c4b2c4)(maplibre-gl@6.15.0)
       maplibre-gl-lidar:
         specifier: catalog:app:mapcn-vue
-        version: 0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
+        version: 0.21.0(patch_hash=bd68d59e2bc3efa8ba263955e158705ce293b94dc0ab6e073b4849f4af755ba1)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
       maplibre-gl-wind:
         specifier: catalog:app:mapcn-vue
         version: 0.2.1(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@deck.gl/layers@9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@loaders.gl/core@4.5.4)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))
@@ -921,7 +921,7 @@ importers:
         version: 21.0.3
       maplibre-gl-lidar:
         specifier: ^0.21.0
-        version: 0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
+        version: 0.21.0(patch_hash=bd68d59e2bc3efa8ba263955e158705ce293b94dc0ab6e073b4849f4af755ba1)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8)
       maplibre-gl-wind:
         specifier: ^0.2.1
         version: 0.2.1(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@deck.gl/layers@9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@loaders.gl/core@4.5.4)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))
@@ -21464,7 +21464,7 @@ snapshots:
     optionalDependencies:
       react: 19.2.8
 
-  maplibre-gl-lidar@0.21.0(patch_hash=d337307dba77f082fc3b744bcb00bef5adf0cfd6db5c7c6ec095981740d6f33d)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8):
+  maplibre-gl-lidar@0.21.0(patch_hash=bd68d59e2bc3efa8ba263955e158705ce293b94dc0ab6e073b4849f4af755ba1)(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))(maplibre-gl@6.15.0)(react@19.2.8):
     dependencies:
       '@deck.gl/core': 9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))
       '@deck.gl/extensions': 9.4.0(@deck.gl/core@9.4.0(@luma.gl/webgpu@9.4.1(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2))))(@luma.gl/core@9.4.2)(@luma.gl/engine@9.4.2(@luma.gl/core@9.4.2)(@luma.gl/shadertools@9.4.2(@luma.gl/core@9.4.2)))
