@@ -240,15 +240,12 @@
       const hasLayer = mapInstance.getLayer(props.layerId);
 
       if (!hasLayer) {
-        // Add layer if it doesn't exist
-        try {
-          if (!mapInstance.getSource(props.sourceId)) {
-            mapInstance.addSource(props.sourceId, props.source);
-          }
-          mapInstance.addLayer(props.layer, props.before);
-        } catch (error) {
-          console.error(`[${props.layerId}] Error adding layer:`, error);
-        }
+        // The layer is not on the map yet. Route through the idempotent,
+        // style-guarded entry point instead of calling addSource()/addLayer()
+        // directly: MapLibre throws "Style is not done loading." for any
+        // mutation issued before the style is parsed, and this watcher runs
+        // immediately at mount — long before the style request resolves.
+        tryAddLayer();
       } else {
         try {
           // Update visibility
@@ -301,15 +298,9 @@
       const hasLayer = mapInstance.getLayer(props.layerId);
 
       if (!hasLayer) {
-        // Only add layer if it doesn't exist
-        try {
-          if (!mapInstance.getSource(props.sourceId)) {
-            mapInstance.addSource(props.sourceId, props.source);
-          }
-          mapInstance.addLayer(props.layer, props.before);
-        } catch (error) {
-          console.error(`[${props.layerId}] Error adding layer:`, error);
-        }
+        // Only add layer if it doesn't exist — through the style-guarded,
+        // idempotent entry point (see the watcher above).
+        tryAddLayer();
       } else {
         // Just update visibility if layer exists
         try {

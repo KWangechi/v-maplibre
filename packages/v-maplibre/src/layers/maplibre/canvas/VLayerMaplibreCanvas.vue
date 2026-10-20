@@ -111,6 +111,10 @@
   const updateSource = (): void => {
     const mapInstance = getMapInstance();
     if (!mapInstance) return;
+    // The style must be ready before sources/layers can be mutated. When it is
+    // not, tryAddLayer() (bound to style.load / idle) adds the CURRENT props
+    // later, so the update is not lost.
+    if (!mapInstance.isStyleLoaded()) return;
 
     try {
       // For canvas sources, we need to remove and re-add both source and layer

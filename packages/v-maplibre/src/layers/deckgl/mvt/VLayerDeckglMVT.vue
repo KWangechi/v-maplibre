@@ -88,15 +88,18 @@
   const { addLayer, removeLayer, updateLayer } = useDeckOverlay(map);
 
   const createLayer = () => {
+    // Only forward optional props that are actually set. deck.gl copies every
+    // own prop onto the layer's props instance, which shadows the layer's
+    // `defaultProps`. Passing `undefined` therefore does NOT fall back to the
+    // default: `pointType: undefined` shadowed GeoJsonLayer's
+    // `pointType: 'circle'` and GeoJsonLayer then crashed on
+    // `pointType.split('+')` while initializing.
     return new MVTLayer({
       id: props.id,
       data: props.data,
       minZoom: props.minZoom,
       maxZoom: props.maxZoom,
-      uniqueIdProperty: props.uniqueIdProperty,
-      highlightedFeatureId: props.highlightedFeatureId,
       binary: props.binary,
-      loadOptions: props.loadOptions,
       getFillColor: props.getFillColor ?? [255, 0, 0, 255],
       getLineColor: props.getLineColor ?? [0, 0, 0, 255],
       getLineWidth: props.getLineWidth ?? 1,
@@ -115,18 +118,29 @@
       extruded: props.extruded,
       wireframe: props.wireframe,
       elevationScale: props.elevationScale,
-      pointType: props.pointType,
       opacity: props.opacity,
       visible: props.visible,
       pickable: props.pickable,
       autoHighlight: props.autoHighlight,
-      highlightColor: props.highlightColor,
-      beforeId: props.beforeId,
       onClick: (info: PickingInfo) => emit('click', info),
       onHover: (info: PickingInfo) => emit('hover', info),
       onTileLoad: (tile: unknown) => emit('tileLoad', tile),
       onTileError: (error: Error, tile: unknown) =>
         emit('tileError', error, tile),
+      ...(props.uniqueIdProperty !== undefined && {
+        uniqueIdProperty: props.uniqueIdProperty,
+      }),
+      ...(props.highlightedFeatureId !== undefined && {
+        highlightedFeatureId: props.highlightedFeatureId,
+      }),
+      ...(props.loadOptions !== undefined && {
+        loadOptions: props.loadOptions,
+      }),
+      ...(props.pointType !== undefined && { pointType: props.pointType }),
+      ...(props.highlightColor !== undefined && {
+        highlightColor: props.highlightColor,
+      }),
+      ...(props.beforeId !== undefined && { beforeId: props.beforeId }),
     } as unknown as ConstructorParameters<typeof MVTLayer>[0]);
   };
 

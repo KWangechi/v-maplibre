@@ -48,16 +48,17 @@ describe('issue #124: core-only VMap must not probe @deck.gl/mapbox', () => {
     expect(MockMapboxOverlay.constructionCount).toBeGreaterThan(0);
   });
 
-  it('constructs the overlay via the lazy path even before style.load', async () => {
+  it('does not construct the overlay before the style is loaded, and constructs it once the style loads', async () => {
     const styleLoaded = { value: false };
-    const onceListeners = new Map<string, () => void>();
+    const styleLoadListeners = new Set<() => void>();
     const fakeMap = {
       isStyleLoaded: () => styleLoaded.value,
-      once: (event: string, cb: () => void) => {
-        onceListeners.set(event, cb);
+      on: (event: string, cb: () => void) => {
+        if (event === 'style.load') styleLoadListeners.add(cb);
       },
-      on: () => {},
-      off: () => {},
+      off: (event: string, cb: () => void) => {
+        if (event === 'style.load') styleLoadListeners.delete(cb);
+      },
       addControl: () => {},
       removeControl: () => {},
       triggerRepaint: () => {},
@@ -74,6 +75,14 @@ describe('issue #124: core-only VMap must not probe @deck.gl/mapbox', () => {
     });
 
     mount(harness);
+    await vi.dynamicImportSettled();
+
+    // MapLibre throws "Style is not done loading." for any style mutation
+    // issued before the style is parsed, so the overlay must wait for it.
+    expect(MockMapboxOverlay.constructionCount).toBe(0);
+
+    styleLoaded.value = true;
+    styleLoadListeners.forEach((cb) => cb());
     await vi.dynamicImportSettled();
 
     expect(MockMapboxOverlay.constructionCount).toBeGreaterThan(0);

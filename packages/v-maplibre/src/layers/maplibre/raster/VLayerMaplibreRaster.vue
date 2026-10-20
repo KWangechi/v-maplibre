@@ -108,6 +108,10 @@
   const updateSource = (): void => {
     const mapInstance = getMapInstance();
     if (!mapInstance) return;
+    // The style must be ready before sources/layers can be mutated. When it is
+    // not, tryAddLayer() (bound to style.load / idle) adds the CURRENT props
+    // later, so the update is not lost.
+    if (!mapInstance.isStyleLoaded()) return;
 
     try {
       // Store the current beforeId since we'll need to reuse it
@@ -116,7 +120,9 @@
       if (mapInstance.getLayer(props.layerId)) {
         mapInstance.removeLayer(props.layerId);
       }
-      mapInstance.removeSource(props.sourceId);
+      if (mapInstance.getSource(props.sourceId)) {
+        mapInstance.removeSource(props.sourceId);
+      }
 
       mapInstance.addSource(props.sourceId, props.source);
       const layerSpec = {
@@ -194,12 +200,12 @@
       const hasLayer = mapInstance.getLayer(props.layerId);
 
       if (!hasLayer) {
-        // Add layer with proper ordering
-        try {
-          mapInstance.addLayer(props.layer, props.before);
-        } catch (error) {
-          console.error(`[${props.layerId}] Error adding layer:`, error);
-        }
+        // The layer is not on the map yet. Route through the idempotent,
+        // style-guarded entry point instead of calling addLayer() directly:
+        // MapLibre throws "Style is not done loading." for any mutation issued
+        // before the style is parsed, and this watcher runs immediately at
+        // mount — long before the style request resolves.
+        tryAddLayer();
       } else {
         try {
           // Update visibility

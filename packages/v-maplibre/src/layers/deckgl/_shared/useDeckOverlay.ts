@@ -4,7 +4,6 @@ import {
   ref,
   shallowRef,
   onUnmounted,
-  onWatcherCleanup,
   watch,
   type InjectionKey,
   type Ref,
@@ -15,7 +14,7 @@ import type { MapboxOverlay } from '@deck.gl/mapbox';
 // layerRegistry (the lib's build tooling does not typecheck, so this only
 // surfaces in the editor / vue-tsc).
 import type { Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
-import { requirePeer } from '../../../utils';
+import { requirePeer, waitForStyleReady } from '../../../utils';
 
 export const DeckOverlayKey: InjectionKey<ShallowRef<MapboxOverlay | null>> =
   Symbol('DeckOverlay');
@@ -48,7 +47,7 @@ interface UseDeckOverlayOptions {
 
 interface UseDeckOverlayReturn {
   overlay: ShallowRef<MapboxOverlay | null>;
-  layers: Ref<unknown[]>;
+  layers: ShallowRef<unknown[]>;
   isInitialized: Ref<boolean>;
   initOverlay: () => Promise<void>;
   addLayer: (layer: unknown) => void;
@@ -107,10 +106,24 @@ export function useDeckOverlay(
   }
 
   const overlay = shallowRef<MapboxOverlay | null>(null);
-  const layers = ref<unknown[]>([]);
+  // shallowRef, NOT ref: the array holds raw deck.gl layer instances. A deep
+  // `ref` wraps the array in a Vue reactive proxy, and every element read
+  // through that proxy is itself wrapped in `reactive()`. deck.gl then drove
+  // the proxied layer instances, and Vue's proxy returned a *wrapped* value
+  // for props that are non-writable + non-configurable (deck.gl freezes its
+  // props objects) — V8 rejects that with
+  // "'get' on proxy: property 'scenegraph' is a read-only and non-configurable
+  // data property on the proxy target but the proxy did not return its actual
+  // value". deck.gl layer instances must never be passed through Vue's deep
+  // reactivity.
+  const layers = shallowRef<unknown[]>([]);
   const isInitialized = ref(false);
   let initPromise: Promise<void> | null = null;
   let clickHandler: ((e: MapMouseEvent) => void) | null = null;
+  // Set when the owning component unmounts. The overlay init waits for the
+  // style, so the promise can still be in flight when the map is torn down —
+  // the guard stops it from constructing an overlay on a dead map.
+  let disposed = false;
 
   /**
    * Workaround for deck.gl MapboxOverlay click events not reaching layer onClick
@@ -156,19 +169,49 @@ export function useDeckOverlay(
     if (overlay.value) return Promise.resolve();
     if (initPromise) return initPromise;
 
-    initPromise = requirePeer(
-      '@deck.gl/mapbox',
-      () => import('@deck.gl/mapbox'),
-      'pnpm add @deck.gl/core @deck.gl/mapbox',
-    )
-      .then(({ MapboxOverlay }) => {
+    // MapLibre throws "Style is not done loading." for every style mutation
+    // issued before the style has been parsed — `map.setProjection()` (globe)
+    // included. Deck.gl layer wrappers mount as soon as VMap renders its slot,
+    // which happens right after `new Map()` and long before the style request
+    // resolves, so the init has to WAIT for the style instead of assuming it
+    // is ready. Waiting here (rather than only on the `watch(map)` path)
+    // closes the race for the lazy `addLayer()` path, which is the one that
+    // actually runs first.
+    initPromise = waitForStyleReady(mapInstance)
+      .then((styleReady) => {
+        if (!styleReady) {
+          // The style never became ready within the timeout — skip the overlay
+          // instead of letting MapLibre throw. Reset initPromise so a later
+          // addLayer() can retry.
+          initPromise = null;
+          return null;
+        }
+        if (disposed) return null;
+        return requirePeer(
+          '@deck.gl/mapbox',
+          () => import('@deck.gl/mapbox'),
+          'pnpm add @deck.gl/core @deck.gl/mapbox',
+        );
+      })
+      .then((mod) => {
+        if (!mod) return;
+        const { MapboxOverlay } = mod;
         if (overlay.value) return;
+        if (disposed) return;
+        // The map instance was replaced while we were waiting for the style
+        // (VMap remount) — this pending promise belongs to the dead map. Drop
+        // it so the `watch(map)` path can start a fresh init for the new map.
+        if (map.value !== mapInstance) {
+          initPromise = null;
+          return;
+        }
 
-        // If every layer was removed while the @deck.gl/mapbox import was still
-        // in flight, there is nothing left to render — skip overlay construction
-        // so a transient layer does not leave a peer-backed overlay behind
-        // (issue #124). Reset initPromise so a later addLayer() can re-init
-        // instead of being stranded on this resolved no-op promise.
+        // If every layer was removed while the style was loading (or while the
+        // @deck.gl/mapbox import was in flight), there is nothing left to
+        // render — skip overlay construction so a transient layer does not
+        // leave a peer-backed overlay behind (issue #124). Reset initPromise so
+        // a later addLayer() can re-init instead of being stranded on this
+        // resolved no-op promise.
         if (layerRegistry.size === 0) {
           initPromise = null;
           return;
@@ -353,28 +396,11 @@ export function useDeckOverlay(
       // deck consumers are unaffected; this watch only flushes layers that
       // registered before the map was ready.
       if (layerRegistry.size === 0) return;
-      if (mapInstance.isStyleLoaded()) {
-        initOverlay();
-        return;
-      }
-      const onStyleLoad = () => initOverlay();
-      mapInstance.once('style.load', onStyleLoad);
-      const interval = setInterval(() => {
-        if (overlay.value) {
-          clearInterval(interval);
-          return;
-        }
-        if (mapInstance.isStyleLoaded()) {
-          clearInterval(interval);
-          initOverlay();
-        }
-      }, 100);
-      const timeout = setTimeout(() => clearInterval(interval), 10000);
-      onWatcherCleanup(() => {
-        mapInstance.off('style.load', onStyleLoad);
-        clearInterval(interval);
-        clearTimeout(timeout);
-      });
+      // initOverlay() waits for the style itself (MapLibre throws "Style is
+      // not done loading." for any style mutation issued too early), so both
+      // entry points share one readiness mechanism instead of duplicating the
+      // style.load bookkeeping here.
+      initOverlay();
     },
     { immediate: true },
   );
@@ -391,6 +417,7 @@ export function useDeckOverlay(
   let throttledRenderListener: (() => void) | null = null;
 
   onUnmounted(() => {
+    disposed = true;
     removeClickHandler(map.value);
     if (map.value && throttledRenderListener) {
       map.value.off('render', throttledRenderListener);

@@ -79,28 +79,27 @@
   const { addLayer, removeLayer, updateLayer } = useDeckOverlay(map);
 
   const createLayer = () => {
+    // Only forward optional props that are actually set. deck.gl copies every
+    // own prop onto the layer's props instance, which shadows the layer's
+    // `defaultProps`. Passing `undefined` therefore does NOT fall back to the
+    // default: `maxCacheByteSize: undefined` made Tileset2D believe byte-size
+    // caching was enabled (it only checks `!== null`) and it then read
+    // `tile.byteLength` off an ImageBitmap, which has no such property —
+    // deck.gl logged "byteLength not defined in tile data" on every tile.
     return new TileLayer({
       id: props.id,
       data: props.data,
-      getTileData: props.getTileData,
       renderSubLayers: props.renderSubLayers,
       tileSize: props.tileSize,
       maxZoom: props.maxZoom,
       minZoom: props.minZoom,
-      maxCacheSize: props.maxCacheSize,
-      maxCacheByteSize: props.maxCacheByteSize,
       refinementStrategy: props.refinementStrategy,
-      zRange: props.zRange,
       maxRequests: props.maxRequests,
-      extent: props.extent,
-      loadOptions: props.loadOptions,
       zoomOffset: props.zoomOffset,
       opacity: props.opacity,
       visible: props.visible,
       pickable: props.pickable,
       autoHighlight: props.autoHighlight,
-      highlightColor: props.highlightColor,
-      beforeId: props.beforeId,
       onClick: (info: PickingInfo) => emit('click', info),
       onHover: (info: PickingInfo) => emit('hover', info),
       onViewportLoad: (tiles: unknown[]) => emit('viewportLoad', tiles),
@@ -108,6 +107,24 @@
       onTileUnload: (tile: unknown) => emit('tileUnload', tile),
       onTileError: (error: Error, tile: unknown) =>
         emit('tileError', error, tile),
+      ...(props.getTileData !== undefined && {
+        getTileData: props.getTileData,
+      }),
+      ...(props.maxCacheSize !== undefined && {
+        maxCacheSize: props.maxCacheSize,
+      }),
+      ...(props.maxCacheByteSize !== undefined && {
+        maxCacheByteSize: props.maxCacheByteSize,
+      }),
+      ...(props.zRange !== undefined && { zRange: props.zRange }),
+      ...(props.extent !== undefined && { extent: props.extent }),
+      ...(props.loadOptions !== undefined && {
+        loadOptions: props.loadOptions,
+      }),
+      ...(props.highlightColor !== undefined && {
+        highlightColor: props.highlightColor,
+      }),
+      ...(props.beforeId !== undefined && { beforeId: props.beforeId }),
     } as TileLayerProps);
   };
 

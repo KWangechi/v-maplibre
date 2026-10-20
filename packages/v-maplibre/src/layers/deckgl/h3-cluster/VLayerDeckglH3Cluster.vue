@@ -84,15 +84,17 @@
       lineWidthScale: props.lineWidthScale,
       lineWidthMinPixels: props.lineWidthMinPixels,
       lineWidthMaxPixels: props.lineWidthMaxPixels,
-      material: props.material,
       opacity: props.opacity,
       visible: props.visible,
       pickable: props.pickable,
       autoHighlight: props.autoHighlight,
-      highlightColor: props.highlightColor,
-      beforeId: props.beforeId,
       onClick: (info: PickingInfo) => emit('click', info),
       onHover: (info: PickingInfo) => emit('hover', info),
+      ...(props.material !== undefined && { material: props.material }),
+      ...(props.highlightColor !== undefined && {
+        highlightColor: props.highlightColor,
+      }),
+      ...(props.beforeId !== undefined && { beforeId: props.beforeId }),
     } as H3ClusterLayerProps);
   };
 
