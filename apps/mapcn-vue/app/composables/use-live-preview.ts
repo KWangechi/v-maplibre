@@ -1,11 +1,20 @@
 import type { Ref } from 'vue';
 
 // Every live preview is a full MapLibre map, often with a deck.gl overlay on
-// its own WebGL canvas. Browsers cap live WebGL contexts at about 16 per
-// page and drop the oldest past that, so only a few previews may run at
-// once; the rest wait until a visible slot frees up. Module state is
-// client-only: previews mount inside <ClientOnly>.
-const MAX_LIVE = 6;
+// its own WebGL canvas, plus its tiles and data. Desktop Chrome caps live
+// WebGL contexts at 16 and evicts the oldest; iOS Safari kills the whole
+// tab under GPU/memory pressure instead. So only a few previews run at once
+// (2 on touch devices, whose GPU memory is far smaller); the rest wait until
+// a visible slot frees up. Module state is client-only: previews mount
+// inside <ClientOnly>.
+const MAX_LIVE_DESKTOP = 6;
+const MAX_LIVE_TOUCH = 2;
+
+let maxLive = MAX_LIVE_DESKTOP;
+if (import.meta.client && window.matchMedia('(pointer: coarse)').matches) {
+  maxLive = MAX_LIVE_TOUCH;
+}
+const MAX_LIVE = maxLive;
 const live = ref<string[]>([]);
 const waiting = ref<string[]>([]);
 
