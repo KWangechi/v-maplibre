@@ -1,4 +1,6 @@
-import type { Highlighter } from 'shiki';
+// The web bundle's own Highlighter type: its languages and themes differ from
+// the full `shiki` bundle, so the root `Highlighter` type does not match.
+import type { Highlighter } from 'shiki/bundle/web';
 
 let highlighterPromise: Promise<Highlighter> | null = null;
 
@@ -20,13 +22,14 @@ export function useShiki(code: Ref<string | undefined>, lang: Ref<string>) {
   const colorMode = useColorMode();
 
   async function highlight() {
-    const shikiPromise = getHighlighter();
-    if (!shikiPromise) return;
+    // Check for code first: empty callers must not load Shiki at all.
     const raw = code.value;
     if (!raw) {
       highlightedHtml.value = '';
       return;
     }
+    const shikiPromise = getHighlighter();
+    if (!shikiPromise) return;
     const shiki = await shikiPromise;
     const theme = colorMode.value === 'dark' ? 'github-dark' : 'github-light';
     highlightedHtml.value = shiki.codeToHtml(raw, {

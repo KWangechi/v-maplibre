@@ -420,13 +420,26 @@ canvas {
   mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
 }
 
+/* Side panel under the floating toolbar: content is fully hidden for the
+   toolbar's 40px, fades in by 96px, and fades out over the last 48px.
+   Fixed px stops (not %) so the fade stays under the toolbar however long
+   the panel scrolls. */
 .gradient-fade-both {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    transparent 40px,
+    black 96px,
+    black calc(100% - 48px),
+    transparent
+  );
   mask-image: linear-gradient(
     to bottom,
-    transparent 0%,
-    black 12%,
-    black 88%,
-    transparent 100%
+    transparent,
+    transparent 40px,
+    black 96px,
+    black calc(100% - 48px),
+    transparent
   );
 }
 

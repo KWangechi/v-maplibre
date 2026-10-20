@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { useClipboard } from '@vueuse/core';
   import { cn } from '~/lib/utils';
 
   const props = withDefaults(
@@ -37,15 +36,46 @@
   }
 
   const dedentedCode = computed(() => dedent(props.code));
-  const codeExpanded = ref(false);
-  const { copy, copied } = useClipboard({ source: dedentedCode });
+
+  // Inside an /examples gallery card only the map renders.
+  const isPreview = inject(GALLERY_PREVIEW_KEY, false);
+
+  // The example's source as SoftwareSourceCode, so search and answer engines
+  // can cite the snippet itself (WebPage + breadcrumb come from usePageGeo).
+  if (!isPreview && props.code && props.title) {
+    const route = useRoute();
+    useSchemaOrg([
+      {
+        '@type': 'SoftwareSourceCode',
+        name: props.title,
+        description: props.description,
+        codeSampleType: 'full solution',
+        programmingLanguage: ['Vue', 'TypeScript'],
+        runtimePlatform: 'Web browser',
+        targetProduct: {
+          '@type': 'SoftwareApplication',
+          name: '@geoql/v-maplibre',
+        },
+        codeRepository: 'https://github.com/geoql/v-maplibre',
+        url: `https://mapcn-vue.geoql.in${route.path}`,
+        text: dedentedCode.value,
+      },
+    ]);
+  }
 
   const langRef = computed(() => 'vue');
-  const { highlightedHtml } = useShiki(dedentedCode, langRef);
+  // Previews show no code, so they never load Shiki.
+  const { highlightedHtml } = useShiki(
+    computed(() => (isPreview ? '' : dedentedCode.value)),
+    langRef,
+  );
 </script>
 
 <template>
-  <div class="flex h-dvh flex-col overflow-hidden lg:flex-row">
+  <div v-if="isPreview" class="relative size-full overflow-hidden">
+    <slot></slot>
+  </div>
+  <div v-else class="flex h-dvh flex-col overflow-hidden lg:flex-row">
     <!-- Left panel: docs/code (desktop only — mobile uses MapInfoSheet) -->
     <div
       class="relative order-last hidden flex-1 flex-col lg:order-first lg:flex lg:w-1/3 lg:max-w-1/3"
@@ -79,53 +109,15 @@
           {{ description }}
         </p>
 
-        <!-- Code block -->
-        <div v-if="code" class="not-prose">
-          <button
-            class="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            :aria-expanded="codeExpanded"
-            aria-controls="code-panel"
-            @click="codeExpanded = !codeExpanded"
-          >
-            <Icon name="lucide:code" class="size-3.5" />
-            <span>{{ codeExpanded ? 'Hide code' : 'View code' }}</span>
-            <Icon
-              name="lucide:chevron-down"
-              :class="[
-                'size-3 transition-transform duration-200',
-                codeExpanded ? 'rotate-180' : '',
-              ]"
-            />
-          </button>
-
-          <div
-            v-show="codeExpanded"
-            id="code-panel"
-            role="region"
-            aria-label="Source code"
-            class="relative overflow-hidden rounded-xl border border-border/50"
-          >
-            <button
-              class="absolute right-2 top-2 z-10 grid size-8 place-items-center rounded-md text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground"
-              :class="copied ? 'text-foreground' : ''"
-              :aria-label="copied ? 'Copied' : 'Copy code'"
-              @click="copy(dedentedCode)"
-            >
-              <Icon
-                :name="copied ? 'lucide:check' : 'lucide:copy'"
-                class="size-3.5"
-              />
-            </button>
-
-            <div
-              class="shiki-wrapper shiki-flush max-h-code-lg overflow-auto text-sm"
-              v-html="highlightedHtml"
-            ></div>
-          </div>
-        </div>
-
         <!-- Install command -->
-        <PackageManagerTabs v-if="registry" :registry="registry" class="mt-8" />
+        <PackageManagerTabs v-if="registry" :registry="registry" class="mb-6" />
+
+        <!-- Usage (open) + components, as collapsible sections -->
+        <ExampleDocsSections
+          v-if="code"
+          :code="dedentedCode"
+          :highlighted-html="highlightedHtml"
+        />
       </div>
 
       <!-- Sticky footer -->
@@ -172,49 +164,14 @@
           {{ description }}
         </p>
 
-        <div v-if="code" class="not-prose mb-4">
-          <button
-            class="mb-3 flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            :aria-expanded="codeExpanded"
-            aria-controls="code-panel-mobile"
-            @click="codeExpanded = !codeExpanded"
-          >
-            <Icon name="lucide:code" class="size-3.5" />
-            <span>{{ codeExpanded ? 'Hide code' : 'View code' }}</span>
-            <Icon
-              name="lucide:chevron-down"
-              :class="[
-                'size-3 transition-transform duration-200',
-                codeExpanded ? 'rotate-180' : '',
-              ]"
-            />
-          </button>
-          <div
-            v-show="codeExpanded"
-            id="code-panel-mobile"
-            role="region"
-            aria-label="Source code"
-            class="relative overflow-hidden rounded-md border border-border"
-          >
-            <button
-              class="absolute right-2 top-2 z-10 grid size-8 place-items-center rounded-md text-muted-foreground/50 transition-colors hover:bg-muted hover:text-foreground"
-              :class="copied ? 'text-foreground' : ''"
-              :aria-label="copied ? 'Copied' : 'Copy code'"
-              @click="copy(dedentedCode)"
-            >
-              <Icon
-                :name="copied ? 'lucide:check' : 'lucide:copy'"
-                class="size-3.5"
-              />
-            </button>
-            <div
-              class="shiki-wrapper shiki-flush max-h-code-sm overflow-auto text-sm"
-              v-html="highlightedHtml"
-            ></div>
-          </div>
-        </div>
+        <PackageManagerTabs v-if="registry" :registry="registry" class="mb-4" />
 
-        <PackageManagerTabs v-if="registry" :registry="registry" />
+        <ExampleDocsSections
+          v-if="code"
+          :code="dedentedCode"
+          :highlighted-html="highlightedHtml"
+          size="sm"
+        />
 
         <div class="mt-6 border-t border-border pt-4">
           <ExampleNavigation />

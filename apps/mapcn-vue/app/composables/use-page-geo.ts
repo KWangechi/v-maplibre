@@ -24,6 +24,13 @@ function humanizeSegment(segment: string): string {
 }
 
 export function usePageGeo(options: PageGeoOptions) {
+  // An example page mounted as an /examples gallery preview must not take
+  // over the gallery's title, canonical and JSON-LD. A component-scoped
+  // head cannot isolate it: Nuxt resolves the head inside
+  // `nuxtApp.runWithContext`, and Vue's inject() reads the app-level
+  // provides first whenever an app context is active.
+  if (inject(GALLERY_PREVIEW_KEY, false)) return;
+
   const config = useRuntimeConfig();
   const route = useRoute();
 

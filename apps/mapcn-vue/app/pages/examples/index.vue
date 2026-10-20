@@ -22,7 +22,17 @@
     category: 'Examples',
   });
 
-  const { categories, totalExamples } = useExamplesData();
+  const {
+    featured,
+    chips,
+    query,
+    active,
+    visible,
+    showFeatured,
+    matchCount,
+    totalExamples,
+    reset,
+  } = useExamplesGallery();
 </script>
 
 <template>
@@ -33,12 +43,34 @@
       <div class="mx-auto w-full max-w-6xl px-4">
         <ExamplesIndexHeader :total-examples="totalExamples" />
 
+        <ExamplesIndexFeatured v-if="showFeatured" :examples="featured" />
+
+        <ExamplesIndexFilters
+          v-model:query="query"
+          v-model:active="active"
+          :chips="chips"
+          :match-count="matchCount"
+        />
+
         <div class="space-y-20">
           <ExamplesIndexSection
-            v-for="category in categories"
+            v-for="category in visible"
             :key="category.id"
             :category="category"
           />
+        </div>
+
+        <div
+          v-if="visible.length === 0"
+          class="flex flex-col items-start gap-3 rounded-md border border-dashed border-border p-8"
+        >
+          <p class="text-sm text-muted-foreground">
+            No examples match
+            <span class="font-mono text-foreground">“{{ query }}”</span>.
+          </p>
+          <Button variant="outline" size="sm" @click="reset">
+            Clear filters
+          </Button>
         </div>
 
         <ExamplesIndexFooterCta />
