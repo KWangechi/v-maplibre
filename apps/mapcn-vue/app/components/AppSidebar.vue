@@ -116,10 +116,14 @@
           class="inline-flex size-8 items-center justify-center rounded-md text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
           @click="toggleColorMode"
         >
-          <Icon
-            :name="colorMode.value === 'dark' ? 'lucide:sun' : 'lucide:moon'"
-            class="size-4"
-          />
+          <!-- Both icons render; CSS picks one from the `.dark` class, so
+            server and client markup match in every mode. -->
+          <span class="contents dark:hidden">
+            <Icon name="lucide:moon" class="size-4" />
+          </span>
+          <span class="hidden dark:contents">
+            <Icon name="lucide:sun" class="size-4" />
+          </span>
           <span class="sr-only">Toggle theme</span>
         </button>
       </div>

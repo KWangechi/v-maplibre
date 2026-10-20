@@ -3,6 +3,12 @@
 
 @plugin 'tailwindcss-animate';
 
+/* `dark:` follows the `.dark` class that @nuxtjs/color-mode sets on <html>.
+   Tailwind v4's default is `prefers-color-scheme`, which ignores the theme
+   toggle: an OS in light mode with the site switched to dark kept every
+   `dark:` utility off. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @utility container {
   margin-inline: auto;
   padding-inline: 1rem;

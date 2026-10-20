@@ -73,10 +73,17 @@
           class="pointer-events-auto inline-flex size-7 items-center justify-center rounded-lg bg-background/80 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground"
           @click="toggleColorMode"
         >
-          <Icon
-            :name="colorMode.value === 'dark' ? 'lucide:sun' : 'lucide:moon'"
-            class="size-4"
-          />
+          <!-- Both icons render; CSS picks one from the `.dark` class. The
+            server cannot know the resolved mode, so a value-based icon
+            mismatched on hydration in dark mode. -->
+          <!-- Wrapper spans carry the display toggle: the icon's own
+            `.iconify` rule sets `display` and would override it. -->
+          <span class="contents dark:hidden">
+            <Icon name="lucide:moon" class="size-4" />
+          </span>
+          <span class="hidden dark:contents">
+            <Icon name="lucide:sun" class="size-4" />
+          </span>
           <span class="sr-only">Toggle theme</span>
         </button>
       </TooltipTrigger>
