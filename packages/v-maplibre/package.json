@@ -162,7 +162,7 @@
     "gaussian-splat-lite": "^1.0.0",
     "maplibre-gl-lidar": "^0.21.0",
     "maplibre-gl-wind": "^0.2.0",
-    "three": ">=0.176.0",
+    "three": ">=0.186.0",
     "vue": "^3.5.0",
     "zarrita": "^0.7.0"
   },

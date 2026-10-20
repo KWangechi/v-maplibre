@@ -22,7 +22,10 @@
   import { TilesFadePlugin } from '3d-tiles-renderer/plugins';
   import { GaussianSplatPlugin } from '3d-tiles-rendererjs-3dgs-plugin';
   import { GaussianSplatRenderer } from 'gaussian-splat-lite';
-  import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+  import {
+    DRACOLoader,
+    DRACO_GLTF_CONFIG,
+  } from 'three/addons/loaders/DRACOLoader.js';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   import { MathUtils, Matrix4, Vector3, Group } from 'three';
   import type { Map } from 'maplibre-gl';
@@ -105,6 +108,7 @@
   let removeFrameHook: (() => void) | null = null;
   let anchorCoord: [number, number, number] | null = null;
   let ownsTileSplatRenderer = false;
+  let dracoLoader: DRACOLoader | null = null;
 
   const getMapInstance = (): Map | null => {
     return map.value || null;
@@ -220,10 +224,13 @@
       // Note: GLTFExtensionsPlugin has a /g flag bug on its regex that
       // causes alternating handler misses, so we skip it and register
       // manually with a non-global regex.
-      const dracoLoader = new DRACOLoader();
-      dracoLoader.setDecoderPath(
-        'https://www.gstatic.com/draco/versioned/decoders/1.5.7/',
-      );
+      // The decoder comes from the consumer's installed `three` package
+      // (three/examples/jsm/libs/draco/gltf), referenced by static
+      // `new URL(..., import.meta.url)` URLs that bundlers emit as assets.
+      // No CDN: it works offline, under a strict CSP, and always matches
+      // the installed DRACOLoader.
+      dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath(DRACO_GLTF_CONFIG);
       const gltfLoader = new GLTFLoader(tiles.manager);
       gltfLoader.setDRACOLoader(dracoLoader);
       tiles.manager.addHandler(/\.(gltf|glb)$/, gltfLoader);
@@ -352,6 +359,9 @@
         tiles.dispose();
         tiles = null;
       }
+      // Terminates the decoder workers.
+      dracoLoader?.dispose();
+      dracoLoader = null;
       if (entry && contentGroup) {
         entry.scene.remove(contentGroup);
       }

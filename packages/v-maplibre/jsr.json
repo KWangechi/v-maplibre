@@ -31,7 +31,7 @@
     "@geoql/maplibre-gl-starfield": "npm:@geoql/maplibre-gl-starfield@^0.1.0",
     "maplibre-gl-lidar": "npm:maplibre-gl-lidar@^0.21.0",
     "maplibre-gl-wind": "npm:maplibre-gl-wind@^0.2.0",
-    "three": "npm:three@>=0.176.0",
+    "three": "npm:three@>=0.186.0",
     "@sparkjsdev/spark": "npm:@sparkjsdev/spark@^2.3.0",
     "@dvt3d/maplibre-three-plugin": "npm:@dvt3d/maplibre-three-plugin@^1.7.0",
     "3d-tiles-renderer": "npm:3d-tiles-renderer@^0.5.0",
