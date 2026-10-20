@@ -89,7 +89,7 @@
     } catch (err) {
       console.error('Trip planner fetch error:', err);
       tripError.value =
-        'Could not build the itinerary — the planning service did not answer. Try again.';
+        'Could not build the itinerary: the planning service did not answer. Try again.';
       tripLoading.value = false;
       return;
     }

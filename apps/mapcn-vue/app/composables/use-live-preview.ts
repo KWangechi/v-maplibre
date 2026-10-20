@@ -10,11 +10,13 @@ import type { Ref } from 'vue';
 const MAX_LIVE_DESKTOP = 6;
 const MAX_LIVE_TOUCH = 2;
 
-let maxLive = MAX_LIVE_DESKTOP;
-if (import.meta.client && window.matchMedia('(pointer: coarse)').matches) {
-  maxLive = MAX_LIVE_TOUCH;
+function liveBudget(): number {
+  if (!import.meta.client) return MAX_LIVE_DESKTOP;
+  return window.matchMedia('(pointer: coarse)').matches
+    ? MAX_LIVE_TOUCH
+    : MAX_LIVE_DESKTOP;
 }
-const MAX_LIVE = maxLive;
+const MAX_LIVE = liveBudget();
 const live = ref<string[]>([]);
 const waiting = ref<string[]>([]);
 

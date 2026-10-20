@@ -6,6 +6,11 @@
 
   const query = defineModel<string>('query', { required: true });
   const active = defineModel<string>('active', { required: true });
+
+  // Stable strings, so each chip's class binding keeps the same reference
+  // across renders.
+  const CHIP_ACTIVE = 'border-foreground bg-foreground text-background';
+  const CHIP_IDLE = 'border-border text-muted-foreground hover:text-foreground';
 </script>
 
 <template>
@@ -44,12 +49,8 @@
         :key="chip.id"
         type="button"
         :aria-pressed="active === chip.id"
-        :class="[
-          'inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-ring',
-          active === chip.id
-            ? 'border-foreground bg-foreground text-background'
-            : 'border-border text-muted-foreground hover:text-foreground',
-        ]"
+        class="inline-flex shrink-0 items-center gap-2 rounded-md border px-3 py-1.5 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-ring"
+        :class="active === chip.id ? CHIP_ACTIVE : CHIP_IDLE"
         @click="active = chip.id"
       >
         {{ chip.title }}

@@ -19,7 +19,7 @@
       <details> keeps every section in the server-rendered HTML. -->
     <details open class="group border-t border-border">
       <summary
-        class="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-md px-2 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden"
+        class="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-md px-2 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <h2 class="text-sm font-bold tracking-tight text-foreground">Usage</h2>
         <Icon
@@ -65,7 +65,7 @@
 
     <details v-if="components.length" class="group border-t border-border">
       <summary
-        class="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-md px-2 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden"
+        class="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-md px-2 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <h2 class="text-sm font-bold tracking-tight text-foreground">
           Components
@@ -107,3 +107,11 @@
     </details>
   </div>
 </template>
+
+<style scoped>
+  /* `list-none` hides the disclosure triangle everywhere except Safari, which
+     draws it through this pseudo-element instead of `display: list-item`. */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>
