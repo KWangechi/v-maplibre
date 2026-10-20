@@ -107,7 +107,7 @@ catalogs:
     '@geoql/maplibre-gl-starfield': ^0.1.2
     '@geoql/maplibre-gl-snow': ^0.0.10
     '@geoql/maplibre-gl-compare': ^0.0.4
-    '@sparkjsdev/spark': ^2.3.1
+    '@sparkjsdev/spark': ^2.4.0
     '@dvt3d/maplibre-three-plugin': ^1.7.1
     '3d-tiles-renderer': ^0.5.3
     '3d-tiles-rendererjs-3dgs-plugin': ^0.3.0
@@ -175,6 +175,7 @@ minimumReleaseAgeExclude:
   - '@tanstack/*'
   - vue
   - '@vue/*'
+  - '@sparkjsdev/spark@2.4.0'
 
 patchedDependencies:
   # @sparkjsdev/spark no longer needs a patch: 2.2.0 dropped its use of the

@@ -313,8 +313,8 @@ catalogs:
       specifier: ^5.0.5
       version: 5.0.5
     '@sparkjsdev/spark':
-      specifier: ^2.3.1
-      version: 2.3.1
+      specifier: ^2.4.0
+      version: 2.4.0
     '@tanstack/vue-table':
       specifier: ^9.3.1
       version: 9.3.1
@@ -645,7 +645,7 @@ importers:
         version: 2.6.2
       '@sparkjsdev/spark':
         specifier: catalog:app:mapcn-vue
-        version: 2.3.1(three@0.186.1)
+        version: 2.4.0(three@0.186.1)
       '@tanstack/vue-table':
         specifier: catalog:app:mapcn-vue
         version: 9.3.1(vue@3.5.44(typescript@6.0.3))
@@ -890,8 +890,8 @@ importers:
         specifier: ^9.4.2
         version: 9.4.2(@luma.gl/core@9.4.2)
       '@sparkjsdev/spark':
-        specifier: ^2.3.1
-        version: 2.3.1(three@0.186.1)
+        specifier: ^2.4.0
+        version: 2.4.0(three@0.186.1)
       '@tsdown/css':
         specifier: ^0.23.1
         version: 0.23.1(jiti@2.7.0)(postcss@8.5.30)(tsdown@0.23.1)(yaml@2.9.1)
@@ -4719,8 +4719,8 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
-  '@sparkjsdev/spark@2.3.1':
-    resolution: {integrity: sha512-K+SyIbkO/dx1TLLudK8Jp3/noS13z/kdNPo6OK2waxQaGy81HBmKGnNBT/t/K9Ew3dsIXmWqsJXxGfmAu1T5Jg==}
+  '@sparkjsdev/spark@2.4.0':
+    resolution: {integrity: sha512-aUjgBfhwDRcF3nUwiAD6Nh7IwvxEmW9liz2qrAXIm2BlPYBmn81QbXIpGFLBSr/o0TKGvEXbNIsKujgPGV/7QQ==}
     peerDependencies:
       three: '>=0.180.0'
 
@@ -16470,9 +16470,8 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@sparkjsdev/spark@2.3.1(three@0.186.1)':
+  '@sparkjsdev/spark@2.4.0(three@0.186.1)':
     dependencies:
-      fflate: 0.8.3
       three: 0.186.1
 
   '@speed-highlight/core@1.2.24': {}

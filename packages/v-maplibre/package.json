@@ -120,7 +120,7 @@
     "@luma.gl/core": "^9.4.2",
     "@luma.gl/engine": "^9.4.2",
     "@luma.gl/shadertools": "^9.4.2",
-    "@sparkjsdev/spark": "^2.3.1",
+    "@sparkjsdev/spark": "^2.4.0",
     "@tsdown/css": "^0.23.1",
     "@types/node": "^26.6.5",
     "@types/three": "^0.186.0",
