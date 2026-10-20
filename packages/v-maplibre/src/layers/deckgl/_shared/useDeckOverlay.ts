@@ -16,6 +16,19 @@ import type { MapboxOverlay } from '@deck.gl/mapbox';
 import type { Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl';
 import { requirePeer, waitForStyleReady } from '../../../utils';
 
+/**
+ * Releases a canvas' WebGL context now instead of at garbage collection.
+ * iOS Safari kills the tab when too many contexts are alive, and Chrome
+ * evicts the oldest live map once 16 exist.
+ */
+function releaseWebGLContext(canvas: HTMLCanvasElement | null): void {
+  if (!canvas) return;
+  // getContext() returns the context the canvas already has; it does not
+  // create a new one when the type matches (deck.gl uses webgl2).
+  const gl = canvas.getContext('webgl2');
+  gl?.getExtension('WEBGL_lose_context')?.loseContext();
+}
+
 export const DeckOverlayKey: InjectionKey<ShallowRef<MapboxOverlay | null>> =
   Symbol('DeckOverlay');
 
@@ -424,12 +437,25 @@ export function useDeckOverlay(
       throttledRenderListener = null;
     }
     if (overlay.value && map.value) {
+      // A non-interleaved overlay draws on its own canvas. deck.gl creates
+      // that device with `_reuseDevices: true`, which makes luma.gl's
+      // destroy() a no-op, so finalize() only detaches the canvas and its
+      // WebGL context stays alive until GC (still true on deck.gl master).
+      // Read the canvas first (finalize() clears it) and release the context
+      // explicitly. An interleaved overlay returns the map's own canvas,
+      // which Map#remove() releases, so it is left alone here.
+      let ownCanvas: HTMLCanvasElement | null = null;
       try {
+        const deckCanvas = overlay.value.getCanvas();
+        if (deckCanvas && deckCanvas !== map.value.getCanvas()) {
+          ownCanvas = deckCanvas;
+        }
         map.value.removeControl(overlay.value);
         overlay.value.finalize();
       } catch (error) {
         console.error('[deck.gl] Error cleaning up overlay:', error);
       }
+      releaseWebGLContext(ownCanvas);
     }
     overlay.value = null;
     layers.value = [];

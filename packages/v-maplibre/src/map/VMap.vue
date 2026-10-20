@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { Map, addProtocol } from 'maplibre-gl';
   import { Protocol } from 'pmtiles';
-  import { onMounted, provide, ref, shallowRef, watch } from 'vue';
+  import { onMounted, onUnmounted, provide, ref, shallowRef, watch } from 'vue';
   import type {
     DragRotateOptions,
     MapOptions,
@@ -97,6 +97,21 @@
     map.value = instance;
     loaded.value = true;
     listenMapEvents();
+  });
+
+  // Map#remove() releases the WebGL context (WEBGL_lose_context), the tile
+  // cache and the worker pool. Without it every unmounted VMap (route change,
+  // v-if, a list of map cards) kept its GPU context alive: iOS Safari kills
+  // the tab after a few, and Chrome evicts the oldest live map once 16
+  // contexts exist. Registered after useDeckOverlay() above, so the deck.gl
+  // overlay is finalized first; children (layers, controls, markers) have
+  // already unmounted by the time this runs.
+  onUnmounted(() => {
+    const instance = map.value;
+    if (!instance) return;
+    map.value = null;
+    loaded.value = false;
+    instance.remove();
   });
 
   // Global-state values are style-spec JSON, so a JSON snapshot gives a

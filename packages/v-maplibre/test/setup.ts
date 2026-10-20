@@ -26,6 +26,7 @@ class MockMap {
   readonly options: MockMapOptions;
   readonly setGlobalStateProperty = vi.fn();
   readonly dragRotate = { enable: vi.fn(), disable: vi.fn() };
+  private readonly _canvas = document.createElement('canvas');
 
   private _container: HTMLElement | string;
   private _style: string | StyleSpecification | undefined;
@@ -172,6 +173,43 @@ class MockMap {
   }
 
   remove() {
+    return this;
+  }
+
+  getCanvas() {
+    return this._canvas;
+  }
+
+  private _projection: { type: string } = { type: 'mercator' };
+
+  setProjection(projection: { type: string }) {
+    this._projection = projection;
+    return this;
+  }
+
+  getProjection() {
+    return this._projection;
+  }
+
+  // Camera getters/setters the globe switch in useDeckOverlay reads back.
+  private _pitch = 0;
+  private _bearing = 0;
+
+  getPitch() {
+    return this._pitch;
+  }
+
+  setPitch(pitch: number) {
+    this._pitch = pitch;
+    return this;
+  }
+
+  getBearing() {
+    return this._bearing;
+  }
+
+  setBearing(bearing: number) {
+    this._bearing = bearing;
     return this;
   }
 }
@@ -416,10 +454,15 @@ class MockMapboxOverlay {
   static constructionCount = 0;
 
   private _layers: MockLayer[] = [];
-  private _map: unknown = null;
+  private _map: { getCanvas(): HTMLCanvasElement } | null = null;
+  // Like MapboxOverlay: a non-interleaved overlay owns a separate canvas,
+  // an interleaved one draws on the map's canvas.
+  private readonly _canvas = document.createElement('canvas');
+  private readonly _interleaved: boolean;
 
-  constructor(_props?: Record<string, unknown>) {
+  constructor(props?: Record<string, unknown>) {
     MockMapboxOverlay.constructionCount++;
+    this._interleaved = props?.interleaved === true;
   }
 
   finalize() {
@@ -436,7 +479,7 @@ class MockMapboxOverlay {
     }
   }
 
-  onAdd(map: unknown) {
+  onAdd(map: { getCanvas(): HTMLCanvasElement }) {
     this._map = map;
     return document.createElement('div');
   }
@@ -446,7 +489,7 @@ class MockMapboxOverlay {
   }
 
   getCanvas() {
-    return document.createElement('canvas');
+    return this._interleaved ? (this._map?.getCanvas() ?? null) : this._canvas;
   }
 }
 

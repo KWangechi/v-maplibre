@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vite-plus/test';
+import { describe, it, expect, beforeEach, vi } from 'vite-plus/test';
 import { mount } from '@vue/test-utils';
 import VMap from '../../src/map/VMap.vue';
 import { MockMap } from '../setup';
@@ -16,6 +16,22 @@ describe('VMap', () => {
     const container = document.createElement('div');
     container.id = 'map';
     document.body.appendChild(container);
+  });
+
+  // Map#remove() is what releases the WebGL context, tiles and workers.
+  // Without it every unmounted VMap kept its GPU context alive: iOS Safari
+  // killed the tab after a few, and desktop Chrome silently evicted the
+  // oldest live maps once 16 contexts existed.
+  it('removes the MapLibre map when it unmounts', async () => {
+    const remove = vi.spyOn(MockMap.prototype, 'remove');
+    const wrapper = mount(VMap, { props: { options: defaultOptions } });
+    await wrapper.vm.$nextTick();
+    expect(remove).not.toHaveBeenCalled();
+
+    wrapper.unmount();
+
+    expect(remove).toHaveBeenCalledTimes(1);
+    remove.mockRestore();
   });
 
   it('renders correctly', () => {
