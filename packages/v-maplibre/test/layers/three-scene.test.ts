@@ -22,8 +22,11 @@ import {
   releaseThreeScene,
   retainSparkRenderer,
   releaseSparkRenderer,
+  retainTileSplatRenderer,
+  releaseTileSplatRenderer,
   mercatorGroupMatrix,
 } from '../../src/layers/three/_shared/useThreeScene';
+import { Object3D } from 'three';
 
 const makeMap = (): Map => {
   const layers: { id: string }[] = [];
@@ -120,6 +123,32 @@ describe('useThreeScene registry (issue #140)', () => {
     expect(entry.sparkRenderer).toBeNull();
 
     releaseThreeScene(map);
+    releaseThreeScene(map);
+  });
+
+  it('keeps ONE tile splat renderer in the scene until the last 3D-tiles layer releases it', () => {
+    const map = makeMap();
+    const entry = acquireThreeScene(map);
+
+    // A real Object3D so scene.add/remove behave like the GSL renderer.
+    const gsl = Object.assign(new Object3D(), { dispose: vi.fn() });
+    const create = vi.fn(() => gsl as never);
+
+    retainTileSplatRenderer(entry, create);
+    retainTileSplatRenderer(entry, create);
+    expect(create).toHaveBeenCalledTimes(1);
+    // The plugin only draws tiles when the renderer sits in the same scene.
+    expect(gsl.parent).toBe(entry.scene);
+
+    releaseTileSplatRenderer(entry);
+    expect(gsl.parent).toBe(entry.scene);
+    expect(gsl.dispose).not.toHaveBeenCalled();
+
+    releaseTileSplatRenderer(entry);
+    expect(gsl.parent).toBeNull();
+    expect(gsl.dispose).toHaveBeenCalledTimes(1);
+    expect(entry.tileSplatRenderer).toBeNull();
+
     releaseThreeScene(map);
   });
 

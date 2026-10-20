@@ -420,6 +420,7 @@ export default defineNuxtConfig({
         '@sparkjsdev/spark',
         '3d-tiles-renderer',
         '3d-tiles-rendererjs-3dgs-plugin',
+        'gaussian-splat-lite',
         // three must be excluded alongside the tiles/splat stack so that
         // GLTFLoader/DRACOLoader resolve to the same module instance as
         // the B3DM parser's internal GLTFLoader — otherwise addHandler
@@ -443,6 +444,7 @@ export default defineNuxtConfig({
         '@sparkjsdev/spark',
         '3d-tiles-renderer',
         '3d-tiles-rendererjs-3dgs-plugin',
+        'gaussian-splat-lite',
       ],
       include: [
         '@deck.gl/mapbox',

@@ -12,15 +12,16 @@
    * map transform, so LOD refinement tracks pan/zoom correctly).
    *
    * @requires `three`, `3d-tiles-renderer`
-   * @requires `@sparkjsdev/spark` + `3d-tiles-rendererjs-3dgs-plugin` (splat tiles)
+   * @requires `gaussian-splat-lite` + `3d-tiles-rendererjs-3dgs-plugin` (splat tiles)
    *
    * Install with:
-   * `pnpm add three 3d-tiles-renderer @sparkjsdev/spark 3d-tiles-rendererjs-3dgs-plugin`
+   * `pnpm add three 3d-tiles-renderer gaussian-splat-lite 3d-tiles-rendererjs-3dgs-plugin`
    */
   import { ref, watch, onBeforeUnmount } from 'vue';
   import { TilesRenderer } from '3d-tiles-renderer';
   import { TilesFadePlugin } from '3d-tiles-renderer/plugins';
   import { GaussianSplatPlugin } from '3d-tiles-rendererjs-3dgs-plugin';
+  import { GaussianSplatRenderer } from 'gaussian-splat-lite';
   import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   import { MathUtils, Matrix4, Vector3, Group } from 'three';
@@ -29,12 +30,11 @@
   import {
     acquireThreeScene,
     releaseThreeScene,
-    retainSparkRenderer,
-    releaseSparkRenderer,
+    retainTileSplatRenderer,
+    releaseTileSplatRenderer,
     mercatorGroupMatrix,
     type ThreeSceneEntry,
   } from '../_shared/useThreeScene';
-  import { SparkRenderer } from '@sparkjsdev/spark';
 
   interface Props {
     /** Unique identifier (informational; tiles share one scene layer). */
@@ -47,14 +47,14 @@
      */
     errorTarget?: number;
     /**
-     * Cross-fade tiles on LOD switches via TilesFadePlugin. Only affects
-     * mesh tiles — splat tiles draw through the shared SparkRenderer, which
-     * ignores per-tile fade materials.
+     * Cross-fade tiles on LOD switches via TilesFadePlugin. Applies to mesh
+     * tiles and, through the plugin's fade bridge, to splat tiles.
      */
     fade?: boolean;
     /**
-     * Parse `KHR_gaussian_splatting` (SPZ) splat tiles via the Spark-backed
-     * GaussianSplatPlugin. Mesh-only tilesets can disable this.
+     * Parse `KHR_gaussian_splatting` (SPZ) splat tiles via the
+     * GaussianSplatPlugin and draw them with a shared Gaussian Splat Lite
+     * renderer. Mesh-only tilesets can disable this.
      */
     splats?: boolean;
     /**
@@ -104,6 +104,7 @@
   let tiles: TilesRenderer | null = null;
   let removeFrameHook: (() => void) | null = null;
   let anchorCoord: [number, number, number] | null = null;
+  let ownsTileSplatRenderer = false;
 
   const getMapInstance = (): Map | null => {
     return map.value || null;
@@ -186,19 +187,24 @@
     try {
       entry = acquireThreeScene(mapInstance);
 
-      // The plugin's SharedSparkRendererManager adds a
-      // CameraRelativeSparkRenderer to the scene when the splat plugin
-      // registers. It stays HIDDEN: the shared plain SparkRenderer below
-      // draws every SplatMesh (standalone and tile-borne alike) through one
-      // accumulation pass, driven by the context's view camera.
-      // focalAdjustment 2 matches the 3DGS tiles plugin's own default for
-      // its internal renderer — at the stock 1.0 splats render visibly soft.
-      const spark = retainSparkRenderer(
-        entry,
-        () =>
-          new SparkRenderer({ renderer: entry!.renderer, focalAdjustment: 2 }),
-      );
-      spark.onDirty = () => entry?.requestRender();
+      if (props.splats) {
+        // 3d-tiles-rendererjs-3dgs-plugin >= 0.2 builds tile meshes on
+        // gaussian-splat-lite and no longer creates a renderer itself: the
+        // application owns one GaussianSplatRenderer per scene. Without it
+        // every splat tile downloads and decodes but nothing is drawn.
+        // Spark's renderer (used by VLayerSplat) cannot draw these meshes.
+        // onDirty requests a frame when async sorts or loads finish, so an
+        // idle scene stays idle.
+        retainTileSplatRenderer(
+          entry,
+          () =>
+            new GaussianSplatRenderer({
+              renderer: entry!.renderer,
+              onDirty: () => entry?.requestRender(),
+            }),
+        );
+        ownsTileSplatRenderer = true;
+      }
 
       contentGroup = new Group();
       contentGroup.matrixAutoUpdate = false;
@@ -223,20 +229,7 @@
       tiles.manager.addHandler(/\.(gltf|glb)$/, gltfLoader);
 
       if (props.fade) tiles.registerPlugin(new TilesFadePlugin());
-      if (props.splats) {
-        tiles.registerPlugin(
-          new GaussianSplatPlugin({
-            renderer: entry.renderer,
-            scene: entry.scene,
-          }),
-        );
-        for (const child of entry.scene.children) {
-          const sparkish = child as Partial<SparkRenderer>;
-          if (child !== spark && sparkish.sortedCenter?.isVector3) {
-            child.visible = false;
-          }
-        }
-      }
+      if (props.splats) tiles.registerPlugin(new GaussianSplatPlugin());
       tiles.setCamera(entry.lodCamera);
       tiles.setResolutionFromRenderer(entry.lodCamera, entry.renderer);
 
@@ -362,8 +355,9 @@
       if (entry && contentGroup) {
         entry.scene.remove(contentGroup);
       }
-      if (entry) {
-        releaseSparkRenderer(entry);
+      if (entry && ownsTileSplatRenderer) {
+        releaseTileSplatRenderer(entry);
+        ownsTileSplatRenderer = false;
       }
       if (mapInstance && entry) {
         releaseThreeScene(mapInstance);

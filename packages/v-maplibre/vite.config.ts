@@ -25,6 +25,7 @@ const EXTERNAL_PREFIXES = [
   '@dvt3d/maplibre-three-plugin',
   '3d-tiles-renderer',
   '3d-tiles-rendererjs-3dgs-plugin',
+  'gaussian-splat-lite',
   'apache-arrow',
   'maplibre-gl-lidar',
   'maplibre-gl-wind',

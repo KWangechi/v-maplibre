@@ -35,10 +35,11 @@
     "@sparkjsdev/spark": "npm:@sparkjsdev/spark@^2.3.0",
     "@dvt3d/maplibre-three-plugin": "npm:@dvt3d/maplibre-three-plugin@^1.7.0",
     "3d-tiles-renderer": "npm:3d-tiles-renderer@^0.5.0",
-    "3d-tiles-rendererjs-3dgs-plugin": "npm:3d-tiles-rendererjs-3dgs-plugin@^0.1.15",
+    "3d-tiles-rendererjs-3dgs-plugin": "npm:3d-tiles-rendererjs-3dgs-plugin@^0.3.0",
     "@luma.gl/core": "npm:@luma.gl/core@^9.3.0",
     "@luma.gl/engine": "npm:@luma.gl/engine@^9.3.0",
-    "@luma.gl/shadertools": "npm:@luma.gl/shadertools@^9.3.0"
+    "@luma.gl/shadertools": "npm:@luma.gl/shadertools@^9.3.0",
+    "gaussian-splat-lite": "npm:gaussian-splat-lite@^1.0.0"
   },
   "publish": {
     "exclude": [

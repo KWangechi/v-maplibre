@@ -51,8 +51,8 @@
                 import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
                 import { VLayer3DTiles } from '@geoql/v-maplibre/3d-tiles';
 
-                // Peers: pnpm add three 3d-tiles-renderer @dvt3d/maplibre-three-plugin \\
-                //          @sparkjsdev/spark 3d-tiles-rendererjs-3dgs-plugin
+                // Peers: pnpm add three 3d-tiles-renderer \\
+                //          gaussian-splat-lite 3d-tiles-rendererjs-3dgs-plugin
 
                 const mapOptions = {
                   style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',

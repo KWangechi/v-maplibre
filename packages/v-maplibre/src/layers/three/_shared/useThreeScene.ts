@@ -2,6 +2,7 @@ import { Euler, Matrix4, PerspectiveCamera, Scene, WebGLRenderer } from 'three';
 import { MercatorCoordinate } from 'maplibre-gl';
 import type { Map, CustomLayerInterface } from 'maplibre-gl';
 import type { SparkRenderer } from '@sparkjsdev/spark';
+import type { GaussianSplatRenderer } from 'gaussian-splat-lite';
 
 /**
  * Shared three.js scene context for a MapLibre map.
@@ -45,6 +46,14 @@ export interface ThreeSceneEntry {
   sparkRenderer: SparkRenderer | null;
   /** Number of live splat layers using {@link sparkRenderer}. */
   splatRefCount: number;
+  /**
+   * Shared Gaussian Splat Lite renderer for 3D-tiles splat content (one per
+   * scene, created lazily). 3d-tiles-rendererjs-3dgs-plugin >= 0.2 builds
+   * its tile meshes on gaussian-splat-lite, which Spark cannot draw.
+   */
+  tileSplatRenderer: GaussianSplatRenderer | null;
+  /** Number of live 3D-tiles layers using {@link tileSplatRenderer}. */
+  tileSplatRefCount: number;
   /** Run `hook` every rendered frame (before the scene draws). */
   addFrameHook: (hook: () => void) => () => void;
   /** Request a new map frame (wraps map.triggerRepaint). */
@@ -166,6 +175,8 @@ export function acquireThreeScene(map: Map): ThreeSceneEntry {
     refCount: 0,
     sparkRenderer: null,
     splatRefCount: 0,
+    tileSplatRenderer: null,
+    tileSplatRefCount: 0,
     addFrameHook: (hook) => {
       frameHooks.add(hook);
       return () => frameHooks.delete(hook);
@@ -290,6 +301,7 @@ export function releaseThreeScene(map: Map): void {
     entry.scene.remove(child);
   }
   entry.sparkRenderer = null;
+  entry.tileSplatRenderer = null;
   for (const layer of map.getStyle()?.layers ?? []) {
     if (layer.id.startsWith('v-maplibre-three-') && map.getLayer(layer.id)) {
       map.removeLayer(layer.id);
@@ -326,5 +338,38 @@ export function releaseSparkRenderer(entry: ThreeSceneEntry): void {
     entry.scene.remove(entry.sparkRenderer);
     entry.sparkRenderer.dispose();
     entry.sparkRenderer = null;
+  }
+}
+
+/**
+ * Register a 3D-tiles layer against the entry's shared Gaussian Splat Lite
+ * renderer, creating it via `create()` on first use. The renderer must live
+ * in the same scene as the tiles: without it the tile splat meshes load but
+ * are never drawn.
+ */
+export function retainTileSplatRenderer(
+  entry: ThreeSceneEntry,
+  create: () => GaussianSplatRenderer,
+): GaussianSplatRenderer {
+  if (!entry.tileSplatRenderer) {
+    entry.tileSplatRenderer = create();
+    entry.scene.add(entry.tileSplatRenderer);
+  }
+  entry.tileSplatRefCount += 1;
+  return entry.tileSplatRenderer;
+}
+
+/**
+ * Release one 3D-tiles reference to the shared Gaussian Splat Lite renderer;
+ * the last release removes it from the scene and disposes it.
+ */
+export function releaseTileSplatRenderer(entry: ThreeSceneEntry): void {
+  entry.tileSplatRefCount -= 1;
+  if (entry.tileSplatRefCount > 0) return;
+  entry.tileSplatRefCount = 0;
+  if (entry.tileSplatRenderer) {
+    entry.scene.remove(entry.tileSplatRenderer);
+    entry.tileSplatRenderer.dispose();
+    entry.tileSplatRenderer = null;
   }
 }
