@@ -30,12 +30,22 @@ export function useGeofence() {
 
   let drawInstance: InstanceType<typeof import('terra-draw').TerraDraw> | null =
     null;
+  // The map the draw instance belongs to, set as soon as init starts.
+  let drawMap: MaplibreMap | null = null;
 
   async function initDraw(map: MaplibreMap): Promise<void> {
+    // One TerraDraw per map. Pages call this from both a `style.load`
+    // listener and an immediate `isStyleLoaded()` check, so it can run twice;
+    // a second instance on the same map fails with
+    // 'Source "td-polygon" already exists'.
+    if (drawMap === map) return;
+    drawMap = map;
     const { TerraDraw, TerraDrawPolygonMode, TerraDrawSelectMode } =
       await import('terra-draw');
     const { TerraDrawMapLibreGLAdapter } =
       await import('terra-draw-maplibre-gl-adapter');
+    // cleanup() ran while the modules were loading (the map unmounted).
+    if (drawMap !== map) return;
 
     const draw = new TerraDraw({
       adapter: new TerraDrawMapLibreGLAdapter({ map }),
@@ -137,6 +147,7 @@ export function useGeofence() {
       drawInstance.stop();
       drawInstance = null;
     }
+    drawMap = null;
   }
 
   return {
