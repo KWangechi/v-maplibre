@@ -92,6 +92,47 @@ export function useSunPosition(options?: {
   const localSunAltitude = ref(45);
   const skyMode = ref<SkyMode>('day');
 
+  /**
+   * The site ships `Permissions-Policy: geolocation=()` (nuxt.config.ts), so
+   * asking for the position is blocked by the browser and logs a policy
+   * violation. The Permissions API reports the effective state of the
+   * feature — 'denied' when the document's policy (or the user) forbids it —
+   * so the position is only requested when it is actually obtainable.
+   * `document.permissionsPolicy` is not available in every browser, the
+   * Permissions API is.
+   */
+  function requestLocalPosition(): void {
+    const geolocation = navigator.geolocation;
+    if (!geolocation) return;
+
+    const ask = (): void => {
+      geolocation.getCurrentPosition(
+        (position) => {
+          latitude.value = position.coords.latitude;
+          longitude.value = position.coords.longitude;
+          refresh();
+        },
+        () => refresh(),
+      );
+    };
+
+    const permissions = navigator.permissions;
+    if (!permissions) {
+      ask();
+      return;
+    }
+
+    permissions
+      .query({ name: 'geolocation' })
+      .then((status) => {
+        if (status.state !== 'denied') ask();
+      })
+      .catch(() => {
+        // Permissions API unavailable — keep the default location instead of
+        // tripping a policy violation.
+      });
+  }
+
   function refresh() {
     const now = new Date();
 
@@ -109,14 +150,7 @@ export function useSunPosition(options?: {
   }
 
   if (import.meta.client) {
-    navigator.geolocation?.getCurrentPosition(
-      (position) => {
-        latitude.value = position.coords.latitude;
-        longitude.value = position.coords.longitude;
-        refresh();
-      },
-      () => refresh(),
-    );
+    requestLocalPosition();
 
     const interval = options?.updateInterval ?? 60_000;
     const timer = setInterval(refresh, interval);

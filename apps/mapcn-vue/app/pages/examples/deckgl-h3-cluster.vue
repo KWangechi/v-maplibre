@@ -47,7 +47,7 @@
         '88283082d7fffff',
         '88283082d3fffff',
         '88283082dbfffff',
-        '882830829ffffff',
+        '8828308299fffff',
       ],
       value: 3000,
     },
@@ -138,10 +138,11 @@
                     {
                       name: 'Downtown Cluster',
                       hexagons: [
-                        '882830829bfffff',
-                        '88283082d7fffff',
-                        '88283082d3fffff',
-                      ],
+                    '882830829bfffff',
+                    '88283082d7fffff',
+                    '88283082d3fffff',
+                    '8828308299fffff',
+                    ],
                       value: 3000,
                     },
                     // ... more clusters

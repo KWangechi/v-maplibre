@@ -31,10 +31,16 @@
     mapInstance.value = map;
   };
 
+  // Sentinel-2 L2A true-colour (TCI) cloud-optimised GeoTIFFs for MGRS tile
+  // 18TXQ (northern Vermont). Scene ids come from the Element84 earth-search
+  // STAC API (https://earth-search.aws.element84.com/v1) — the previous
+  // S2A_18TXQ_20180915 / S2B_18TXQ_20240920 scenes no longer exist in the
+  // bucket and returned 404. Both scenes use granule sequence `_0` so the two
+  // layers cover exactly the same footprint.
   const BEFORE_COG =
-    'https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/T/XQ/2018/9/S2A_18TXQ_20180915_0_L2A/TCI.tif';
+    'https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/T/XQ/2018/9/S2B_18TXQ_20180930_0_L2A/TCI.tif';
   const AFTER_COG =
-    'https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/T/XQ/2024/9/S2B_18TXQ_20240920_0_L2A/TCI.tif';
+    'https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/T/XQ/2024/9/S2B_18TXQ_20240928_0_L2A/TCI.tif';
 
   const splitPosition = ref<[number]>([50]);
   const afterOpacity = computed(() => splitPosition.value[0]! / 100);
@@ -106,7 +112,7 @@ ${SCRIPT_END}
 <template>
   <ComponentDemo
     title="Before / After Comparison"
-    description="Compare two COG layers side-by-side with a draggable swipe slider. Useful for change detection, time-series and A/B raster comparison. Vermont, 2018 vs 2024 Sentinel-2 TCI."
+    description="Compare two COG layers side-by-side with a draggable swipe slider. Useful for change detection, time-series and A/B raster comparison. Northern Vermont (MGRS 18TXQ), 2018 vs 2024 Sentinel-2 true colour."
     :code="codeExample"
     registry="map-deckgl-raster"
     full-width

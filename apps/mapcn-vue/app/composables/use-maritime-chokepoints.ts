@@ -122,28 +122,63 @@ const VESSEL_NAMES = [
 
 const STS_VESSEL_POOL = VESSEL_NAMES.slice(0, 16);
 
-function generateVesselPositions(cp: Chokepoint): VesselPosition[] {
-  const count = Math.floor(Math.random() * 201) + 400; // 400-600
+/**
+ * Deterministic PRNG (mulberry32). The vessel field used to be generated with
+ * `Math.random()` during setup, so the server rendered one set of vessels and
+ * the client another one — the stats panel then showed different counts on
+ * both sides and hydration failed. A seeded stream keeps the demo
+ * reproducible AND identical across the SSR/client boundary.
+ */
+function createSeededRandom(seed: number): () => number {
+  let state = seed >>> 0;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** FNV-1a — turns a chokepoint id into a stable PRNG seed. */
+function hashString(value: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function generateVesselPositions(
+  cp: Chokepoint,
+  random: () => number,
+): VesselPosition[] {
+  const count = Math.floor(random() * 201) + 400; // 400-600
   const types: VesselType[] = ['tanker', 'cargo', 'container', 'patrol'];
   const typeWeights = [0.45, 0.3, 0.2, 0.05];
 
   return Array.from({ length: count }, (_, i) => {
-    const t = Math.random();
+    const t = random();
     const lanePt = interpolateLane(cp.lane, t);
     // Tight scatter (~3-9km) keeps vessels inside the navigable channel, not on land
-    const scatterStd = 0.03 + Math.random() * 0.05;
-    const angle = Math.random() * 2 * Math.PI;
+    const scatterStd = 0.03 + random() * 0.05;
+    const angle = random() * 2 * Math.PI;
     return {
       lng: lanePt[0] + scatterStd * Math.cos(angle),
       lat: lanePt[1] + scatterStd * Math.sin(angle),
       vesselId: `v-${cp.id}-${i}`,
-      type: weightedPick(types, typeWeights),
+      type: weightedPick(types, typeWeights, random),
     };
   });
 }
 
-function weightedPick<T>(items: T[], weights: number[]): T {
-  const r = Math.random();
+function weightedPick<T>(
+  items: T[],
+  weights: number[],
+  random: () => number,
+): T {
+  const r = random();
   let cumulative = 0;
   for (let i = 0; i < items.length; i++) {
     cumulative += weights[i]!;
@@ -152,8 +187,11 @@ function weightedPick<T>(items: T[], weights: number[]): T {
   return items[items.length - 1]!;
 }
 
-function generateStsEvents(positions: VesselPosition[]): StsEvent[] {
-  const count = Math.floor(Math.random() * 5) + 6; // 6-10
+function generateStsEvents(
+  positions: VesselPosition[],
+  random: () => number,
+): StsEvent[] {
+  const count = Math.floor(random() * 5) + 6; // 6-10
   const events: StsEvent[] = [];
   const usedIndices = new Set<number>();
 
@@ -161,7 +199,7 @@ function generateStsEvents(positions: VesselPosition[]): StsEvent[] {
     let idx1: number;
     let attempts = 0;
     do {
-      idx1 = Math.floor(Math.random() * positions.length);
+      idx1 = Math.floor(random() * positions.length);
       attempts++;
     } while (usedIndices.has(idx1) && attempts < 20);
     usedIndices.add(idx1);
@@ -169,21 +207,21 @@ function generateStsEvents(positions: VesselPosition[]): StsEvent[] {
     let idx2: number;
     attempts = 0;
     do {
-      idx2 = Math.floor(Math.random() * positions.length);
+      idx2 = Math.floor(random() * positions.length);
       attempts++;
     } while ((idx2 === idx1 || usedIndices.has(idx2)) && attempts < 20);
     usedIndices.add(idx2);
 
     const v1 = positions[idx1]!;
     const v2 = positions[idx2]!;
-    const risk = Math.round(30 + Math.random() * 70);
+    const risk = Math.round(30 + random() * 70);
 
     events.push({
       id: `sts-${i}`,
       midpointLng: (v1.lng + v2.lng) / 2,
       midpointLat: (v1.lat + v2.lat) / 2,
-      vessel1Name: STS_VESSEL_POOL[idx1 % STS_VESSEL_POOL.length],
-      vessel2Name: STS_VESSEL_POOL[idx2 % STS_VESSEL_POOL.length],
+      vessel1Name: STS_VESSEL_POOL[idx1 % STS_VESSEL_POOL.length]!,
+      vessel2Name: STS_VESSEL_POOL[idx2 % STS_VESSEL_POOL.length]!,
       risk,
     });
   }
@@ -217,8 +255,11 @@ export function useMaritimeChokepoints() {
 
   function generate(): void {
     const cp = selectedChokepoint.value;
-    vesselPositions.value = generateVesselPositions(cp);
-    stsEvents.value = generateStsEvents(vesselPositions.value);
+    // One seeded stream per chokepoint: server and client derive the exact
+    // same vessel field and STS events.
+    const random = createSeededRandom(hashString(cp.id));
+    vesselPositions.value = generateVesselPositions(cp, random);
+    stsEvents.value = generateStsEvents(vesselPositions.value, random);
   }
 
   function selectChokepoint(id: string): void {

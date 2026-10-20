@@ -37,6 +37,22 @@
   const mapId = useId();
   const { mapStyle } = useMapStyle();
 
+  // The maps.guru style only ships the Noto Sans family, and its glyph server
+  // (https://tiles.maps.guru/fonts/{fontstack}/{range}.pbf) only serves those
+  // stacks. The layer wrapper's Mapbox default ("DIN Offc Pro Medium",
+  // "Arial Unicode MS Bold") 404s against it, so the cluster count labels
+  // never render. Keep this in sync with the fonts the style's own symbol
+  // layers use.
+  //
+  // The whole text-paint object is passed: the wrapper's prop default is
+  // REPLACED (not merged) by a partial object, which would leave the text
+  // colour and size undefined.
+  const CLUSTER_TEXT_PAINT = {
+    color: '#ffffff',
+    font: ['Noto Sans Medium'],
+    size: 12,
+  };
+
   const mapOptions = computed(() => ({
     container: `cluster-example-${mapId}`,
     style: mapStyle.value,
@@ -84,6 +100,7 @@
             color: '#10b981',
             radius: 5,
           }"
+          :text-paint="CLUSTER_TEXT_PAINT"
           @cluster-click="emit('clusterClick', $event)"
           @point-click="emit('pointClick', $event)"
         />

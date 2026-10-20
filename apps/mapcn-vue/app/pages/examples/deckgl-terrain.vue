@@ -14,6 +14,8 @@
   });
 
   const { mapStyle } = useMapStyle();
+  const config = useRuntimeConfig();
+  const mapsguruApiKey = config.public.mapsguruApiKey;
   const mapId = useId();
 
   const mapOptions = computed(() => ({
@@ -28,7 +30,14 @@
   // Terrain tile URL (using Mapzen/AWS terrain tiles)
   const TERRAIN_IMAGE =
     'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
-  const SURFACE_IMAGE = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // Surface texture tiles — maps.guru satellite raster.
+  //
+  // NOT tile.openstreetmap.org: the OSM tile usage policy (§3.1) requires a
+  // valid HTTP Referer from web pages and forbids a Referrer-Policy that
+  // suppresses it, so OSM answers those requests with a 403 "Access blocked"
+  // page. maps.guru serves satellite imagery from its own tile service and is
+  // already the basemap provider for this site.
+  const SURFACE_IMAGE = `https://tiles.maps.guru/v1/planet-raster/{z}/{x}/{y}.jpg?key=${mapsguruApiKey}`;
 
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
@@ -47,8 +56,10 @@
 
                     // Terrain elevation tiles (Mapzen Terrarium format)
                     const TERRAIN_IMAGE = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
-                    // Surface texture tiles
-                    const SURFACE_IMAGE = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+                    // Surface texture tiles — maps.guru satellite raster.
+                    // tile.openstreetmap.org is not used: the OSM tile usage policy
+                    // requires a valid HTTP Referer and blocks requests without one.
+                    const SURFACE_IMAGE = 'https://tiles.maps.guru/v1/planet-raster/{z}/{x}/{y}.jpg?key=YOUR_MAPS_GURU_API_KEY';
                   ${SCRIPT_END}
 
                   <template>

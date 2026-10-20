@@ -10,8 +10,17 @@
   } from '~/types/defense-spectral';
   import type { Theme } from '~/types/compare';
 
+  // MapLibre fetches raster tiles with fetch(), so the tile host MUST send
+  // `Access-Control-Allow-Origin`. Esri's World_Imagery endpoints
+  // (server/services.arcgisonline.com) send no CORS headers and now answer
+  // 403 from the edge, which blanked the satellite layer. EOX Sentinel-2
+  // cloudless serves the same kind of imagery with CORS enabled and is
+  // already the satellite source used by the globe examples.
   const SATELLITE_SOURCE =
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    'https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2020_3857/default/g/{z}/{y}/{x}.jpg';
+
+  const SATELLITE_ATTRIBUTION =
+    'Imagery: <a href="https://s2maps.eu" target="_blank" rel="noreferrer">Sentinel-2 cloudless</a> by EOX, contains modified Copernicus Sentinel data';
 
   const BAND_PAINT: Record<SpectralBand, RasterPaintConfig> = {
     visual: { 'raster-opacity': 1 },
@@ -75,7 +84,7 @@
       type: 'raster',
       tiles: [SATELLITE_SOURCE],
       tileSize: 256,
-      attribution: '&copy; Esri',
+      attribution: SATELLITE_ATTRIBUTION,
       maxzoom: 18,
     });
 

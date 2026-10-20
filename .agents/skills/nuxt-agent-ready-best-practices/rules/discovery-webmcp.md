@@ -79,18 +79,25 @@ Fix: detect automation and skip the heavy widget. Bots get a lightweight static 
 <script setup lang="ts">
   // Headless checkers have no GPU; MapLibre tile streaming starves their
   // networkidle wait and the WebMCP check times out. Bots get the gradient only.
-  const isAutomated = navigator.webdriver === true;
+  //
+  // `navigator.webdriver` ALONE is too broad: it is also set by headed
+  // automation (Playwright headed, Selenium headed, QA harnesses), which has a
+  // real GPU and renders the map fine — gating on it alone replaces the map
+  // with the fallback for every automated browser. Gate on the headless
+  // signature as well.
+  const isHeadlessScanner =
+    navigator.webdriver === true && /HeadlessChrome/i.test(navigator.userAgent);
 </script>
 
 <template>
   <div class="hero">
     <!-- Live map only for real users; static fallback (CSS gradient) for bots -->
-    <VMap v-if="!isAutomated" :options="mapOptions" />
+    <VMap v-if="!isHeadlessScanner" :options="mapOptions" />
   </div>
 </template>
 ```
 
-Delaying the heavy work (e.g. starting a map animation 15s after idle) is NOT enough — the _initial_ tile load alone can exceed the 8s window. Gating on `navigator.webdriver` is the reliable fix. Verify both paths (see below): the bot path must reach `networkidle` in a few seconds AND still expose the tools.
+Delaying the heavy work (e.g. starting a map animation 15s after idle) is NOT enough — the _initial_ tile load alone can exceed the 8s window. Gating on headless automation is the reliable fix. Verify both paths (see below): the bot path must reach `networkidle` in a few seconds AND still expose the tools.
 
 ### Verify in a real browser (Playwright)
 

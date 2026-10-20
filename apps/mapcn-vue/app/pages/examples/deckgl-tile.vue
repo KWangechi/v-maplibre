@@ -24,7 +24,11 @@
     zoom: 2,
   }));
 
-  const TILE_URL = 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // OpenTopoMap raster tiles (256 px, CORS enabled, no API key).
+  // The previous OpenStreetMap tile endpoint rejects requests without a
+  // Referer (the app sends none) and answers with the "Access blocked"
+  // placeholder tile, so the layer had nothing to draw.
+  const TILE_URL = 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png';
 
   interface TileProps {
     tile: {
@@ -69,7 +73,7 @@
                     zoom: 2,
                     };
 
-                    const TILE_URL = 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png';
+                    const TILE_URL = 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png';
 
                     const renderSubLayers = (props) => {
                     const { tile: { boundingBox }, data } = props;

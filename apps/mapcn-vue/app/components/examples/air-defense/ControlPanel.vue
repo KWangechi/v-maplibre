@@ -116,7 +116,10 @@
         <div>
           <span class="text-muted-foreground">Coverage</span>
           <p class="font-mono font-bold">
-            {{ stats.coverageAreaKm2.toLocaleString() }} km²
+            <!-- Locale is pinned: the server renders with en-IN ("4,24,900")
+                 while the browser uses en-US ("424,900"), which breaks
+                 hydration for any value >= 100,000. -->
+            {{ stats.coverageAreaKm2.toLocaleString('en-US') }} km²
           </p>
         </div>
         <div>

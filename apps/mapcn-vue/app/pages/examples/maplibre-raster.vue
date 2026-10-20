@@ -18,6 +18,8 @@
   });
 
   const { mapStyle } = useMapStyle();
+  const config = useRuntimeConfig();
+  const mapsguruApiKey = config.public.mapsguruApiKey;
   const mapId = useId();
 
   const mapOptions = computed(() => ({
@@ -27,19 +29,29 @@
     zoom: 2,
   }));
 
-  // Raster source configuration (using OpenStreetMap tiles)
+  // Raster source configuration — maps.guru satellite raster tiles.
+  //
+  // NOT tile.openstreetmap.org: the OSM tile usage policy (§3.1) requires a
+  // valid HTTP Referer from web pages and forbids a Referrer-Policy that
+  // suppresses it, so OSM answers those requests with a 403 "Access blocked"
+  // page. maps.guru serves the same imagery class from its own tile service
+  // and is already the basemap provider for this site.
   const rasterSource = {
     type: 'raster' as const,
-    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    tiles: [
+      `https://tiles.maps.guru/v1/planet-raster/{z}/{x}/{y}.jpg?key=${mapsguruApiKey}`,
+    ],
     tileSize: 256,
-    attribution: '© OpenStreetMap contributors',
+    maxzoom: 13,
+    attribution:
+      '© <a href="https://maps.guru">maps.guru</a> © <a href="https://www.maptiler.com/copyright/">MapTiler</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
   };
 
   // Raster layer configuration
   const rasterLayer = {
-    id: 'osm-raster',
+    id: 'satellite-raster',
     type: 'raster' as const,
-    source: 'osm-source',
+    source: 'satellite-source',
     paint: {
       'raster-opacity': 0.7,
     },
@@ -57,17 +69,21 @@
                     zoom: 2,
                     };
 
+                    // maps.guru satellite raster tiles (get a key at maps.guru/signup).
+                    // tile.openstreetmap.org is not used: the OSM tile usage policy
+                    // requires a valid HTTP Referer and blocks requests without one.
                     const rasterSource = {
                     type: 'raster',
-                    tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                    tiles: ['https://tiles.maps.guru/v1/planet-raster/{z}/{x}/{y}.jpg?key=YOUR_MAPS_GURU_API_KEY'],
                     tileSize: 256,
-                    attribution: '© OpenStreetMap contributors',
+                    maxzoom: 13,
+                    attribution: '© maps.guru © MapTiler © OpenStreetMap contributors',
                     };
 
                     const rasterLayer = {
-                    id: 'osm-raster',
+                    id: 'satellite-raster',
                     type: 'raster',
-                    source: 'osm-source',
+                    source: 'satellite-source',
                     paint: {
                       'raster-opacity': 0.7,
                     },
@@ -78,8 +94,8 @@
                     <VMap :options="mapOptions" class="h-125 w-full">
                       <VControlNavigation position="top-right" />
                       <VLayerMaplibreRaster
-                        source-id="osm-source"
-                        layer-id="osm-raster"
+                        source-id="satellite-source"
+                        layer-id="satellite-raster"
                         :source="rasterSource"
                         :layer="rasterLayer"
                       />
@@ -90,7 +106,7 @@
 <template>
   <ComponentDemo
     title="Raster Layer"
-    description="Display raster tile layers from tile servers like OpenStreetMap."
+    description="Display raster tile layers from a permitted raster tile server — maps.guru satellite imagery."
     :code="codeExample"
     registry="map-layers"
     full-width
@@ -102,8 +118,8 @@
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
           <VLayerMaplibreRaster
-            source-id="osm-source"
-            layer-id="osm-raster"
+            source-id="satellite-source"
+            layer-id="satellite-raster"
             :source="rasterSource"
             :layer="rasterLayer"
           />

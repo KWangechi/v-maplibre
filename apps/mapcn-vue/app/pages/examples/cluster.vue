@@ -78,6 +78,7 @@
                       :source="{ type: 'geojson', data: pointsData }"
                       :cluster-paint="{ colors: ['#10b981', '#059669', '#047857'], radii: [15, 22, 30] }"
                       :unclustered-paint="{ color: '#10b981', radius: 5 }"
+                      :text-paint="{ color: '#ffffff', font: ['Noto Sans Medium'], size: 12 }"
                       @cluster-click="handleClusterClick"
                       @point-click="handlePointClick"
                     />

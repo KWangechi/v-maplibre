@@ -27,10 +27,19 @@
     handleWindError,
   } = useWindData();
 
-  const numParticles = ref([8192]);
-  const maxAge = ref([30]);
-  const speedFactor = ref([50]);
-  const lineWidth = ref([1.5]);
+  // Defaults for the wind particle controls. The control panel exposes them as
+  // `number[]` models (shadcn-vue Slider emits an array), so the page reads
+  // index 0 — with an explicit fallback so the map layer always receives a
+  // number even if the model is momentarily empty.
+  const DEFAULT_NUM_PARTICLES = 8192;
+  const DEFAULT_MAX_AGE = 30;
+  const DEFAULT_SPEED_FACTOR = 50;
+  const DEFAULT_LINE_WIDTH = 1.5;
+
+  const numParticles = ref([DEFAULT_NUM_PARTICLES]);
+  const maxAge = ref([DEFAULT_MAX_AGE]);
+  const speedFactor = ref([DEFAULT_SPEED_FACTOR]);
+  const lineWidth = ref([DEFAULT_LINE_WIDTH]);
   const speedRange = ref<[number, number]>([0, 30]);
   async function handleMapLoad(_map: Map): Promise<void> {
     await fetchWindData();
@@ -127,10 +136,10 @@
         :error="error"
         :last-updated="lastUpdated"
         :color-ramp="colorRamp"
-        :num-particles="numParticles[0]"
-        :max-age="maxAge[0]"
-        :speed-factor="speedFactor[0]"
-        :line-width="lineWidth[0]"
+        :num-particles="numParticles[0] ?? DEFAULT_NUM_PARTICLES"
+        :max-age="maxAge[0] ?? DEFAULT_MAX_AGE"
+        :speed-factor="speedFactor[0] ?? DEFAULT_SPEED_FACTOR"
+        :line-width="lineWidth[0] ?? DEFAULT_LINE_WIDTH"
         :speed-range="speedRange"
         class="size-full"
         @load="handleMapLoad"

@@ -48,8 +48,11 @@
     bearing: -17,
   }));
 
-  const mapRef = ref<MaplibreMap | null>(null);
-  const snowLayer = ref<MaplibreSnowLayer | null>(null);
+  // shallowRef: both are class instances — `ref()` would unwrap their types
+  // into plain object shapes and break the MapLibreMap/MaplibreSnowLayer
+  // types expected by useSnowLayerSync.
+  const mapRef = shallowRef<MaplibreMap | null>(null);
+  const snowLayer = shallowRef<MaplibreSnowLayer | null>(null);
   const { start: startSnowSync, stop: stopSnowSync } = useSnowLayerSync(
     mapRef,
     snowLayer,
@@ -177,7 +180,6 @@
           <VControlNavigation position="top-right" />
           <VControlScale position="bottom-left" />
           <VLayerMaplibreGeojson
-            v-if="!loading && snowGeoJson.features.length > 0"
             source-id="snow-streets"
             layer-id="snow-extrusion"
             :source="snowSource"

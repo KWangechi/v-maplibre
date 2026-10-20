@@ -81,7 +81,11 @@
         <span class="text-muted-foreground">({{ positions.length }}/6)</span>
       </h3>
       <div class="space-y-1">
-        <button
+        <!-- The remove control is a SIBLING of the select button, never a
+             child: a <button> nested in a <button> is invalid HTML, so the
+             browser parser closes the outer button early and the SSR markup
+             no longer matches the client vdom (hydration mismatch). -->
+        <div
           v-for="pos in positions"
           :key="pos.id"
           class="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-xs transition-colors"
@@ -90,25 +94,30 @@
               ? 'bg-primary/15 text-foreground'
               : 'text-muted-foreground hover:bg-accent hover:text-foreground'
           "
-          @click="emit('selectPosition', pos.id)"
         >
-          <span
-            class="size-2.5 shrink-0 rounded-full"
-            :class="getWeaponColor(pos.weaponType)"
-          ></span>
-          <span class="font-mono font-bold">{{ pos.label }}</span>
-          <span
-            class="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-2xs uppercase"
-          >
-            {{ pos.weaponType }}
-          </span>
           <button
-            class="ml-1 rounded p-0.5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
-            @click.stop="emit('removePosition', pos.id)"
+            class="flex flex-1 items-center gap-2 text-left"
+            @click="emit('selectPosition', pos.id)"
+          >
+            <span
+              class="size-2.5 shrink-0 rounded-full"
+              :class="getWeaponColor(pos.weaponType)"
+            ></span>
+            <span class="font-mono font-bold">{{ pos.label }}</span>
+            <span
+              class="ml-auto rounded-full bg-muted px-1.5 py-0.5 text-2xs uppercase"
+            >
+              {{ pos.weaponType }}
+            </span>
+          </button>
+          <button
+            class="rounded p-0.5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
+            :aria-label="`Remove ${pos.label}`"
+            @click="emit('removePosition', pos.id)"
           >
             <Icon name="lucide:x" class="size-3" />
           </button>
-        </button>
+        </div>
       </div>
     </div>
 

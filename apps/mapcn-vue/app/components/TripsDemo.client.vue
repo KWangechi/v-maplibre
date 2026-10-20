@@ -3,7 +3,7 @@
   import { VLayerDeckglTrips } from '@geoql/v-maplibre/deck.gl';
 
   const { mapStyle } = useMapStyle();
-  const { isAutomated } = useIsAutomated();
+  const { isHeadlessScanner } = useIsHeadlessScanner();
 
   const mapOptions = computed(() => ({
     container: 'trips-map',
@@ -75,7 +75,7 @@
 
 <template>
   <div
-    v-if="isAutomated"
+    v-if="isHeadlessScanner"
     class="flex size-full items-center justify-center bg-muted font-mono text-xs text-muted-foreground"
   >
     Animated trips demo

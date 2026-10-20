@@ -6,7 +6,7 @@
   import AnimatedArcLayer from '~/utils/animated-arc-layer';
 
   const colorMode = useColorMode();
-  const { isAutomated } = useIsAutomated();
+  const { isHeadlessScanner } = useIsHeadlessScanner();
   const mapRef = shallowRef<Map | null>(null);
   const overlayRef = shallowRef<MapboxOverlay | null>(null);
   const currentTime = ref(0);
@@ -309,7 +309,7 @@
 
 <template>
   <div
-    v-if="isAutomated"
+    v-if="isHeadlessScanner"
     class="flex size-full items-center justify-center bg-muted font-mono text-xs text-muted-foreground"
   >
     Global delivery arcs demo

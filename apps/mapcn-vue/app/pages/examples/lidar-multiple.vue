@@ -23,6 +23,21 @@
 
   const { mapStyle } = useMapStyle();
   const mapId = useId();
+  const lidarRef = ref<InstanceType<typeof VControlLidar> | null>(null);
+
+  // Two datasets from different providers and formats, both loaded into the
+  // same viewer: an Entwine Point Tile index (Red Rocks, Colorado) and a
+  // Cloud-Optimized Point Cloud file (Autzen, Oregon).
+  const DATASETS = [
+    {
+      name: 'Red Rocks',
+      url: 'https://na-c.entwine.io/red-rocks/ept.json',
+    },
+    {
+      name: 'Autzen',
+      url: 'https://s3.amazonaws.com/hobu-lidar/autzen-classified.copc.laz',
+    },
+  ];
 
   const legendItems: GradientLegendItem[] = [
     {
@@ -37,8 +52,9 @@
   const mapOptions = computed(() => ({
     container: `lidar-multiple-example-${mapId}`,
     style: mapStyle.value,
-    center: [-105.5, 39.75] as [number, number],
-    zoom: 10,
+    // Red Rocks EPT bounds (EPSG:26913) span ~880 m centred here.
+    center: [-105.205048, 39.6653] as [number, number],
+    zoom: 15.5,
     pitch: 45,
     maxPitch: 85,
   }));
@@ -50,6 +66,35 @@
   const handleError = (error: unknown) => {
     console.error('Failed to load point cloud:', error);
   };
+
+  // The control is created asynchronously (the maplibre-gl-lidar peer is
+  // dynamically imported) and it only accepts loads once its internal
+  // instance exists, so wait for it before handing over the dataset URLs.
+  async function waitForControl(): Promise<boolean> {
+    for (let attempt = 0; attempt < 100; attempt++) {
+      if (lidarRef.value?.getControl()) return true;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    return false;
+  }
+
+  async function loadDatasets(): Promise<void> {
+    if (!(await waitForControl())) {
+      console.error('LiDAR control did not initialise in time');
+      return;
+    }
+    for (const dataset of DATASETS) {
+      try {
+        await lidarRef.value?.loadPointCloud(dataset.url);
+      } catch (error) {
+        console.error(`Failed to load ${dataset.name}:`, error);
+      }
+    }
+  }
+
+  onMounted(() => {
+    void loadDatasets();
+  });
 
   const SCRIPT_END = '</' + 'script>';
   const SCRIPT_START = '<' + 'script setup lang="ts">';
@@ -64,8 +109,8 @@
 
                   const mapOptions = {
                   style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-                  center: [-105.5, 39.75],
-                  zoom: 10,
+                  center: [-105.205048, 39.6653],
+                  zoom: 15.5,
                   pitch: 45,
                   maxPitch: 85,
                   };
@@ -95,6 +140,24 @@
                   const loadDataset = async (url: string) => {
                   await lidarRef.value?.loadPointCloud(url);
                   };
+
+                  // The control is created asynchronously, so wait for it before
+                  // handing over the dataset URLs.
+                  const waitForControl = async () => {
+                  for (let attempt = 0; attempt < 100; attempt++) {
+                  if (lidarRef.value?.getControl()) return true;
+                  await new Promise((resolve) => setTimeout(resolve, 100));
+                  }
+                  return false;
+                  };
+
+                  // Load them all once the control is ready
+                  onMounted(async () => {
+                  await waitForControl();
+                  for (const dataset of datasets) {
+                  await loadDataset(dataset.url);
+                  }
+                  });
 
                   // Get list of loaded point clouds
                   const getPointClouds = () => {
@@ -148,6 +211,7 @@
             :interactive="false"
           />
           <VControlLidar
+            ref="lidarRef"
             position="top-right"
             :options="{
               collapsed: false,

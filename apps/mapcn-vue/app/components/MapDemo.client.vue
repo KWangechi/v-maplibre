@@ -15,7 +15,7 @@
 
   const mapId = useId();
   const { mapStyle } = useMapStyle();
-  const { isAutomated } = useIsAutomated();
+  const { isHeadlessScanner } = useIsHeadlessScanner();
 
   const mapOptions = computed(() => ({
     container: `map-demo-${mapId}`,
@@ -27,7 +27,7 @@
 
 <template>
   <div
-    v-if="isAutomated"
+    v-if="isHeadlessScanner"
     class="flex size-full items-center justify-center bg-muted font-mono text-xs text-muted-foreground"
   >
     Interactive map demo

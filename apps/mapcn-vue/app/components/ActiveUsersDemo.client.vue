@@ -4,7 +4,7 @@
   import type { PickingInfo } from '@deck.gl/core';
 
   const { mapStyle } = useMapStyle();
-  const { isAutomated } = useIsAutomated();
+  const { isHeadlessScanner } = useIsHeadlessScanner();
 
   const mapOptions = computed(() => ({
     container: 'active-users-map',
@@ -99,7 +99,7 @@
 
 <template>
   <div
-    v-if="isAutomated"
+    v-if="isHeadlessScanner"
     class="flex size-full items-center justify-center bg-muted font-mono text-xs text-muted-foreground"
   >
     Active users demo

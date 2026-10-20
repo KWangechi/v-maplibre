@@ -4,7 +4,7 @@
     ChokepointStats,
   } from '~/types/maritime-chokepoints';
 
-  defineProps<{
+  const props = defineProps<{
     chokepoints: Chokepoint[];
     selectedId: string;
     showSts: boolean;
@@ -23,6 +23,14 @@
     pause: [];
     reset: [];
   }>();
+
+  function handleHexagonRadius(value: number[] | undefined): void {
+    emit('setHexagonRadius', value?.[0] ?? props.hexagonRadius);
+  }
+
+  function handleElevationScale(value: number[] | undefined): void {
+    emit('setElevationScale', value?.[0] ?? props.elevationScale);
+  }
 </script>
 
 <template>
@@ -61,7 +69,7 @@
         :max="6000"
         :step="250"
         class="w-full"
-        @update:model-value="emit('setHexagonRadius', $event[0]!)"
+        @update:model-value="handleHexagonRadius"
       />
     </div>
 
@@ -79,7 +87,7 @@
         :max="300"
         :step="10"
         class="w-full"
-        @update:model-value="emit('setElevationScale', $event[0]!)"
+        @update:model-value="handleElevationScale"
       />
     </div>
 

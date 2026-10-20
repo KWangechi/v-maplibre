@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { VMap, VControlNavigation, VControlScale } from '@geoql/v-maplibre';
   import { VLayerMultiCog } from '@geoql/v-maplibre/geotiff';
+  import { LinearRescale } from '@developmentseed/deck.gl-raster/gpu-modules';
   import type { Map } from 'maplibre-gl';
+  import type { SentinelPreset, SentinelScene } from '~/types/sentinel2';
   import {
     Select,
     SelectContent,
@@ -23,21 +25,7 @@
     category: 'deck.gl',
   });
 
-  interface Scene {
-    title: string;
-    baseUrl: string;
-    center: [number, number];
-    zoom: number;
-  }
-
-  interface Preset {
-    id: string;
-    title: string;
-    sources: Record<string, string>;
-    composite: { r: string; g?: string; b?: string };
-  }
-
-  const SCENES: Scene[] = [
+  const SCENES: SentinelScene[] = [
     {
       title: 'Torres del Paine, Chile',
       baseUrl:
@@ -68,7 +56,7 @@
     },
   ];
 
-  const PRESETS: Preset[] = [
+  const PRESETS: SentinelPreset[] = [
     {
       id: 'true-color',
       title: 'True Color (R · G · B)',
@@ -93,7 +81,7 @@
   const mapId = useId();
   const mapInstance = shallowRef<Map | null>(null);
   const sceneId = ref(0);
-  const presetId = ref<Preset['id']>('true-color');
+  const presetId = ref<SentinelPreset['id']>('true-color');
 
   const currentScene = computed(() => SCENES[sceneId.value]!);
   const currentPreset = computed(
@@ -125,6 +113,17 @@
 
   const composite = computed(() => currentPreset.value.composite);
 
+  // Sentinel-2 L2A COGs store reflectance as uint16 (DN = reflectance * 10000).
+  // The r16unorm texture normalization folds that range into 0.0 – 0.15, so a
+  // raw composite renders almost black. Rescale that window back to 0 – 1 so
+  // the imagery is visible.
+  const renderPipeline = [
+    {
+      module: LinearRescale,
+      props: { rescaleMin: 0, rescaleMax: 0.15 },
+    },
+  ];
+
   function getPresetLabel(id: string) {
     return PRESETS.find((p) => p.id === id)?.title ?? id;
   }
@@ -148,6 +147,7 @@
   const codeExample = `${SCRIPT_START}
 import { VMap } from '@geoql/v-maplibre';
 import { VLayerMultiCog } from '@geoql/v-maplibre/geotiff';
+import { LinearRescale } from '@developmentseed/deck.gl-raster/gpu-modules';
 
 const base =
   'https://sentinel-cogs.s3.us-west-2.amazonaws.com/' +
@@ -160,6 +160,12 @@ const sources = {
 };
 
 const composite = { r: 'red', g: 'green', b: 'blue' };
+
+// Sentinel-2 reflectance is uint16 (DN = reflectance * 10000); the r16unorm
+// texture normalization folds it into 0.0 - 0.15, so rescale back to 0 - 1.
+const renderPipeline = [
+  { module: LinearRescale, props: { rescaleMin: 0, rescaleMax: 0.15 } },
+];
 ${SCRIPT_END}
 
 <template>
@@ -168,6 +174,7 @@ ${SCRIPT_END}
       id="sentinel2"
       :sources="sources"
       :composite="composite"
+      :render-pipeline="renderPipeline"
     />
   </VMap>
 </template>`;
@@ -196,6 +203,7 @@ ${SCRIPT_END}
             id="sentinel2"
             :sources="sources"
             :composite="composite"
+            :render-pipeline="renderPipeline"
           />
         </VMap>
       </ClientOnly>
