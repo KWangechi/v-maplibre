@@ -69,7 +69,7 @@ catalogs:
     better-sqlite3: ^13.0.3
     docus: ^5.15.0
     nuxt: ^4.6.2
-    wrangler: ^4.151.1
+    wrangler: ^4.151.3
     # Required by docus → @nuxt/content collection schema generation.
     # CI fails on `nuxt prepare` without these because @nuxt/content 3.13.x
     # peer-requires zod (not bundled). Local installs sometimes resolve to
@@ -143,7 +143,7 @@ catalogs:
     clsx: ^2.1.1
     flatbush: ^4.6.2
     jszip: ^3.10.2
-    maplibre-gl-interpolate-heatmap: 0.1.3
+    maplibre-gl-interpolate-heatmap: 0.1.4
     maplibre-gl-lidar: ^0.21.0
     motion-v: ^2.8.0
     nuxt: ^4.6.2
@@ -162,7 +162,7 @@ catalogs:
     tw-animate-css: ^1.4.0
     vue-sonner: ^2.0.9
     vue-tsc: ^3.3.13
-    wrangler: ^4.151.1
+    wrangler: ^4.151.3
     terra-draw: ^1.38.0
     terra-draw-maplibre-gl-adapter: ^1.5.0
     yoga-wasm-web: ^0.3.3
@@ -180,7 +180,8 @@ minimumReleaseAgeExclude:
 patchedDependencies:
   # @sparkjsdev/spark no longer needs a patch: 2.2.0 dropped its use of the
   # deprecated THREE.Clock (the 2.1.0 patch only silenced the three r183+ warn).
-  maplibre-gl-interpolate-heatmap@0.1.3: patches/maplibre-gl-interpolate-heatmap@0.1.3.patch
+  # Temporary until upstream ships the fixes. Remove when released:
+  # opengeos/maplibre-gl-lidar#111 (CSP-safe LAZ), #112 (WebGL context leak), #113 (teardown race)
   maplibre-gl-lidar@0.21.0: patches/maplibre-gl-lidar@0.21.0.patch
 peerDependencyRules:
   allowAny:
